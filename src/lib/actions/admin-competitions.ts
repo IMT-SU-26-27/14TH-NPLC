@@ -6,10 +6,10 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { COMPETITIONS_TAG } from "@/lib/data/competitions";
 import { assetExists, deleteAsset, QRIS_FOLDER, signUpload } from "@/lib/cloudinary/server";
-import { databaseErrorMessage, errorState, fieldErrorState } from "@/lib/form";
+import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
 import { localePath } from "@/lib/i18n/config";
 import { getRequestLocale } from "@/lib/i18n/server";
-import { competitionSchema, qrisSchema, uuidSchema } from "@/lib/validations/admin";
+import { competitionSchema, paymentSettingsSchema, qrisSchema, uuidSchema } from "@/lib/validations/admin";
 import type { ActionResult, FormState } from "@/types";
 import type { CloudinaryUploadSignature } from "@/types/cloudinary";
 import type { QrisInput } from "@/types/admin";
@@ -81,6 +81,35 @@ export async function deleteCompetition(competitionId: string): Promise<ActionRe
 
   updateTag(COMPETITIONS_TAG);
   redirect(localePath(await getRequestLocale(), "/admin/competitions"));
+}
+
+// How participants pay for a competition: its QRIS image, or a transfer to a BCA account.
+export async function savePaymentSettings(_prev: FormState, formData: FormData): Promise<FormState> {
+  if (!(await isAdmin())) return errorState(NOT_ADMIN);
+  const parsed = paymentSettingsSchema.safeParse({
+    competitionId: formData.get("competitionId"),
+    paymentMethod: formData.get("paymentMethod"),
+    bankAccountNumber: formData.get("bankAccountNumber") ?? "",
+    bankAccountHolder: formData.get("bankAccountHolder") ?? "",
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const p = parsed.data;
+  const isBank = p.paymentMethod === "bank_transfer";
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("competitions")
+    .update({
+      payment_method: p.paymentMethod,
+      // Keep the saved account when switching to QRIS, so switching back doesn't lose it.
+      ...(isBank ? { bank_account_number: p.bankAccountNumber, bank_account_holder: p.bankAccountHolder } : {}),
+    })
+    .eq("id", p.competitionId);
+  if (error) return errorState(databaseErrorMessage(error));
+
+  updateTag(COMPETITIONS_TAG);
+  refresh();
+  return successState("admin.payment.saved");
 }
 
 export async function getQrisUploadSignature(): Promise<ActionResult<CloudinaryUploadSignature>> {

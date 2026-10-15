@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Image from "next/image";
 import { InfoIcon, OctagonXIcon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 import { getPaymentUploadSignature, submitPayment } from "@/lib/actions/registration";
-import { formatRupiah } from "@/lib/format";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -14,6 +12,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/c
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
 import type { PaymentPanelProps, PaymentProofFormat } from "@/types/registration";
 
 const ACCEPT = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -22,14 +21,14 @@ const MAX_BYTES = 5 * 1024 * 1024;
 export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
   const [file, setFile] = useState<File | null>(null);
   const [submitting, startSubmit] = useTransition();
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const { upload, uploading, progress, error, errorParams } = useCloudinaryUpload({
     getSignature: () => getPaymentUploadSignature(team.id),
     maxBytes: MAX_BYTES,
     accept: ACCEPT,
   });
 
-  const { min_members, max_members, fee } = team.competition;
+  const { min_members, max_members } = team.competition;
   const memberCount = team.members.length;
   const teamReady = memberCount >= min_members && memberCount <= max_members;
   const busy = uploading || submitting;
@@ -51,26 +50,8 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-[minmax(0,14rem)_1fr]">
-      <div className="space-y-2">
-        {qrisUrl ? (
-          <Image
-            src={qrisUrl}
-            alt={t("payment.qrisAlt", { competition: team.competition.name })}
-            width={448}
-            height={448}
-            className="bg-card w-full rounded-lg border"
-          />
-        ) : (
-          <Alert>
-            <InfoIcon />
-            <AlertDescription>{t("payment.qrisMissing")}</AlertDescription>
-          </Alert>
-        )}
-        <p className="text-sm">
-          {t("payment.amount")}: <span className="font-semibold">{formatRupiah(fee, lang)}</span>
-        </p>
-      </div>
+    <div className="grid gap-6 md:grid-cols-[minmax(0,16rem)_1fr]">
+      <PaymentInstructions details={team.competition} qrisUrl={qrisUrl} />
 
       <form onSubmit={handleSubmit}>
         <FieldGroup>

@@ -75,6 +75,26 @@ export const competitionSchema = z
     { message: "validation.closesAfterOpens", path: ["registrationClosesAt"] },
   );
 
+export const paymentSettingsSchema = z
+  .object({
+    competitionId: z.uuid(),
+    paymentMethod: z.enum(["qris", "bank_transfer"]),
+    bankAccountNumber: z
+      .string()
+      .trim()
+      .transform((v) => v.replace(/[\s-]/g, "")),
+    bankAccountHolder: z.string().trim().max(100),
+  })
+  .superRefine((v, ctx) => {
+    if (v.paymentMethod !== "bank_transfer") return;
+    if (!/^[0-9]{6,20}$/.test(v.bankAccountNumber)) {
+      ctx.addIssue({ code: "custom", message: "validation.bankAccountNumber", path: ["bankAccountNumber"] });
+    }
+    if (v.bankAccountHolder.length < 2) {
+      ctx.addIssue({ code: "custom", message: "validation.bankAccountHolder", path: ["bankAccountHolder"] });
+    }
+  });
+
 export const qrisSchema = z.object({
   competitionId: z.uuid(),
   publicId: z.string().min(1),

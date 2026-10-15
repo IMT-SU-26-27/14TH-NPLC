@@ -22,7 +22,7 @@ export type PaymentProofFormat = (typeof PAYMENT_PROOF_FORMATS)[number];
 
 export type TeamCompetition = Pick<
   PublicCompetition,
-  "id" | "slug" | "name" | "type" | "min_members" | "max_members" | "fee" | "qris_public_id" | "registration_opens_at" | "registration_closes_at"
+  "id" | "slug" | "name" | "type" | "min_members" | "max_members" | "fee" | "qris_public_id" | "payment_method" | "bank_account_number" | "bank_account_holder" | "registration_opens_at" | "registration_closes_at"
 >;
 
 export type TeamMember = Pick<

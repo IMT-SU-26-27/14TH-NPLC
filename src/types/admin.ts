@@ -135,3 +135,13 @@ export type PaymentProofButtonProps = {
 };
 
 export type QrisInput = z.infer<typeof qrisSchema>;
+
+export type PaymentSettingsCardProps = {
+  competitions: Competition[];
+  lang: Locale;
+};
+
+export type PaymentSettingsDialogProps = {
+  competition: Competition;
+  qrisUrl: string | null;
+};

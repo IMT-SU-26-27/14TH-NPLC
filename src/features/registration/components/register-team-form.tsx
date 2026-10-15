@@ -1,11 +1,10 @@
 "use client";
 
 import { startTransition, useActionState, useState } from "react";
-import Image from "next/image";
-import { InfoIcon, OctagonXIcon } from "lucide-react";
+import { OctagonXIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature } from "@/lib/actions/registration";
 import { initialFormState } from "@/lib/form";
-import { formatRupiah } from "@/lib/format";
+import { isPaymentReady } from "@/lib/payment";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,6 +13,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegen
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
 import type { RegisterTeamFormProps } from "@/types/registration";
 
 const ACCEPT = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -22,7 +22,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
 // Registering = creating the team AND paying: the proof is uploaded first, then the team is created with it.
 export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFormProps) {
   const [state, action, pending] = useActionState(createRegistration, initialFormState);
-  const { t, lang, fieldErrors } = useI18n();
+  const { t, fieldErrors } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [missingProof, setMissingProof] = useState(false);
   const { upload, uploading, progress, error: uploadError, errorParams } = useCloudinaryUpload({
@@ -100,26 +100,8 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
         <FieldSet>
           <FieldLegend>{t("register.paymentTitle")}</FieldLegend>
           <FieldDescription>{t("register.paymentLead")}</FieldDescription>
-          <div className={qrisUrl ? "grid gap-6 sm:grid-cols-[12rem_1fr]" : "grid gap-6"}>
-            <div className="space-y-2">
-              {qrisUrl ? (
-                <Image
-                  src={qrisUrl}
-                  alt={t("payment.qrisAlt", { competition: competition.name })}
-                  width={384}
-                  height={384}
-                  className="bg-card aspect-square w-full rounded-lg border object-contain"
-                />
-              ) : (
-                <Alert>
-                  <InfoIcon />
-                  <AlertDescription>{t("payment.qrisMissing")}</AlertDescription>
-                </Alert>
-              )}
-              <p className="text-sm">
-                {t("payment.amount")}: <span className="font-semibold">{formatRupiah(competition.fee, lang)}</span>
-              </p>
-            </div>
+          <div className="grid gap-6 sm:grid-cols-[14rem_1fr]">
+            <PaymentInstructions details={competition} qrisUrl={qrisUrl} />
             <Field data-invalid={!!proofError}>
               <FieldLabel htmlFor="paymentProof">{t("payment.proof")}</FieldLabel>
               <Input
@@ -147,7 +129,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
           </Alert>
         )}
 
-        <Button type="submit" size="lg" disabled={busy || !qrisUrl}>
+        <Button type="submit" size="lg" disabled={busy || !isPaymentReady(competition, qrisUrl)}>
           {busy && <Spinner />}
           {uploading ? t("payment.uploading", { progress }) : t("register.submit")}
         </Button>

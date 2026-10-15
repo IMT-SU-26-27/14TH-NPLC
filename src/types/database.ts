@@ -99,6 +99,8 @@ export type Database = {
     Tables: {
       competitions: {
         Row: {
+          bank_account_holder: string | null
+          bank_account_number: string | null
           created_at: string
           description: string
           fee: number
@@ -107,6 +109,7 @@ export type Database = {
           max_members: number
           min_members: number
           name: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
           qris_public_id: string | null
           registration_closes_at: string | null
           registration_opens_at: string | null
@@ -115,6 +118,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          bank_account_holder?: string | null
+          bank_account_number?: string | null
           created_at?: string
           description?: string
           fee?: number
@@ -123,6 +128,7 @@ export type Database = {
           max_members?: number
           min_members?: number
           name: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
           qris_public_id?: string | null
           registration_closes_at?: string | null
           registration_opens_at?: string | null
@@ -131,6 +137,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          bank_account_holder?: string | null
+          bank_account_number?: string | null
           created_at?: string
           description?: string
           fee?: number
@@ -139,6 +147,7 @@ export type Database = {
           max_members?: number
           min_members?: number
           name?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
           qris_public_id?: string | null
           registration_closes_at?: string | null
           registration_opens_at?: string | null
@@ -930,6 +939,7 @@ export type Database = {
         | "runtime_error_other"
         | "internal_error"
         | "exec_format_error"
+      payment_method: "qris" | "bank_transfer"
       registration_status:
         | "pending_payment"
         | "under_review"
@@ -1626,6 +1636,7 @@ export const Constants = {
         "internal_error",
         "exec_format_error",
       ],
+      payment_method: ["qris", "bank_transfer"],
       registration_status: [
         "pending_payment",
         "under_review",

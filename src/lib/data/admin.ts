@@ -74,7 +74,7 @@ export async function getRegistrationDetail(id: string): Promise<AdminTeam | nul
     .select(
       `id, team_name, referral_code, status, leader_id, payment_proof_public_id, payment_proof_format, payment_submitted_at,
        rejection_reason, reviewed_at, created_at,
-       competition:competitions ( id, slug, name, type, min_members, max_members, fee, qris_public_id, registration_opens_at, registration_closes_at ),
+       competition:competitions ( id, slug, name, type, min_members, max_members, fee, qris_public_id, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at ),
        members:registration_members ( id, user_id, full_name, email, phone, nisn, is_leader, created_at ),
        events:registration_events ( id, status, note, created_at )`,
     )
