@@ -75,6 +75,11 @@ src/
 - GSAP runs only in client components. Use `useGSAP` from `@gsap/react` (auto cleanup) with a `scope` ref; register plugins once with `gsap.registerPlugin(useGSAP, ...)`. Reusable animation logic goes in a hook in `src/hooks/`.
 - Respect `prefers-reduced-motion` for non-essential animations.
 
+## Design workflow
+- **Always use the `impeccable` skill for any website design work**: new pages, redesigns, layout, typography, color/theme changes, motion, and UI polish. Invoke it before writing UI code, not after.
+- Impeccable works inside this project's rules: compose shadcn/ui components, and change the look through the CSS variables in `globals.css` rather than raw palette colors.
+- **Review the design once it's done.** After finishing any UI work, run an impeccable design review (critique/audit, e.g. the `impeccable-finish-reviewer` agent) against the built page, fix the material issues it finds, and only then commit.
+
 ## Environment
 - Copy `.env.local.example` to `.env.local` and fill in the self-hosted Supabase URL and anon key.
 - Validate env vars with a Zod schema instead of reading `process.env.X!` throughout the code.
