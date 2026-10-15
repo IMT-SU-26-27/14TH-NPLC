@@ -14,6 +14,12 @@ docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 --sin
 docker exec supabase-db psql -U postgres -d postgres -c "insert into supabase_migrations.schema_migrations (version, name) values ('<version>', '<name>'); notify pgrst, 'reload schema';"
 ```
 
+After a schema change, regenerate the TypeScript types in `src/types/database.ts` (both Supabase clients use them):
+
+```bash
+pnpm db:types
+```
+
 To make yourself an admin, sign in once and then run:
 
 ```sql
