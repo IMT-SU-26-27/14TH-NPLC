@@ -37,3 +37,8 @@ export function formatDateRange(start: string, end: string | null, lang: Locale)
   if (!end || end === start) return fmt.format(from);
   return fmt.formatRange(from, new Date(`${end}T00:00:00Z`));
 }
+
+// Scores in the locale's own decimal style, at most two decimals: "95", "95,5" (id) / "95.5" (en).
+export function formatScore(value: number, lang: Locale): string {
+  return new Intl.NumberFormat(INTL_LOCALE[lang], { maximumFractionDigits: 2 }).format(value);
+}

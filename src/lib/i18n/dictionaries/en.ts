@@ -479,6 +479,7 @@ export const en: Dictionary = {
     noScores: "No teams on the leaderboard yet.",
     timeLeft: "Time left",
     noEndTime: "No end time",
+    daySuffix: "d",
     ended: "Contest ended",
     live: "Live",
     scheduled: "Not started",

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { subscribeAuthed } from "@/lib/supabase/realtime";
 import { useI18n } from "@/hooks/use-i18n";
 import type { RegistrationStatus } from "@/types/registration";
 
@@ -15,10 +15,8 @@ export function useRegistrationRealtime(registrationIds: string[]) {
 
   useEffect(() => {
     if (!key) return;
-    const supabase = createSupabaseBrowserClient();
-    const channel = supabase
-      .channel(`registration-events:${key}`)
-      .on(
+    return subscribeAuthed(`registration-events:${key}`, (channel) =>
+      channel.on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "registration_events", filter: `registration_id=in.(${key})` },
         (payload) => {
@@ -27,12 +25,8 @@ export function useRegistrationRealtime(registrationIds: string[]) {
           if (status === "rejected") toast.error(t("dashboard.rejected"));
           router.refresh();
         },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      ),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps -- t changes identity every render; the language is fixed per page
   }, [key, router]);
 }
