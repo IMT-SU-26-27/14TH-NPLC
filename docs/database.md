@@ -1,8 +1,20 @@
 # Database
 
-The schema is defined in [`supabase/migrations/20261015000000_init_schema.sql`](../supabase/migrations/20261015000000_init_schema.sql). Starting data is in [`supabase/seed.sql`](../supabase/seed.sql). Neither has been applied to Supabase yet.
+The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Starting data is in [`supabase/seed.sql`](../supabase/seed.sql).
 
-To apply: `supabase db push`, or paste the migration and then the seed into the Studio SQL editor. To make yourself an admin, sign in once and then run:
+| Migration | What it does |
+|---|---|
+| `20261015000000_init_schema.sql` | Tables, functions, RLS policies, realtime publication |
+| `20261015010000_fix_anon_competitions_read.sql` | Splits the competitions read policy so logged-out visitors don't call `private.is_admin()` (which anon may not execute) |
+
+Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
+
+```bash
+docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 --single-transaction < supabase/migrations/<file>.sql
+docker exec supabase-db psql -U postgres -d postgres -c "insert into supabase_migrations.schema_migrations (version, name) values ('<version>', '<name>'); notify pgrst, 'reload schema';"
+```
+
+To make yourself an admin, sign in once and then run:
 
 ```sql
 update public.profiles set role = 'admin' where email = 'you@example.com';
