@@ -6,6 +6,14 @@ Competition registration website. Next.js 16 (App Router, Cache Components) + Su
 - Claude is **not a contributor or co-author** on this project. Do not add Claude to git commits, PR descriptions, or GitHub contributor lists. The user is the sole author.
 - Claude provides coding assistance, debugging, and implementation guidance only.
 
+## Git workflow
+- After finishing each feature, commit and push to GitHub (`origin`, branch `main`) without waiting to be asked.
+- One feature per commit. Use Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:` (e.g. `feat: add team referral code join flow`).
+- Before committing: run `pnpm exec tsc --noEmit` and `pnpm lint`, and fix failures. Never commit or push a broken build.
+- Check `git status` and the staged diff before committing. Never commit `.env*` files (except `.env.local.example`), keys, tokens or other secrets.
+- No `Co-Authored-By` lines or any other Claude attribution in commit messages or PR descriptions.
+- Never force-push, rewrite pushed history, or push to another branch or remote without being asked.
+
 ## Package manager
 - Use `pnpm` only. Never run `npm`, `npx` or `yarn`. Use `pnpm add`, `pnpm dlx`, `pnpm exec`.
 
@@ -46,6 +54,13 @@ src/
 - Every table has Row Level Security enabled with explicit policies. The anon key is public; RLS is the actual access control.
 - The service role key is server-only: name it `SUPABASE_SERVICE_ROLE_KEY` (never `NEXT_PUBLIC_`) and use it only in `server-only` files for admin tasks.
 - Generate DB types with the Supabase CLI into `src/types/database.ts` and pass them to the clients.
+- Schema changes go in a new file in `supabase/migrations/`; never edit an applied migration. Keep `docs/database.md` in sync.
+- CP submissions are judged on the server with the self-hosted Judge0 (`JUDGE0_URL`, server-only) and inserted with the service role. Never send hidden test cases or the Judge0 URL to the browser.
+
+## Files and images (Cloudinary)
+- All images and uploaded files go to Cloudinary, never Supabase Storage. Store only the Cloudinary `public_id` in the database.
+- Cloudinary helpers live in `src/lib/cloudinary/`. `CLOUDINARY_API_SECRET` is server-only; uploads are signed by a server action and sent from the browser directly to Cloudinary.
+- Payment proofs use the `authenticated` delivery type. Show them only through a signed, expiring URL created after checking the viewer is an admin or on that team.
 
 ## Validation
 - Always `import { z } from "zod"`. Use it for forms, Server Action inputs, search params and env vars.
