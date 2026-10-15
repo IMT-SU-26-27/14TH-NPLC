@@ -21,5 +21,6 @@ export async function GET(request: NextRequest) {
     if (!error) return NextResponse.redirect(new URL(next, origin));
   }
 
+  // The proxy adds the visitor's language prefix.
   return NextResponse.redirect(new URL("/login?error=confirm", origin));
 }

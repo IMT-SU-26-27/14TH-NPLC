@@ -1,7 +1,7 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
-import type { PublicCompetition } from "@/types/competition";
+import type { PublicCompetition, RegistrationWindow } from "@/types/competition";
 
 export const COMPETITIONS_TAG = "competitions";
 
@@ -28,7 +28,7 @@ export async function getActiveCompetitionBySlug(slug: string): Promise<PublicCo
   return competitions.find((c) => c.slug === slug) ?? null;
 }
 
-export function isRegistrationOpen(competition: PublicCompetition, now = new Date()): boolean {
+export function isRegistrationOpen(competition: RegistrationWindow, now = new Date()): boolean {
   const opens = competition.registration_opens_at ? new Date(competition.registration_opens_at) : null;
   const closes = competition.registration_closes_at ? new Date(competition.registration_closes_at) : null;
   return (!opens || now >= opens) && (!closes || now < closes);

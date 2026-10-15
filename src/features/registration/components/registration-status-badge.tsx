@@ -1,14 +1,21 @@
+"use client";
+
+import { useI18n } from "@/hooks/use-i18n";
 import { Badge } from "@/components/ui/badge";
 import type { RegistrationStatusBadgeProps } from "@/types/registration";
 
-const STATUS = {
-  pending_payment: { label: "Waiting for payment", variant: "outline" },
-  under_review: { label: "Under review", variant: "secondary" },
-  accepted: { label: "Accepted", variant: "default" },
-  rejected: { label: "Rejected", variant: "destructive" },
+const VARIANT = {
+  pending_payment: "outline",
+  under_review: "secondary",
+  accepted: "default",
+  rejected: "destructive",
 } as const;
 
 export function RegistrationStatusBadge({ status }: RegistrationStatusBadgeProps) {
-  const { label, variant } = STATUS[status];
-  return <Badge variant={variant}>{label}</Badge>;
+  const { t } = useI18n();
+  return (
+    <Badge variant={VARIANT[status]} className={status === "accepted" ? "bg-success text-success-foreground" : undefined}>
+      {t(`status.${status}`)}
+    </Badge>
+  );
 }

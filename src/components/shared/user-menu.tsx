@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutDashboardIcon, LogOutIcon, UsersIcon } from "lucide-react";
+import { LayoutDashboardIcon, LogOutIcon, ShieldIcon, UsersIcon } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
+import { useI18n } from "@/hooks/use-i18n";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,6 +17,7 @@ import {
 import type { UserMenuProps } from "@/types/auth";
 
 export function UserMenu({ user }: UserMenuProps) {
+  const { t, href } = useI18n();
   const name = user.full_name || user.email;
 
   return (
@@ -29,18 +31,24 @@ export function UserMenu({ user }: UserMenuProps) {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem render={<Link href="/dashboard" />}>
+        <DropdownMenuItem render={<Link href={href("/dashboard")} />}>
           <LayoutDashboardIcon />
-          Dashboard
+          {t("nav.dashboard")}
         </DropdownMenuItem>
-        <DropdownMenuItem render={<Link href="/join" />}>
+        <DropdownMenuItem render={<Link href={href("/join")} />}>
           <UsersIcon />
-          Join a team
+          {t("nav.joinTeam")}
         </DropdownMenuItem>
+        {user.role === "admin" && (
+          <DropdownMenuItem render={<Link href={href("/admin")} />}>
+            <ShieldIcon />
+            {t("nav.admin")}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
           <LogOutIcon />
-          Sign out
+          {t("nav.signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

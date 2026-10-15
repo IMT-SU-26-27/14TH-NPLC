@@ -4,19 +4,22 @@ import { useState } from "react";
 import type { CloudinaryUploadResult, UseCloudinaryUploadOptions } from "@/types/cloudinary";
 
 // Uploads one file straight to Cloudinary with a server-issued signature, reporting progress.
+// `error` is a dictionary key; `errorParams` fills its placeholders.
 export function useCloudinaryUpload({ getSignature, maxBytes, accept }: UseCloudinaryUploadOptions) {
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorParams, setErrorParams] = useState<Record<string, number>>();
 
   async function upload(file: File): Promise<CloudinaryUploadResult | null> {
     setError(null);
     if (!accept.includes(file.type)) {
-      setError("Use a JPG, PNG, WEBP or PDF file");
+      setError("errors.fileType");
       return null;
     }
     if (file.size > maxBytes) {
-      setError(`The file is larger than ${Math.round(maxBytes / 1024 / 1024)} MB`);
+      setErrorParams({ size: Math.round(maxBytes / 1024 / 1024) });
+      setError("errors.fileTooLarge");
       return null;
     }
 
@@ -49,12 +52,12 @@ export function useCloudinaryUpload({ getSignature, maxBytes, accept }: UseCloud
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve({ publicId: res.public_id, format: res.format });
           } else {
-            setError(res.error?.message ?? "Upload failed. Try again.");
+            setError(res.error?.message ?? "errors.uploadFailed");
             resolve(null);
           }
         };
         xhr.onerror = () => {
-          setError("Upload failed. Check your connection and try again.");
+          setError("errors.uploadConnection");
           resolve(null);
         };
         xhr.send(body);
@@ -64,5 +67,5 @@ export function useCloudinaryUpload({ getSignature, maxBytes, accept }: UseCloud
     }
   }
 
-  return { upload, uploading, progress, error };
+  return { upload, uploading, progress, error, errorParams };
 }

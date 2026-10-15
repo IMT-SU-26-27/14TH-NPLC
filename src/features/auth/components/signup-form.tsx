@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MailCheckIcon, OctagonXIcon } from "lucide-react";
 import { signUp } from "@/lib/actions/auth";
 import { initialFormState } from "@/lib/form";
+import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -14,15 +15,18 @@ import type { AuthFormProps } from "@/types/auth";
 
 export function SignupForm({ next }: AuthFormProps) {
   const [state, action, pending] = useActionState(signUp, initialFormState);
+  const { t, href, fieldErrors } = useI18n();
   const errors = state.fieldErrors ?? {};
 
   if (state.status === "success") {
     return (
       <Alert>
         <MailCheckIcon />
-        <AlertTitle>Check your email</AlertTitle>
+        <AlertTitle>{t("auth.checkEmailTitle")}</AlertTitle>
         <AlertDescription>
-          {state.message} Then <Link href="/login">sign in</Link>.
+          <p>
+            {t("auth.checkEmail", state.params)} <Link href={href("/login")}>{t("auth.signInAfter")}</Link>.
+          </p>
         </AlertDescription>
       </Alert>
     );
@@ -33,39 +37,40 @@ export function SignupForm({ next }: AuthFormProps) {
       <input type="hidden" name="next" value={next ?? "/dashboard"} />
       <FieldGroup>
         <Field data-invalid={!!errors.fullName}>
-          <FieldLabel htmlFor="fullName">Full name</FieldLabel>
+          <FieldLabel htmlFor="fullName">{t("common.fullName")}</FieldLabel>
           <Input id="fullName" name="fullName" autoComplete="name" aria-invalid={!!errors.fullName} required />
-          <FieldError errors={errors.fullName} />
+          <FieldError errors={fieldErrors(errors.fullName)} />
         </Field>
         <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <FieldLabel htmlFor="email">{t("common.email")}</FieldLabel>
           <Input id="email" name="email" type="email" autoComplete="email" aria-invalid={!!errors.email} required />
-          <FieldError errors={errors.email} />
+          <FieldError errors={fieldErrors(errors.email)} />
         </Field>
         <Field data-invalid={!!errors.password}>
-          <FieldLabel htmlFor="password">Password</FieldLabel>
+          <FieldLabel htmlFor="password">{t("auth.password")}</FieldLabel>
           <Input id="password" name="password" type="password" autoComplete="new-password" aria-invalid={!!errors.password} required />
-          <FieldDescription>At least 8 characters.</FieldDescription>
-          <FieldError errors={errors.password} />
+          <FieldDescription>{t("auth.passwordHint")}</FieldDescription>
+          <FieldError errors={fieldErrors(errors.password)} />
         </Field>
         <Field data-invalid={!!errors.confirmPassword}>
-          <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+          <FieldLabel htmlFor="confirmPassword">{t("auth.confirmPassword")}</FieldLabel>
           <Input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" aria-invalid={!!errors.confirmPassword} required />
-          <FieldError errors={errors.confirmPassword} />
+          <FieldError errors={fieldErrors(errors.confirmPassword)} />
         </Field>
         {state.status === "error" && state.message && (
           <Alert variant="destructive">
             <OctagonXIcon />
-            <AlertDescription>{state.message}</AlertDescription>
+            <AlertDescription>{t(state.message)}</AlertDescription>
           </Alert>
         )}
         <Field>
           <Button type="submit" size="lg" disabled={pending}>
             {pending && <Spinner />}
-            Create account
+            {t("auth.createAccount")}
           </Button>
           <FieldDescription className="text-center">
-            Already registered? <Link href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}>Sign in</Link>
+            {t("auth.haveAccount")}{" "}
+            <Link href={next ? `${href("/login")}?next=${encodeURIComponent(next)}` : href("/login")}>{t("auth.signIn")}</Link>
           </FieldDescription>
         </Field>
       </FieldGroup>

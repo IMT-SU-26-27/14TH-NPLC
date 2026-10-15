@@ -1,6 +1,7 @@
 import { OctagonXIcon, UsersIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
 import { previewTeam } from "@/lib/data/registrations";
+import { getT } from "@/lib/i18n/get-dictionary";
 import { referralCodeSchema } from "@/lib/validations/registration";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -10,15 +11,16 @@ import { JoinCodeForm } from "@/features/registration/components/join-code-form"
 import { JoinTeamForm } from "@/features/registration/components/join-team-form";
 import type { JoinSectionProps } from "@/types/registration";
 
-export async function JoinSection({ searchParams }: JoinSectionProps) {
+export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
+  const t = getT(lang);
   const { code } = await searchParams;
   const user = await requireUser(code ? `/join?code=${encodeURIComponent(code)}` : "/join");
 
   const codeCard = (message?: string) => (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Join a team</CardTitle>
-        <CardDescription>Enter the code your team leader shared with you.</CardDescription>
+        <CardTitle className="text-xl">{t("join.title")}</CardTitle>
+        <CardDescription>{t("join.lead")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {message && (
@@ -35,20 +37,18 @@ export async function JoinSection({ searchParams }: JoinSectionProps) {
   if (!code) return codeCard();
 
   const parsed = referralCodeSchema.safeParse(code);
-  if (!parsed.success) return codeCard(parsed.error.issues[0].message);
+  if (!parsed.success) return codeCard(t(parsed.error.issues[0].message));
 
   const preview = await previewTeam(parsed.data);
-  if (!preview) return codeCard("No team has this code. Check it with your team leader.");
+  if (!preview) return codeCard(t("join.notFound"));
 
-  const spotsLeft = preview.max_members - preview.member_count;
+  const full = preview.member_count >= preview.max_members;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-xl">{preview.team_name}</CardTitle>
-        <CardDescription>
-          {preview.competition_name} · led by {preview.leader_name}
-        </CardDescription>
+        <CardDescription>{t("join.ledBy", { competition: preview.competition_name, leader: preview.leader_name })}</CardDescription>
         <CardAction>
           <Badge variant="secondary">
             <UsersIcon />
@@ -57,15 +57,11 @@ export async function JoinSection({ searchParams }: JoinSectionProps) {
         </CardAction>
       </CardHeader>
       <CardContent className="space-y-6">
-        {!preview.is_joinable || spotsLeft <= 0 ? (
+        {!preview.is_joinable || full ? (
           <Alert variant="destructive">
             <OctagonXIcon />
-            <AlertTitle>{spotsLeft <= 0 ? "This team is full" : "This team isn't accepting members"}</AlertTitle>
-            <AlertDescription>
-              {spotsLeft <= 0
-                ? "Ask the leader to remove someone, or join a different team."
-                : "Its payment has already been submitted, or registration has closed."}
-            </AlertDescription>
+            <AlertTitle>{full ? t("join.fullTitle") : t("join.closedTitle")}</AlertTitle>
+            <AlertDescription>{full ? t("join.fullDescription") : t("join.closedDescription")}</AlertDescription>
           </Alert>
         ) : (
           <JoinTeamForm referralCode={parsed.data} preview={preview} user={user} />

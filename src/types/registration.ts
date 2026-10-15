@@ -2,6 +2,7 @@ import type { z } from "zod";
 import type { Enums, Tables } from "@/types/database";
 import type { PublicCompetition } from "@/types/competition";
 import type { CurrentUser } from "@/types/auth";
+import type { LangParams, Locale } from "@/types/i18n";
 import type {
   createRegistrationSchema,
   joinTeamSchema,
@@ -21,7 +22,7 @@ export type PaymentProofFormat = (typeof PAYMENT_PROOF_FORMATS)[number];
 
 export type TeamCompetition = Pick<
   PublicCompetition,
-  "id" | "slug" | "name" | "type" | "min_members" | "max_members" | "fee" | "qris_public_id"
+  "id" | "slug" | "name" | "type" | "min_members" | "max_members" | "fee" | "qris_public_id" | "registration_opens_at" | "registration_closes_at"
 >;
 
 export type TeamMember = Pick<
@@ -63,17 +64,24 @@ export type TeamPreview = {
 export type RegisterTeamFormProps = {
   competition: PublicCompetition;
   user: CurrentUser;
+  qrisUrl: string | null;
 };
 
 export type RegisterPageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ lang: string; slug: string }>;
+};
+
+export type RegisterSectionProps = {
+  params: Promise<{ lang: string; slug: string }>;
 };
 
 export type JoinPageProps = {
+  params: LangParams;
   searchParams: Promise<{ code?: string }>;
 };
 
 export type JoinSectionProps = {
+  lang: Locale;
   searchParams: Promise<{ code?: string }>;
 };
 
@@ -88,6 +96,12 @@ export type JoinCodeFormProps = {
 };
 
 export type DashboardPageProps = {
+  params: LangParams;
+  searchParams: Promise<{ notice?: string }>;
+};
+
+export type DashboardContentProps = {
+  lang: Locale;
   searchParams: Promise<{ notice?: string }>;
 };
 
@@ -95,15 +109,18 @@ export type TeamCardProps = {
   team: Team;
   userId: string;
   qrisUrl: string | null;
+  lang: Locale;
 };
 
 export type TeamTimelineProps = {
   team: Team;
+  lang: Locale;
 };
 
 export type TeamMembersProps = {
   team: Team;
   userId: string;
+  canEdit: boolean;
 };
 
 export type MemberActionProps = {
@@ -126,6 +143,7 @@ export type RegistrationStatusBadgeProps = {
 
 export type AccountCardProps = {
   user: CurrentUser;
+  lang: Locale;
 };
 
 export type DeleteTeamButtonProps = {

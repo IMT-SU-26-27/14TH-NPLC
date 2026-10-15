@@ -1,9 +1,11 @@
 import { z } from "zod";
 import type { FieldErrors, FormState } from "@/types";
 
+// Server Actions return dictionary keys; client components translate them with useI18n().
+
 export const initialFormState: FormState = { status: "idle" };
 
-export function fieldErrorState(error: z.ZodError, message = "Please fix the highlighted fields"): FormState {
+export function fieldErrorState(error: z.ZodError, message = "validation.fixFields"): FormState {
   const fieldErrors: FieldErrors = {};
   for (const [field, messages] of Object.entries(z.flattenError(error).fieldErrors)) {
     fieldErrors[field] = (messages as string[] | undefined)?.map((m) => ({ message: m }));
@@ -19,17 +21,38 @@ export function successState(message: string): FormState {
   return { status: "success", message };
 }
 
-// Maps Postgres errors raised by the schema (RAISE EXCEPTION, constraints) to a readable message.
+// Messages raised by the schema's RAISE EXCEPTION statements, matched by prefix.
+const RAISED: [string, string][] = [
+  ["You are already on a team", "errors.alreadyOnTeam"],
+  ["The leader is already on this team", "errors.alreadyOnTeam"],
+  ["Registration for this competition is closed", "errors.registrationClosed"],
+  ["No team has this code", "errors.teamNotFound"],
+  ["This team is no longer accepting members", "errors.teamNotAccepting"],
+  ["This team already has the maximum", "errors.teamFull"],
+  ["The team name cannot be changed", "errors.teamNameLocked"],
+  ["This registration can no longer be edited", "errors.registrationLocked"],
+  ["Only an admin can", "errors.adminOnly"],
+  ["Admins only", "errors.adminOnly"],
+  ["Upload the payment proof before submitting", "errors.proofRequired"],
+  ["This competition needs", "errors.teamSize"],
+  ["A team needs exactly one leader", "errors.teamSize"],
+  ["The team leader cannot be removed", "errors.leaderProtected"],
+  ["Sign in to", "errors.signInAgain"],
+];
+
+// Maps Postgres errors (RAISE EXCEPTION, constraints) to a dictionary key.
+// Unknown messages pass through unchanged and are shown as-is.
 export function databaseErrorMessage(error: { code?: string; message: string }): string {
+  const raised = RAISED.find(([prefix]) => error.message.startsWith(prefix));
+  if (raised) return raised[1];
   if (error.code === "23505") {
-    if (error.message.includes("nisn")) return "This NISN is already registered in this competition";
-    if (error.message.includes("email")) return "This email is already registered in this competition";
-    if (error.message.includes("team_name")) return "That team name is already taken in this competition";
-    if (error.message.includes("competition_level")) return "Another problem already uses this level number";
-    if (error.message.includes("slug")) return "Another competition already uses this slug";
+    if (error.message.includes("nisn")) return "errors.duplicateNisn";
+    if (error.message.includes("email")) return "errors.duplicateEmail";
+    if (error.message.includes("team_name")) return "errors.duplicateTeamName";
+    if (error.message.includes("competition_level")) return "errors.duplicateLevel";
+    if (error.message.includes("slug")) return "errors.duplicateSlug";
+    if (error.message.includes("competition_user") || error.message.includes("competition_leader")) return "errors.alreadyOnTeam";
   }
-  if (error.code === "42501" && error.message.includes("row-level security")) {
-    return "You don't have permission to do that";
-  }
+  if (error.code === "42501") return "errors.permission";
   return error.message;
 }

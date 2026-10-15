@@ -1,5 +1,6 @@
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { redirectWithCookies, updateSession } from "@/lib/supabase/proxy";
+import { DEFAULT_LOCALE, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 
 const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp"];
 const SIGNED_OUT_ONLY = ["/login", "/signup"];
@@ -8,19 +9,42 @@ function matches(path: string, prefixes: string[]) {
   return prefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 }
 
-// Optimistic route guards. Pages and RLS enforce the same rules again on the server.
+// 1. Every page lives under /id or /en; unprefixed URLs go to the remembered (or default) language.
+// 2. Optimistic route guards on the path without its locale. Pages and RLS enforce the same rules again.
 export async function proxy(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+
+  if (pathname.startsWith("/auth/")) {
+    const { response } = await updateSession(request);
+    return response();
+  }
+
+  const [, first, ...rest] = pathname.split("/");
+  if (!isLocale(first)) {
+    const saved = request.cookies.get(LOCALE_COOKIE)?.value;
+    const lang = isLocale(saved) ? saved : DEFAULT_LOCALE;
+    return NextResponse.redirect(new URL(`/${lang}${pathname === "/" ? "" : pathname}${search}`, request.url));
+  }
+
+  const lang = first;
+  const path = `/${rest.join("/")}`;
   const { supabase, user, response } = await updateSession(request);
-  const path = request.nextUrl.pathname;
-  const to = (pathname: string, params?: Record<string, string>) => {
-    const url = new URL(pathname, request.url);
+
+  const withLocale = (res: NextResponse) => {
+    if (request.cookies.get(LOCALE_COOKIE)?.value !== lang) {
+      res.cookies.set(LOCALE_COOKIE, lang, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+    }
+    return res;
+  };
+  const to = (target: string, params?: Record<string, string>) => {
+    const url = new URL(`/${lang}${target}`, request.url);
     Object.entries(params ?? {}).forEach(([key, value]) => url.searchParams.set(key, value));
-    return redirectWithCookies(url, response());
+    return withLocale(redirectWithCookies(url, response()));
   };
 
   if (!user) {
-    if (matches(path, SIGNED_IN_ONLY)) return to("/login", { next: path });
-    return response();
+    if (matches(path, SIGNED_IN_ONLY)) return to("/login", { next: `${pathname}${search}` });
+    return withLocale(response());
   }
 
   if (matches(path, SIGNED_OUT_ONLY)) return to("/dashboard");
@@ -50,7 +74,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  return response();
+  return withLocale(response());
 }
 
 export const config = {

@@ -2,6 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { localePath } from "@/lib/i18n/config";
+import { getRequestLocale } from "@/lib/i18n/server";
 import type { CurrentUser } from "@/types/auth";
 
 // Deduplicated per request, so layouts and pages can both call it.
@@ -23,12 +25,15 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
 export async function requireUser(next = "/dashboard"): Promise<CurrentUser> {
   const user = await getCurrentUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(next)}`);
+  if (!user) {
+    const lang = await getRequestLocale();
+    redirect(`${localePath(lang, "/login")}?next=${encodeURIComponent(localePath(lang, next))}`);
+  }
   return user;
 }
 
 export async function requireAdmin(): Promise<CurrentUser> {
   const user = await requireUser("/admin");
-  if (user.role !== "admin") redirect("/dashboard");
+  if (user.role !== "admin") redirect(localePath(await getRequestLocale(), "/dashboard"));
   return user;
 }

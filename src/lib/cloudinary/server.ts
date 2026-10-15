@@ -5,6 +5,8 @@ import type { CloudinaryDeliveryType, CloudinaryUploadSignature } from "@/types/
 
 export const CLOUDINARY_ROOT = "14th-nplc";
 export const paymentProofFolder = (registrationId: string) => `${CLOUDINARY_ROOT}/payment-proofs/${registrationId}`;
+// Proofs uploaded while registering, before the team (and its id) exists.
+export const newRegistrationProofFolder = (userId: string) => `${CLOUDINARY_ROOT}/payment-proofs/new/${userId}`;
 export const QRIS_FOLDER = `${CLOUDINARY_ROOT}/qris`;
 
 function client() {

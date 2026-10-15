@@ -38,6 +38,13 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (required for the leader), 10-digit NISN. A person (account, NISN or email) can be on only one team per competition. |
 | `registration_events` | The timeline on the participant dashboard. Written automatically on every status change; the rejection reason is stored as the event's `note`. |
 
+### Homepage content
+
+| Table | What it holds |
+|---|---|
+| `site_content` | One row: the About NPLC title and body in Indonesian and English. Empty fields fall back to the built-in copy. Anyone can read it; admins edit it on `/admin/content`. |
+| `timeline_events` | The homepage timeline: `starts_on`, optional `ends_on`, title and description in both languages, sorted by start date. Anyone can read; admins add, edit and delete. |
+
 ### Competitive programming
 
 | Table | What it holds |
@@ -56,7 +63,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 |---|---|
 | `registration_overview` (view) | Admin registrations table: one row per team with competition name, referral code, leader details and member count. Search and filter on it. |
 | `competition_stats` (view) | Admin dashboard counts per competition: `accepted_teams`, `accepted_people`, `under_review_teams`, `total_teams`. Add the rows together for the overall total. |
-| `create_registration(competition_id, team_name, leader_name, leader_phone, leader_nisn)` | Registration form. Creates the team and the leader's member row, and generates the referral code. |
+| `create_registration(competition_id, team_name, leader_name, leader_phone, leader_nisn, payment_proof_public_id, payment_proof_format)` | Registration form. Creates the team already paid (status `under_review`) with the leader's member row and the referral code. The server action first checks the proof exists in Cloudinary. |
 | `preview_team(referral_code)` | Join page. Shows team name, competition, leader, member count and whether it can still be joined, before the user confirms. |
 | `join_team(referral_code, full_name, nisn, phone?)` | Join page. Adds the signed-in user to the team. |
 | `cp_access()` | `src/proxy.ts`. Returns the caller's accepted CP teams and each contest's status. |
@@ -65,20 +72,23 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 ## Registration flow
 
 ```
-leader creates team ─▶ members join with the referral code
+leader fills team details + uploads QRIS payment proof
+       │  (registering = paying: the team only exists once the proof is sent)
+       ▼
+under_review ──(admin)──▶ accepted
+       ▲           │
+       │           └──▶ rejected (reason required) ──(leader uploads a new proof)──┘
        │
-pending_payment ──(leader uploads proof + submits)──▶ under_review ──(admin)──▶ accepted
-       ▲                                                   │
-       └──── team fixes members, resubmits ◀── rejected ◀──┘ (reason required)
+members join with the referral code at any point while the competition's registration window is open
 ```
 
-- The leader creates the team, gets its referral code and shares it. Members sign in and join with the code.
-- Team editing is limited to adding members (by code) and removing them. The leader can remove any member, and a member can leave. Nobody, admins included, can remove the leader row; it only goes away when the whole team is deleted.
+- Paying is part of registering: the register form takes the team details and the payment proof together. The proof is uploaded to Cloudinary first (`14th-nplc/payment-proofs/new/<user id>/`), then `create_registration()` creates the team as `under_review` with the referral code.
+- Members join with the code, and the leader can remove members (or a member can leave), while the competition's registration window is open, whatever the status. Nobody, admins included, can remove the leader row.
 - Participants can't change the team name, competition or referral code. Admins can fix the name.
-- Joining and removing are allowed only while the status is `pending_payment` or `rejected`, and while the competition's registration window is open.
-- Submitting checks the team has exactly one leader and the right number of members.
+- The minimum team size is checked when an admin accepts: accepting a team with too few members is refused. The maximum is enforced on every join.
+- After a rejection the leader uploads a new proof, which sends the team back to `under_review`.
 - Only admins can accept or reject. Rejecting requires a reason, and the reviewer and time are recorded.
-- The leader can delete the whole team while it's still `pending_payment`.
+- `pending_payment` is no longer used by the app; it remains for teams an admin creates by hand.
 
 ## Who can see what (Row Level Security)
 

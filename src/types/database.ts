@@ -7,6 +7,94 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  pgbouncer: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      get_auth: {
+        Args: { p_usename: string }
+        Returns: {
+          password: string
+          username: string
+        }[]
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  private: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      assert_cp_competition: {
+        Args: { p_competition_id: string }
+        Returns: undefined
+      }
+      assert_team_valid: {
+        Args: { p_registration_id: string; p_require_min?: boolean }
+        Returns: undefined
+      }
+      can_view_problem: { Args: { p_problem_id: string }; Returns: boolean }
+      competition_open: { Args: { p_competition_id: string }; Returns: boolean }
+      cp_is_live: { Args: { p_competition_id: string }; Returns: boolean }
+      generate_referral_code: { Args: never; Returns: string }
+      is_admin: { Args: never; Returns: boolean }
+      is_cp_participant: {
+        Args: { p_competition_id: string }
+        Returns: boolean
+      }
+      is_team_leader: { Args: { p_registration_id: string }; Returns: boolean }
+      is_team_member: { Args: { p_registration_id: string }; Returns: boolean }
+      is_trusted: { Args: never; Returns: boolean }
+      registration_editable: {
+        Args: { p_registration_id: string }
+        Returns: boolean
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       competitions: {
@@ -89,28 +177,24 @@ export type Database = {
           {
             foreignKeyName: "cp_problem_scores_best_submission_id_fkey"
             columns: ["best_submission_id"]
-            isOneToOne: false
             referencedRelation: "cp_submissions"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_problem_scores_problem_id_fkey"
             columns: ["problem_id"]
-            isOneToOne: false
             referencedRelation: "cp_problems"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_problem_scores_registration_id_fkey"
             columns: ["registration_id"]
-            isOneToOne: false
             referencedRelation: "registration_overview"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_problem_scores_registration_id_fkey"
             columns: ["registration_id"]
-            isOneToOne: false
             referencedRelation: "registrations"
             referencedColumns: ["id"]
           },
@@ -169,14 +253,12 @@ export type Database = {
           {
             foreignKeyName: "cp_problems_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: false
             referencedRelation: "competition_stats"
             referencedColumns: ["competition_id"]
           },
           {
             foreignKeyName: "cp_problems_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: false
             referencedRelation: "competitions"
             referencedColumns: ["id"]
           },
@@ -214,28 +296,24 @@ export type Database = {
           {
             foreignKeyName: "cp_scores_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: false
             referencedRelation: "competition_stats"
             referencedColumns: ["competition_id"]
           },
           {
             foreignKeyName: "cp_scores_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: false
             referencedRelation: "competitions"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_scores_registration_id_fkey"
             columns: ["registration_id"]
-            isOneToOne: true
             referencedRelation: "registration_overview"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_scores_registration_id_fkey"
             columns: ["registration_id"]
-            isOneToOne: true
             referencedRelation: "registrations"
             referencedColumns: ["id"]
           },
@@ -285,21 +363,18 @@ export type Database = {
           {
             foreignKeyName: "cp_sessions_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: true
             referencedRelation: "competition_stats"
             referencedColumns: ["competition_id"]
           },
           {
             foreignKeyName: "cp_sessions_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: true
             referencedRelation: "competitions"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_sessions_started_by_fkey"
             columns: ["started_by"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -337,14 +412,12 @@ export type Database = {
           {
             foreignKeyName: "cp_submission_results_submission_id_fkey"
             columns: ["submission_id"]
-            isOneToOne: false
             referencedRelation: "cp_submissions"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_submission_results_test_case_id_fkey"
             columns: ["test_case_id"]
-            isOneToOne: false
             referencedRelation: "cp_test_cases"
             referencedColumns: ["id"]
           },
@@ -406,28 +479,24 @@ export type Database = {
           {
             foreignKeyName: "cp_submissions_problem_id_fkey"
             columns: ["problem_id"]
-            isOneToOne: false
             referencedRelation: "cp_problems"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_submissions_registration_id_fkey"
             columns: ["registration_id"]
-            isOneToOne: false
             referencedRelation: "registration_overview"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_submissions_registration_id_fkey"
             columns: ["registration_id"]
-            isOneToOne: false
             referencedRelation: "registrations"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cp_submissions_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -465,7 +534,6 @@ export type Database = {
           {
             foreignKeyName: "cp_test_cases_problem_id_fkey"
             columns: ["problem_id"]
-            isOneToOne: false
             referencedRelation: "cp_problems"
             referencedColumns: ["id"]
           },
@@ -530,21 +598,18 @@ export type Database = {
           {
             foreignKeyName: "registration_events_actor_id_fkey"
             columns: ["actor_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "registration_events_registration_id_fkey"
             columns: ["registration_id"]
-            isOneToOne: false
             referencedRelation: "registration_overview"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "registration_events_registration_id_fkey"
             columns: ["registration_id"]
-            isOneToOne: false
             referencedRelation: "registrations"
             referencedColumns: ["id"]
           },
@@ -594,21 +659,18 @@ export type Database = {
           {
             foreignKeyName: "registration_members_registration_fkey"
             columns: ["registration_id", "competition_id"]
-            isOneToOne: false
             referencedRelation: "registration_overview"
             referencedColumns: ["id", "competition_id"]
           },
           {
             foreignKeyName: "registration_members_registration_fkey"
             columns: ["registration_id", "competition_id"]
-            isOneToOne: false
             referencedRelation: "registrations"
             referencedColumns: ["id", "competition_id"]
           },
           {
             foreignKeyName: "registration_members_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -667,32 +729,91 @@ export type Database = {
           {
             foreignKeyName: "registrations_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: false
             referencedRelation: "competition_stats"
             referencedColumns: ["competition_id"]
           },
           {
             foreignKeyName: "registrations_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: false
             referencedRelation: "competitions"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "registrations_leader_id_fkey"
             columns: ["leader_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "registrations_reviewed_by_fkey"
             columns: ["reviewed_by"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_content: {
+        Row: {
+          about_body_en: string
+          about_body_id: string
+          about_title_en: string
+          about_title_id: string
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          about_body_en?: string
+          about_body_id?: string
+          about_title_en?: string
+          about_title_id?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          about_body_en?: string
+          about_body_id?: string
+          about_title_en?: string
+          about_title_id?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      timeline_events: {
+        Row: {
+          created_at: string
+          description_en: string
+          description_id: string
+          ends_on: string | null
+          id: string
+          starts_on: string
+          title_en: string
+          title_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string
+          description_id?: string
+          ends_on?: string | null
+          id?: string
+          starts_on: string
+          title_en: string
+          title_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string
+          description_id?: string
+          ends_on?: string | null
+          id?: string
+          starts_on?: string
+          title_en?: string
+          title_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -734,14 +855,12 @@ export type Database = {
           {
             foreignKeyName: "registrations_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: false
             referencedRelation: "competition_stats"
             referencedColumns: ["competition_id"]
           },
           {
             foreignKeyName: "registrations_competition_id_fkey"
             columns: ["competition_id"]
-            isOneToOne: false
             referencedRelation: "competitions"
             referencedColumns: ["id"]
           },
@@ -767,6 +886,8 @@ export type Database = {
           p_leader_name: string
           p_leader_nisn: string
           p_leader_phone: string
+          p_payment_proof_format: string
+          p_payment_proof_public_id: string
           p_team_name: string
         }
         Returns: string
@@ -815,6 +936,543 @@ export type Database = {
         | "accepted"
         | "rejected"
       user_role: "participant" | "admin"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  storage: {
+    Tables: {
+      buckets: {
+        Row: {
+          allowed_mime_types: string[] | null
+          avif_autodetection: boolean | null
+          created_at: string | null
+          file_size_limit: number | null
+          id: string
+          name: string
+          owner: string | null
+          owner_id: string | null
+          public: boolean | null
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string | null
+        }
+        Insert: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
+          created_at?: string | null
+          file_size_limit?: number | null
+          id: string
+          name: string
+          owner?: string | null
+          owner_id?: string | null
+          public?: boolean | null
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string | null
+        }
+        Update: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
+          created_at?: string | null
+          file_size_limit?: number | null
+          id?: string
+          name?: string
+          owner?: string | null
+          owner_id?: string | null
+          public?: boolean | null
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      buckets_analytics: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          format: string
+          id: string
+          name: string
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          format?: string
+          id?: string
+          name: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          format?: string
+          id?: string
+          name?: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      buckets_vectors: {
+        Row: {
+          created_at: string
+          id: string
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      iceberg_namespaces: {
+        Row: {
+          bucket_name: string
+          catalog_id: string
+          created_at: string
+          id: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_name: string
+          catalog_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_name?: string
+          catalog_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iceberg_namespaces_catalog_id_fkey"
+            columns: ["catalog_id"]
+            referencedRelation: "buckets_analytics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iceberg_tables: {
+        Row: {
+          bucket_name: string
+          catalog_id: string
+          created_at: string
+          id: string
+          location: string
+          name: string
+          namespace_id: string
+          remote_table_id: string | null
+          shard_id: string | null
+          shard_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          bucket_name: string
+          catalog_id: string
+          created_at?: string
+          id?: string
+          location: string
+          name: string
+          namespace_id: string
+          remote_table_id?: string | null
+          shard_id?: string | null
+          shard_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bucket_name?: string
+          catalog_id?: string
+          created_at?: string
+          id?: string
+          location?: string
+          name?: string
+          namespace_id?: string
+          remote_table_id?: string | null
+          shard_id?: string | null
+          shard_key?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iceberg_tables_catalog_id_fkey"
+            columns: ["catalog_id"]
+            referencedRelation: "buckets_analytics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iceberg_tables_namespace_id_fkey"
+            columns: ["namespace_id"]
+            referencedRelation: "iceberg_namespaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      migrations: {
+        Row: {
+          executed_at: string | null
+          hash: string
+          id: number
+          name: string
+        }
+        Insert: {
+          executed_at?: string | null
+          hash: string
+          id: number
+          name: string
+        }
+        Update: {
+          executed_at?: string | null
+          hash?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      objects: {
+        Row: {
+          bucket_id: string | null
+          created_at: string | null
+          id: string
+          last_accessed_at: string | null
+          metadata: Json | null
+          name: string | null
+          owner: string | null
+          owner_id: string | null
+          path_tokens: string[] | null
+          updated_at: string | null
+          user_metadata: Json | null
+          version: string | null
+        }
+        Insert: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          name?: string | null
+          owner?: string | null
+          owner_id?: string | null
+          path_tokens?: string[] | null
+          updated_at?: string | null
+          user_metadata?: Json | null
+          version?: string | null
+        }
+        Update: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          name?: string | null
+          owner?: string | null
+          owner_id?: string | null
+          path_tokens?: string[] | null
+          updated_at?: string | null
+          user_metadata?: Json | null
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objects_bucketId_fkey"
+            columns: ["bucket_id"]
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          in_progress_size: number
+          key: string
+          metadata: Json | null
+          owner_id: string | null
+          upload_signature: string
+          user_metadata: Json | null
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id: string
+          in_progress_size?: number
+          key: string
+          metadata?: Json | null
+          owner_id?: string | null
+          upload_signature: string
+          user_metadata?: Json | null
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          in_progress_size?: number
+          key?: string
+          metadata?: Json | null
+          owner_id?: string | null
+          upload_signature?: string
+          user_metadata?: Json | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
+            columns: ["bucket_id"]
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          etag: string
+          id: string
+          key: string
+          owner_id: string | null
+          part_number: number
+          size: number
+          upload_id: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          etag: string
+          id?: string
+          key: string
+          owner_id?: string | null
+          part_number: number
+          size?: number
+          upload_id: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          etag?: string
+          id?: string
+          key?: string
+          owner_id?: string | null
+          part_number?: number
+          size?: number
+          upload_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
+            columns: ["bucket_id"]
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
+            columns: ["upload_id"]
+            referencedRelation: "s3_multipart_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vector_indexes: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id: string
+          metadata_configuration: Json | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id?: string
+          metadata_configuration?: Json | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          data_type?: string
+          dimension?: number
+          distance_metric?: string
+          id?: string
+          metadata_configuration?: Json | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vector_indexes_bucket_id_fkey"
+            columns: ["bucket_id"]
+            referencedRelation: "buckets_vectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      allow_any_operation: {
+        Args: { expected_operations: string[] }
+        Returns: boolean
+      }
+      allow_only_operation: {
+        Args: { expected_operation: string }
+        Returns: boolean
+      }
+      can_insert_object: {
+        Args: { bucketid: string; metadata: Json; name: string; owner: string }
+        Returns: undefined
+      }
+      extension: { Args: { name: string }; Returns: string }
+      filename: { Args: { name: string }; Returns: string }
+      foldername: { Args: { name: string }; Returns: string[] }
+      get_common_prefix: {
+        Args: { p_delimiter: string; p_key: string; p_prefix: string }
+        Returns: string
+      }
+      get_size_by_bucket: {
+        Args: never
+        Returns: {
+          bucket_id: string
+          size: number
+        }[]
+      }
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string
+          delimiter_param: string
+          max_keys?: number
+          next_key_token?: string
+          next_upload_token?: string
+          prefix_param: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+        }[]
+      }
+      list_objects_with_delimiter: {
+        Args: {
+          _bucket_id: string
+          delimiter_param: string
+          max_keys?: number
+          next_token?: string
+          prefix_param: string
+          sort_order?: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      operation: { Args: never; Returns: string }
+      search: {
+        Args: {
+          bucketname: string
+          levels?: number
+          limits?: number
+          offsets?: number
+          prefix: string
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_by_timestamp: {
+        Args: {
+          p_bucket_id: string
+          p_level: number
+          p_limit: number
+          p_prefix: string
+          p_sort_column: string
+          p_sort_column_after: string
+          p_sort_order: string
+          p_start_after: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_v2: {
+        Args: {
+          bucket_name: string
+          levels?: number
+          limits?: number
+          prefix: string
+          sort_column?: string
+          sort_column_after?: string
+          sort_order?: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+    }
+    Enums: {
+      buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -940,6 +1598,15 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  pgbouncer: {
+    Enums: {},
+  },
+  private: {
+    Enums: {},
+  },
   public: {
     Enums: {
       competition_type: ["competitive_programming", "logic"],
@@ -966,6 +1633,11 @@ export const Constants = {
         "rejected",
       ],
       user_role: ["participant", "admin"],
+    },
+  },
+  storage: {
+    Enums: {
+      buckettype: ["STANDARD", "ANALYTICS", "VECTOR"],
     },
   },
 } as const

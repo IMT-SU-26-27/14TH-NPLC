@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { getPaymentUploadSignature, submitPayment } from "@/lib/actions/registration";
 import { formatRupiah } from "@/lib/format";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
+import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -21,7 +22,8 @@ const MAX_BYTES = 5 * 1024 * 1024;
 export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
   const [file, setFile] = useState<File | null>(null);
   const [submitting, startSubmit] = useTransition();
-  const { upload, uploading, progress, error } = useCloudinaryUpload({
+  const { t, lang } = useI18n();
+  const { upload, uploading, progress, error, errorParams } = useCloudinaryUpload({
     getSignature: () => getPaymentUploadSignature(team.id),
     maxBytes: MAX_BYTES,
     accept: ACCEPT,
@@ -43,8 +45,8 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
         publicId: uploaded.publicId,
         format: uploaded.format as PaymentProofFormat,
       });
-      if (result.ok) toast.success(result.message ?? "Payment submitted");
-      else toast.error(result.message);
+      if (result.ok) toast.success(t(result.message ?? "payment.submitted"));
+      else toast.error(t(result.message));
     });
   }
 
@@ -54,7 +56,7 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
         {qrisUrl ? (
           <Image
             src={qrisUrl}
-            alt={`QRIS code to pay for ${team.competition.name}`}
+            alt={t("payment.qrisAlt", { competition: team.competition.name })}
             width={448}
             height={448}
             className="bg-card w-full rounded-lg border"
@@ -62,11 +64,11 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
         ) : (
           <Alert>
             <InfoIcon />
-            <AlertDescription>The QRIS code hasn&apos;t been uploaded yet. Check back soon.</AlertDescription>
+            <AlertDescription>{t("payment.qrisMissing")}</AlertDescription>
           </Alert>
         )}
         <p className="text-sm">
-          Amount: <span className="font-semibold">{formatRupiah(fee)}</span>
+          {t("payment.amount")}: <span className="font-semibold">{formatRupiah(fee, lang)}</span>
         </p>
       </div>
 
@@ -75,21 +77,19 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
           {!teamReady && (
             <Alert>
               <InfoIcon />
-              <AlertTitle>Team not complete yet</AlertTitle>
-              <AlertDescription>
-                You need {min_members}–{max_members} members before submitting. You have {memberCount}.
-              </AlertDescription>
+              <AlertTitle>{t("payment.teamIncompleteTitle")}</AlertTitle>
+              <AlertDescription>{t("payment.teamIncomplete", { min: min_members, max: max_members, count: memberCount })}</AlertDescription>
             </Alert>
           )}
           {team.status === "rejected" && (
             <Alert variant="destructive">
               <OctagonXIcon />
-              <AlertTitle>Fix the issue and submit again</AlertTitle>
+              <AlertTitle>{t("payment.fixAndResubmit")}</AlertTitle>
               <AlertDescription>{team.rejection_reason}</AlertDescription>
             </Alert>
           )}
           <Field data-invalid={!!error}>
-            <FieldLabel htmlFor={`proof-${team.id}`}>Payment proof</FieldLabel>
+            <FieldLabel htmlFor={`proof-${team.id}`}>{t("payment.proof")}</FieldLabel>
             <Input
               id={`proof-${team.id}`}
               type="file"
@@ -98,13 +98,13 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
               aria-invalid={!!error}
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
-            <FieldDescription>Screenshot or PDF of the QRIS payment, up to 5 MB.</FieldDescription>
-            <FieldError errors={error ? [{ message: error }] : undefined} />
+            <FieldDescription>{t("payment.proofHint")}</FieldDescription>
+            <FieldError errors={error ? [{ message: t(error, errorParams) }] : undefined} />
           </Field>
           {uploading && <Progress value={progress} />}
           <Button type="submit" disabled={!file || !teamReady || busy}>
             {busy ? <Spinner /> : <UploadIcon />}
-            {uploading ? `Uploading ${progress}%` : submitting ? "Submitting…" : "Submit payment"}
+            {uploading ? t("payment.uploading", { progress }) : submitting ? t("payment.submitting") : t("payment.submit")}
           </Button>
         </FieldGroup>
       </form>

@@ -1,6 +1,7 @@
 import type { z } from "zod";
 import type { Tables } from "@/types/database";
 import type { signInSchema, signUpSchema } from "@/lib/validations/auth";
+import type { LangParams, Locale } from "@/types/i18n";
 
 export type Profile = Tables<"profiles">;
 
@@ -16,11 +17,13 @@ export type AuthFormProps = {
 export type AuthSearchParams = Promise<{ next?: string; error?: string }>;
 
 export type AuthPageProps = {
+  params: LangParams;
   searchParams: AuthSearchParams;
 };
 
 export type AuthFormLoaderProps = {
   mode: "login" | "signup";
+  lang: Locale;
   searchParams: AuthSearchParams;
 };
 

@@ -4,21 +4,25 @@ const phone = z
   .string()
   .trim()
   .transform((v) => v.replace(/[\s-]/g, ""))
-  .pipe(z.string().regex(/^\+?[0-9]{8,15}$/, "Enter a phone number like 081234567890"));
+  .pipe(z.string().regex(/^\+?[0-9]{8,15}$/, "validation.phone"));
 
-const nisn = z.string().trim().regex(/^[0-9]{10}$/, "NISN is exactly 10 digits");
+const nisn = z.string().trim().regex(/^[0-9]{10}$/, "validation.nisn");
 
-const fullName = z.string().trim().min(2, "Enter the full name").max(100);
+const fullName = z.string().trim().min(2, "validation.fullName").max(100);
 
 export const referralCodeSchema = z
   .string()
   .trim()
   .toUpperCase()
-  .regex(/^[A-Z0-9]{8}$/, "Team codes are 8 letters and numbers");
+  .regex(/^[A-Z0-9]{8}$/, "validation.referralCode");
+
+export const PAYMENT_PROOF_FORMATS_LIST = ["jpg", "jpeg", "png", "webp", "pdf"] as const;
 
 export const createRegistrationSchema = z.object({
   competitionId: z.uuid(),
-  teamName: z.string().trim().min(2, "Use at least 2 characters").max(60, "Use at most 60 characters"),
+  paymentProofPublicId: z.string().min(1, "errors.proofRequired"),
+  paymentProofFormat: z.enum(PAYMENT_PROOF_FORMATS_LIST, "errors.proofRequired"),
+  teamName: z.string().trim().min(2, "validation.teamNameMin").max(60, "validation.teamNameMax"),
   leaderName: fullName,
   leaderPhone: phone,
   leaderNisn: nisn,
@@ -31,7 +35,7 @@ export const joinTeamSchema = z.object({
   phone: z.union([z.literal("").transform(() => undefined), phone]).optional(),
 });
 
-export const PAYMENT_PROOF_FORMATS = ["jpg", "jpeg", "png", "webp", "pdf"] as const;
+export const PAYMENT_PROOF_FORMATS = PAYMENT_PROOF_FORMATS_LIST;
 
 export const submitPaymentSchema = z.object({
   registrationId: z.uuid(),

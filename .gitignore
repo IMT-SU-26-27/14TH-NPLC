@@ -43,3 +43,8 @@ next-env.d.ts
 
 # claude code personal settings
 .claude/settings.local.json
+
+# Design review
+.impeccable
+# impeccable review screenshots (regenerated per review)
+.impeccable/review/

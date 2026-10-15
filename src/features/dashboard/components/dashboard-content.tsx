@@ -3,15 +3,18 @@ import { InfoIcon, UsersIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
 import { getMyTeams } from "@/lib/data/registrations";
 import { publicImageUrl } from "@/lib/cloudinary/server";
+import { localePath } from "@/lib/i18n/config";
+import { getT } from "@/lib/i18n/get-dictionary";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { AccountCard } from "@/features/dashboard/components/account-card";
 import { TeamCard } from "@/features/dashboard/components/team-card";
 import { RegistrationRealtime } from "@/features/dashboard/components/registration-realtime";
-import type { DashboardPageProps } from "@/types/registration";
+import type { DashboardContentProps } from "@/types/registration";
 
-export async function DashboardContent({ searchParams }: DashboardPageProps) {
+export async function DashboardContent({ lang, searchParams }: DashboardContentProps) {
+  const t = getT(lang);
   const [{ notice }, user, teams] = await Promise.all([searchParams, requireUser("/dashboard"), getMyTeams()]);
 
   return (
@@ -19,14 +22,10 @@ export async function DashboardContent({ searchParams }: DashboardPageProps) {
       {notice === "cp-not-registered" && (
         <Alert>
           <InfoIcon />
-          <AlertTitle>The contest page is for accepted teams</AlertTitle>
-          <AlertDescription>
-            You need an accepted competitive programming registration to open it.
-          </AlertDescription>
+          <AlertTitle>{t("dashboard.cpNoticeTitle")}</AlertTitle>
+          <AlertDescription>{t("dashboard.cpNoticeDescription")}</AlertDescription>
         </Alert>
       )}
-
-      <AccountCard user={user} />
 
       {teams.length === 0 ? (
         <Empty className="border">
@@ -34,15 +33,15 @@ export async function DashboardContent({ searchParams }: DashboardPageProps) {
             <EmptyMedia variant="icon">
               <UsersIcon />
             </EmptyMedia>
-            <EmptyTitle>You&apos;re not on a team yet</EmptyTitle>
-            <EmptyDescription>Register a new team as its leader, or join one with a code from your leader.</EmptyDescription>
+            <EmptyTitle>{t("dashboard.emptyTitle")}</EmptyTitle>
+            <EmptyDescription>{t("dashboard.emptyDescription")}</EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="flex-row justify-center">
-            <Link href="/register" className={buttonVariants()}>
-              Register a team
+            <Link href={localePath(lang, "/register")} className={buttonVariants()}>
+              {t("dashboard.registerTeam")}
             </Link>
-            <Link href="/join" className={buttonVariants({ variant: "outline" })}>
-              Join with a code
+            <Link href={localePath(lang, "/join")} className={buttonVariants({ variant: "outline" })}>
+              {t("dashboard.joinWithCode")}
             </Link>
           </EmptyContent>
         </Empty>
@@ -52,12 +51,15 @@ export async function DashboardContent({ searchParams }: DashboardPageProps) {
             key={team.id}
             team={team}
             userId={user.id}
+            lang={lang}
             qrisUrl={team.competition.qris_public_id ? publicImageUrl(team.competition.qris_public_id) : null}
           />
         ))
       )}
 
-      <RegistrationRealtime registrationIds={teams.map((t) => t.id)} />
+      <AccountCard user={user} lang={lang} />
+
+      <RegistrationRealtime registrationIds={teams.map((team) => team.id)} />
     </div>
   );
 }

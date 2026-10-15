@@ -3,6 +3,7 @@
 import { Trash2Icon } from "lucide-react";
 import { deleteRegistration } from "@/lib/actions/registration";
 import { useConfirmAction } from "@/hooks/use-confirm-action";
+import { useI18n } from "@/hooks/use-i18n";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,25 +21,24 @@ import type { DeleteTeamButtonProps } from "@/types/registration";
 
 export function DeleteTeamButton({ registrationId }: DeleteTeamButtonProps) {
   const { open, setOpen, pending, run } = useConfirmAction();
+  const { t } = useI18n();
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger render={<Button variant="ghost" size="sm" />}>
         <Trash2Icon />
-        Delete team
+        {t("dashboard.deleteTeam")}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this team?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Everyone is removed and the team code stops working. You can register a new team afterwards.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{t("dashboard.deleteTitle")}</AlertDialogTitle>
+          <AlertDialogDescription>{t("dashboard.deleteDescription")}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" disabled={pending} onClick={() => run(() => deleteRegistration(registrationId), "Team deleted")}>
+          <AlertDialogCancel disabled={pending}>{t("common.cancel")}</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" disabled={pending} onClick={() => run(() => deleteRegistration(registrationId), "dashboard.teamDeleted")}>
             {pending && <Spinner />}
-            Delete team
+            {t("dashboard.deleteTeam")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -7,7 +7,10 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "res.cloudinary.com" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "api.cloudinary.com" },
+    ],
   },
   partialPrefetching: true,
   reactCompiler: true,
