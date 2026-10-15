@@ -1,0 +1,74 @@
+"use client";
+
+import { useActionState } from "react";
+import Link from "next/link";
+import { MailCheckIcon, OctagonXIcon } from "lucide-react";
+import { signUp } from "@/lib/actions/auth";
+import { initialFormState } from "@/lib/form";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import type { AuthFormProps } from "@/types/auth";
+
+export function SignupForm({ next }: AuthFormProps) {
+  const [state, action, pending] = useActionState(signUp, initialFormState);
+  const errors = state.fieldErrors ?? {};
+
+  if (state.status === "success") {
+    return (
+      <Alert>
+        <MailCheckIcon />
+        <AlertTitle>Check your email</AlertTitle>
+        <AlertDescription>
+          {state.message} Then <Link href="/login">sign in</Link>.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <form action={action}>
+      <input type="hidden" name="next" value={next ?? "/dashboard"} />
+      <FieldGroup>
+        <Field data-invalid={!!errors.fullName}>
+          <FieldLabel htmlFor="fullName">Full name</FieldLabel>
+          <Input id="fullName" name="fullName" autoComplete="name" aria-invalid={!!errors.fullName} required />
+          <FieldError errors={errors.fullName} />
+        </Field>
+        <Field data-invalid={!!errors.email}>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <Input id="email" name="email" type="email" autoComplete="email" aria-invalid={!!errors.email} required />
+          <FieldError errors={errors.email} />
+        </Field>
+        <Field data-invalid={!!errors.password}>
+          <FieldLabel htmlFor="password">Password</FieldLabel>
+          <Input id="password" name="password" type="password" autoComplete="new-password" aria-invalid={!!errors.password} required />
+          <FieldDescription>At least 8 characters.</FieldDescription>
+          <FieldError errors={errors.password} />
+        </Field>
+        <Field data-invalid={!!errors.confirmPassword}>
+          <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+          <Input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" aria-invalid={!!errors.confirmPassword} required />
+          <FieldError errors={errors.confirmPassword} />
+        </Field>
+        {state.status === "error" && state.message && (
+          <Alert variant="destructive">
+            <OctagonXIcon />
+            <AlertDescription>{state.message}</AlertDescription>
+          </Alert>
+        )}
+        <Field>
+          <Button type="submit" size="lg" disabled={pending}>
+            {pending && <Spinner />}
+            Create account
+          </Button>
+          <FieldDescription className="text-center">
+            Already registered? <Link href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}>Sign in</Link>
+          </FieldDescription>
+        </Field>
+      </FieldGroup>
+    </form>
+  );
+}

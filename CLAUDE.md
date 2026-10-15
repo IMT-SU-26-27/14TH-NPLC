@@ -68,7 +68,10 @@ src/
 - Validate on the server in every Server Action even if the form already validated on the client.
 
 ## Styling and animation
-- Tailwind CSS v4 + shadcn/ui (`components.json`, style `base-nova`, lucide icons). Add primitives with `pnpm dlx shadcn@latest add <name>`. Do not edit generated files in `components/ui/` unless needed; wrap them instead.
+- Tailwind CSS v4 + shadcn/ui (`components.json`, style `base-nova`, lucide icons).
+- **Use shadcn/ui for every UI component.** Never hand-build a component (button, input, alert, badge, empty state, loader, form field, dialog, table, ...) when shadcn has one: add it with `pnpm dlx shadcn@latest add <name>` and compose it. Forms use `Field`, `FieldGroup`, `FieldLabel`, `FieldError`; messages use `Alert`; empty lists use `Empty`; loading uses `Spinner` / `Skeleton`. Plain elements are only for page layout (wrappers, grids, headings).
+- Do not edit generated files in `components/ui/`.
+- **Colors come only from the theme in `src/app/globals.css`.** Use the token utilities (`bg-background`, `text-foreground`, `bg-primary`, `text-muted-foreground`, `border-border`, `text-destructive`, `bg-card`, `bg-accent`, ...). Never use raw Tailwind palette colors (`bg-emerald-500`, `text-zinc-600`, hex values). To change the look, edit the CSS variables in `globals.css`.
 - GSAP runs only in client components. Use `useGSAP` from `@gsap/react` (auto cleanup) with a `scope` ref; register plugins once with `gsap.registerPlugin(useGSAP, ...)`. Reusable animation logic goes in a hook in `src/hooks/`.
 - Respect `prefers-reduced-motion` for non-essential animations.
 
