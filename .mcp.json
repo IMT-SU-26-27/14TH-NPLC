@@ -4,7 +4,7 @@
       "type": "http",
       "url": "https://supabase.enthusiastrun.com/mcp?features=docs%2Cdatabase%2Cdebugging%2Cdevelopment",
       "headers": {
-        "apikey": "${SUPABSE_SERVICE_ROLE_KEY}"
+        "apikey": "${SUPABASE_MCP_KEY}"
       }
     }
   }
