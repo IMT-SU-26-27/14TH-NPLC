@@ -1,10 +1,14 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { publicEnv } from "@/lib/env";
 import type { Database } from "@/types/database";
 
 export async function createSupabaseServerClient() {
+  // Session reads are per request, and supabase-js reads the clock (Date.now) while checking the session,
+  // which Cache Components rejects during prerendering. connection() defers everything after it to request time.
+  await connection();
   const cookieStore = await cookies();
 
   return createServerClient<Database>(
