@@ -64,6 +64,7 @@ export async function ContestWaiting({ lang }: LangProps) {
       competitionId={context.competitionId}
       status={context.session.status}
       scheduledStartAt={context.session.scheduled_start_at}
+      durationSeconds={context.session.duration_seconds}
       teamName={context.teamName}
     />
   );

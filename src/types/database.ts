@@ -377,6 +377,7 @@ export type Database = {
         Row: {
           competition_id: string
           created_at: string
+          duration_seconds: number | null
           ended_at: string | null
           id: string
           leaderboard_frozen_at: string | null
@@ -393,6 +394,7 @@ export type Database = {
         Insert: {
           competition_id: string
           created_at?: string
+          duration_seconds?: number | null
           ended_at?: string | null
           id?: string
           leaderboard_frozen_at?: string | null
@@ -409,6 +411,7 @@ export type Database = {
         Update: {
           competition_id?: string
           created_at?: string
+          duration_seconds?: number | null
           ended_at?: string | null
           id?: string
           leaderboard_frozen_at?: string | null
@@ -983,6 +986,10 @@ export type Database = {
           registration_id: string
           session_status: Database["public"]["Enums"]["cp_session_status"]
         }[]
+      }
+      cp_finish_if_time_up: {
+        Args: { p_competition_id: string }
+        Returns: boolean
       }
       create_registration: {
         Args: {

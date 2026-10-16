@@ -70,7 +70,9 @@ export async function updateSessionSettings(_prev: FormState, formData: FormData
   const parsed = sessionSchema.safeParse({
     competitionId: formData.get("competitionId"),
     scheduledStartAt: formData.get("scheduledStartAt") ?? "",
-    scheduledEndAt: formData.get("scheduledEndAt") ?? "",
+    durationHours: formData.get("durationHours") || 0,
+    durationMinutes: formData.get("durationMinutes") || 0,
+    durationSeconds: formData.get("durationSeconds") || 0,
     cooldownSeconds: formData.get("cooldownSeconds"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
@@ -80,7 +82,8 @@ export async function updateSessionSettings(_prev: FormState, formData: FormData
     .from("cp_sessions")
     .update({
       scheduled_start_at: parsed.data.scheduledStartAt,
-      scheduled_end_at: parsed.data.scheduledEndAt,
+      // While the contest runs, the cp_sessions_set_end trigger moves the end time to match.
+      duration_seconds: parsed.data.duration,
       submission_cooldown_seconds: parsed.data.cooldownSeconds,
     })
     .eq("competition_id", parsed.data.competitionId);
@@ -97,7 +100,15 @@ export async function setContestStatus(competitionId: string, status: CpSessionS
   if (!parsed.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
-  const { data: before } = await supabase.from("cp_sessions").select("status").eq("competition_id", competitionId).maybeSingle();
+  const { data: before } = await supabase
+    .from("cp_sessions")
+    .select("status, duration_seconds")
+    .eq("competition_id", competitionId)
+    .maybeSingle();
+  // A fresh start needs a duration: the timer and the automatic end are based on it.
+  if (status === "live" && before?.status !== "paused" && !before?.duration_seconds) {
+    return { ok: false, message: "admin.cp.durationRequired" };
+  }
   // The cp_sessions_prepare trigger handles the timestamps (and pushes the scheduled end back on resume).
   // Resetting to "not started" also unfreezes the leaderboard.
   const { error } = await supabase

@@ -122,7 +122,7 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
 
   // Cooldown checked before spending Judge0 time; the database trigger checks it again on insert.
   const [{ data: session }, { data: last }] = await Promise.all([
-    admin.from("cp_sessions").select("submission_cooldown_seconds").eq("competition_id", problem.competition_id).single(),
+    admin.from("cp_sessions").select("submission_cooldown_seconds, scheduled_end_at").eq("competition_id", problem.competition_id).single(),
     admin
       .from("cp_submissions")
       .select("created_at")
@@ -131,6 +131,10 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
       .limit(1)
       .maybeSingle(),
   ]);
+  // Strict deadline on arrival; the database allows a short grace only for code already being judged.
+  if (session?.scheduled_end_at && Date.now() >= new Date(session.scheduled_end_at).getTime()) {
+    return { ok: false, message: "cp.errors.timeUp" };
+  }
   const cooldown = session?.submission_cooldown_seconds ?? 0;
   if (last) {
     const wait = Math.ceil(cooldown - (Date.now() - new Date(last.created_at).getTime()) / 1000);
@@ -177,6 +181,7 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
   if (error) {
     if (error.message.startsWith("Please wait")) return { ok: false, message: "cp.errors.cooldown", params: { seconds: cooldown } };
     if (error.message.startsWith("The contest is not running")) return { ok: false, message: "cp.errors.notLive" };
+    if (error.message.startsWith("The contest time is over")) return { ok: false, message: "cp.errors.timeUp" };
     return { ok: false, message: "errors.generic" };
   }
 

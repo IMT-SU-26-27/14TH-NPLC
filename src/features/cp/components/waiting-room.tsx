@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { HourglassIcon, PauseIcon, TrophyIcon } from "lucide-react";
 import { toast } from "sonner";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatDuration } from "@/lib/format";
 import { useCountdown } from "@/hooks/use-countdown";
 import { useCpSessionRealtime } from "@/hooks/use-cp-session-realtime";
 import { useI18n } from "@/hooks/use-i18n";
@@ -24,7 +24,7 @@ function clock(seconds: number, daySuffix: string) {
 // Moves the team into the contest the moment an admin presses start (Supabase Realtime on cp_sessions).
 // Uses a full page load, not router.replace: the client router can reuse the cached
 // "/cp → /cp/waiting" redirect from before the start and land the team back here.
-export function WaitingRoom({ competitionId, status, scheduledStartAt, teamName }: WaitingRoomProps) {
+export function WaitingRoom({ competitionId, status, scheduledStartAt, durationSeconds, teamName }: WaitingRoomProps) {
   const router = useRouter();
   const { t, href, lang } = useI18n();
   const left = useCountdown(status === "scheduled" ? scheduledStartAt : null);
@@ -99,6 +99,9 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, teamName 
         ) : (
           <p className="text-muted-foreground text-sm">{t("cp.waiting.noSchedule")}</p>
         )}
+        {durationSeconds ? (
+          <p className="text-muted-foreground text-sm">{t("cp.waiting.duration", { duration: formatDuration(durationSeconds, lang) })}</p>
+        ) : null}
       </EmptyContent>
     </Empty>
   );

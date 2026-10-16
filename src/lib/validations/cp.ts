@@ -43,16 +43,16 @@ export const sessionSchema = z
       .string()
       .trim()
       .transform((v) => (v === "" ? null : new Date(`${v}:00+07:00`).toISOString())),
-    scheduledEndAt: z
-      .string()
-      .trim()
-      .transform((v) => (v === "" ? null : new Date(`${v}:00+07:00`).toISOString())),
+    durationHours: z.coerce.number().int("validation.wholeNumber").min(0, "validation.nonNegative").max(48, "validation.durationRange"),
+    durationMinutes: z.coerce.number().int("validation.wholeNumber").min(0, "validation.nonNegative").max(59, "validation.minutesRange"),
+    durationSeconds: z.coerce.number().int("validation.wholeNumber").min(0, "validation.nonNegative").max(59, "validation.minutesRange"),
     cooldownSeconds: z.coerce.number().int().min(0, "validation.nonNegative").max(600, "validation.cooldownMax"),
   })
-  .refine((v) => !v.scheduledStartAt || !v.scheduledEndAt || v.scheduledEndAt > v.scheduledStartAt, {
-    message: "validation.endAfterStart",
-    path: ["scheduledEndAt"],
-  });
+  .transform(({ durationHours, durationMinutes, durationSeconds, ...rest }) => ({
+    ...rest,
+    duration: durationHours * 3600 + durationMinutes * 60 + durationSeconds,
+  }))
+  .refine((v) => v.duration > 0 && v.duration <= 172800, { message: "validation.durationRequired", path: ["duration"] });
 
 export const contestStatusSchema = z.object({
   competitionId: z.uuid(),

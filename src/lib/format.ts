@@ -52,3 +52,25 @@ export function formatDateRange(start: string, end: string | null, lang: Locale)
 export function formatScore(value: number, lang: Locale): string {
   return new Intl.NumberFormat(INTL_LOCALE[lang], { maximumFractionDigits: 2 }).format(value);
 }
+
+// 3725 -> "01:02:05". Hours keep counting past 24 (a contest is at most 48 hours).
+export function formatClock(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
+}
+
+// 9000 -> "2 jam 30 menit" / "2 h 30 min".
+export function formatDuration(seconds: number, lang: Locale): string {
+  const t = getT(lang);
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  const parts = [
+    h > 0 && t("cp.duration.hours", { count: h }),
+    m > 0 && t("cp.duration.minutes", { count: m }),
+    s > 0 && t("cp.duration.seconds", { count: s }),
+  ].filter(Boolean);
+  return parts.join(" ");
+}

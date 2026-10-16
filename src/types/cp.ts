@@ -205,6 +205,7 @@ export type WaitingRoomProps = {
   competitionId: string;
   status: CpSessionStatus;
   scheduledStartAt: string | null;
+  durationSeconds: number | null;
   teamName: string | null;
 };
 
@@ -215,8 +216,10 @@ export type ContestHeaderProps = {
 };
 
 export type ContestClockProps = {
-  startedAt: string | null;
+  competitionId: string;
+  status: CpSessionStatus;
   endsAt: string | null;
+  pausedAt: string | null;
 };
 
 export type ProblemListProps = {

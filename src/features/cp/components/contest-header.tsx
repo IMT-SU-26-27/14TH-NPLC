@@ -15,7 +15,12 @@ export function ContestHeader({ lang, context, showBackToProblems }: ContestHead
         {context.teamName && <p className="text-muted-foreground">{t("cp.waiting.team", { team: context.teamName })}</p>}
       </div>
       <div className="flex items-center gap-2">
-        <ContestClock startedAt={context.session.started_at} endsAt={context.session.scheduled_end_at} />
+        <ContestClock
+          competitionId={context.competitionId}
+          status={context.session.status}
+          endsAt={context.session.scheduled_end_at}
+          pausedAt={context.session.paused_at}
+        />
         {showBackToProblems && (
           <Link href={localePath(lang, "/cp")} className={buttonVariants({ variant: "outline" })}>
             <ArrowLeftIcon />

@@ -26,6 +26,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/c
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { ContestClock } from "@/features/cp/components/contest-clock";
 import type { ContestControlProps, ContestTransition, ContestTransitionButtonProps } from "@/types/cp";
 
 const STATUS_BADGE = {
@@ -68,6 +69,7 @@ function ContestTransitionButton({ competitionId, transition: tr }: ContestTrans
 export function ContestControl({ contest }: ContestControlProps) {
   const { t, lang, fieldErrors } = useI18n();
   const { session } = contest;
+  const duration = session.duration_seconds ?? 0;
   const [state, action, pending] = useActionState(updateSessionSettings, initialFormState);
   const errors = state.fieldErrors ?? {};
 
@@ -98,6 +100,9 @@ export function ContestControl({ contest }: ContestControlProps) {
           {transitions.map((tr) => (
             <ContestTransitionButton key={tr.to} competitionId={contest.competitionId} transition={tr} />
           ))}
+          {(session.status === "live" || session.status === "paused") && (
+            <ContestClock competitionId={contest.competitionId} status={session.status} endsAt={session.scheduled_end_at} pausedAt={session.paused_at} />
+          )}
           <p className="text-muted-foreground text-sm">
             {session.started_at && t("admin.cp.startedAt", { date: formatDateTime(session.started_at, lang) })}
             {session.paused_at && ` · ${t("admin.cp.pausedAt", { date: formatDateTime(session.paused_at, lang) })}`}
@@ -118,10 +123,35 @@ export function ContestControl({ contest }: ContestControlProps) {
                 <FieldDescription>{t("admin.cp.scheduleHint")}</FieldDescription>
                 <FieldError errors={fieldErrors(errors.scheduledStartAt)} />
               </Field>
-              <Field data-invalid={!!errors.scheduledEndAt}>
-                <FieldLabel htmlFor="scheduledEndAt">{t("admin.cp.scheduledEnd")}</FieldLabel>
-                <Input id="scheduledEndAt" name="scheduledEndAt" type="datetime-local" defaultValue={toWibInputValue(session.scheduled_end_at)} aria-invalid={!!errors.scheduledEndAt} />
-                <FieldError errors={fieldErrors(errors.scheduledEndAt)} />
+              <Field data-invalid={!!errors.duration}>
+                <FieldLabel htmlFor="durationHours">{t("admin.cp.duration")}</FieldLabel>
+                <div className="grid grid-cols-3 gap-2">
+                  {(
+                    [
+                      ["durationHours", t("admin.cp.hours"), 48, Math.floor(duration / 3600)],
+                      ["durationMinutes", t("admin.cp.minutes"), 59, Math.floor((duration % 3600) / 60)],
+                      ["durationSeconds", t("admin.cp.seconds"), 59, duration % 60],
+                    ] as const
+                  ).map(([name, unit, max, value]) => (
+                    <div key={name} className="space-y-1">
+                      <Input
+                        id={name}
+                        name={name}
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        max={max}
+                        defaultValue={value}
+                        aria-label={unit}
+                        aria-invalid={!!errors.duration}
+                        className="tabular-nums"
+                      />
+                      <span className="text-muted-foreground block text-xs">{unit}</span>
+                    </div>
+                  ))}
+                </div>
+                <FieldDescription>{t("admin.cp.durationHint")}</FieldDescription>
+                <FieldError errors={fieldErrors(errors.duration)} />
               </Field>
               <Field data-invalid={!!errors.cooldownSeconds}>
                 <FieldLabel htmlFor="cooldownSeconds">{t("admin.cp.cooldown")}</FieldLabel>

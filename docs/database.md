@@ -10,6 +10,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261016000100_cp_pause_and_difficulty.sql` | Contest pause/resume (`paused_at`, `paused_seconds`, trigger), `cp_problems.difficulty`, `admin_save_problem` takes `difficulty` |
 | `20261016120000_push_subscriptions.sql` | `push_subscriptions` for web push notifications |
 | `20261016130000_cp_leaderboard_freeze.sql` | Leaderboard freeze (`cp_sessions.leaderboard_frozen_at`, `cp_leaderboard_snapshots`) and hiding the leaderboard from participants after the contest ends |
+| `20261016140000_cp_contest_duration.sql` | `cp_sessions.duration_seconds`; the end time is set from it on start, submissions are refused after it, and `cp_finish_if_time_up()` ends the contest |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -59,7 +60,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 
 | Table | What it holds |
 |---|---|
-| `cp_sessions` | One per CP competition. `status` is `scheduled`, `live`, `paused` or `ended`. The admin's start/pause/resume/end buttons update it; `started_at`/`ended_at`/`paused_at` are filled automatically. Only a live contest can be paused. While paused, problems are hidden and submissions are refused (both require `live`) and participants wait in the waiting room. On resume the pause length is added to `paused_seconds` and `scheduled_end_at` moves back by it. `submission_cooldown_seconds` limits how often a team can submit (default 10). |
+| `cp_sessions` | One per CP competition. `status` is `scheduled`, `live`, `paused` or `ended`. The admin's start/pause/resume/end buttons update it; `started_at`/`ended_at`/`paused_at` are filled automatically. Only a live contest can be paused. While paused, problems are hidden and submissions are refused (both require `live`) and participants wait in the waiting room. On resume the pause length is added to `paused_seconds` and `scheduled_end_at` moves back by it. `submission_cooldown_seconds` limits how often a team can submit (default 10). `duration_seconds` (required before starting) sets the length: on start `scheduled_end_at` becomes `started_at + duration_seconds + paused_seconds` (the `cp_sessions_set_end` trigger, which also follows duration changes while running). After `scheduled_end_at` no submission is accepted (2-minute grace in the database for code already being judged; the server action checks strictly on arrival), and the contest timer calls `cp_finish_if_time_up()` at zero to set `status = 'ended'`. |
 | `cp_problems` | The levels: `level` number, `difficulty` (`easy`, `medium`, `hard`; default `easy`), title, markdown statement, input/output format, `constraints`, `time_limit_ms`, `memory_limit_kb`, `points`, `is_published`. A problem can only be published once it has a test case. |
 | `cp_test_cases` | One or more per problem, in order. `is_sample` cases are shown to participants; the rest stay hidden. |
 | `cp_submissions` | Every judged submission: language, code, overall verdict, tests passed out of total, slowest time, highest memory, `efficiency`, `score`, compiler output. |
@@ -78,6 +79,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | `preview_team(referral_code)` | Join page. Shows team name, competition, leader, member count and whether it can still be joined, before the user confirms. |
 | `join_team(referral_code, full_name, nisn, phone?)` | Join page. Adds the signed-in user to the team. |
 | `cp_access()` | `src/proxy.ts`. Returns the caller's accepted CP teams and each contest's status. |
+| `cp_finish_if_time_up(competition_id)` | Contest timer at zero. Ends a live contest whose end time has passed; does nothing otherwise, so any signed-in user may call it. |
 | `admin_save_problem(problem, test_cases)` | Admin problem form. Saves a problem and replaces its test cases in one step. |
 
 ## Registration flow
