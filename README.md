@@ -120,7 +120,7 @@ As an admin:
 1. **Admin → Competitions:** set each competition's team size, fee and registration window.
 2. **Admin → Registrations → Payment:** for each competition choose **QRIS** (upload the QRIS image) or **BCA transfer** (account number and holder name). Teams can't register until this is set.
 3. **Admin → Content:** write the About NPLC text and add the timeline dates (both languages).
-4. **Admin → CP contest:** add problems with test cases, set the schedule and submission cooldown, and press **Start** when the contest begins.
+4. **Admin → CP contest:** the seed already adds 10 easy problems (levels 1-10). Add more with test cases and a difficulty (easy / medium / hard), set the schedule and submission cooldown, and press **Start** when the contest begins. **Pause** hides the problems and sends teams back to the waiting room; **Resume** brings them back and moves the scheduled end back by the length of the pause.
 
 ---
 

@@ -13,6 +13,7 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ContestControl } from "@/features/cp/components/contest-control";
+import { DifficultyBadge } from "@/features/cp/components/difficulty-badge";
 import { DeleteProblemButton } from "@/features/cp/components/delete-problem-button";
 import { ProblemForm } from "@/features/cp/components/problem-form";
 import type { AdminCpSectionProps, AdminProblemPageProps } from "@/types/cp";
@@ -82,6 +83,7 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
                 <TableRow>
                   <TableHead className="w-16">{t("admin.cp.form.level")}</TableHead>
                   <TableHead>{t("admin.cp.form.titleLabel")}</TableHead>
+                  <TableHead>{t("admin.cp.form.difficulty")}</TableHead>
                   <TableHead className="text-right">{t("admin.cp.form.points")}</TableHead>
                   <TableHead>{t("admin.cp.form.testCases")}</TableHead>
                   <TableHead>{t("admin.registrations.status")}</TableHead>
@@ -96,6 +98,9 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
                       <Link href={localePath(lang, `/admin/cp/problems/${p.id}`)} className="font-medium underline-offset-4 hover:underline">
                         {p.title}
                       </Link>
+                    </TableCell>
+                    <TableCell>
+                      <DifficultyBadge difficulty={p.difficulty} label={t(`cp.difficulty.${p.difficulty}`)} />
                     </TableCell>
                     <TableCell className="text-right tabular-nums">{p.points}</TableCell>
                     <TableCell>{t("admin.cp.tests", { count: p.testCaseCount })}</TableCell>

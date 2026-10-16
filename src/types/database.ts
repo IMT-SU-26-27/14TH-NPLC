@@ -214,6 +214,7 @@ export type Database = {
           competition_id: string
           constraints: string
           created_at: string
+          difficulty: Database["public"]["Enums"]["cp_difficulty"]
           id: string
           input_format: string
           is_published: boolean
@@ -230,6 +231,7 @@ export type Database = {
           competition_id: string
           constraints?: string
           created_at?: string
+          difficulty?: Database["public"]["Enums"]["cp_difficulty"]
           id?: string
           input_format?: string
           is_published?: boolean
@@ -246,6 +248,7 @@ export type Database = {
           competition_id?: string
           constraints?: string
           created_at?: string
+          difficulty?: Database["public"]["Enums"]["cp_difficulty"]
           id?: string
           input_format?: string
           is_published?: boolean
@@ -334,6 +337,8 @@ export type Database = {
           created_at: string
           ended_at: string | null
           id: string
+          paused_at: string | null
+          paused_seconds: number
           scheduled_end_at: string | null
           scheduled_start_at: string | null
           started_at: string | null
@@ -347,6 +352,8 @@ export type Database = {
           created_at?: string
           ended_at?: string | null
           id?: string
+          paused_at?: string | null
+          paused_seconds?: number
           scheduled_end_at?: string | null
           scheduled_start_at?: string | null
           started_at?: string | null
@@ -360,6 +367,8 @@ export type Database = {
           created_at?: string
           ended_at?: string | null
           id?: string
+          paused_at?: string | null
+          paused_seconds?: number
           scheduled_end_at?: string | null
           scheduled_start_at?: string | null
           started_at?: string | null
@@ -924,8 +933,9 @@ export type Database = {
     }
     Enums: {
       competition_type: "competitive_programming" | "logic"
+      cp_difficulty: "easy" | "medium" | "hard"
       cp_language: "python" | "cpp" | "java"
-      cp_session_status: "scheduled" | "live" | "ended"
+      cp_session_status: "scheduled" | "live" | "paused" | "ended"
       cp_verdict:
         | "accepted"
         | "wrong_answer"
@@ -1620,8 +1630,9 @@ export const Constants = {
   public: {
     Enums: {
       competition_type: ["competitive_programming", "logic"],
+      cp_difficulty: ["easy", "medium", "hard"],
       cp_language: ["python", "cpp", "java"],
-      cp_session_status: ["scheduled", "live", "ended"],
+      cp_session_status: ["scheduled", "live", "paused", "ended"],
       cp_verdict: [
         "accepted",
         "wrong_answer",
@@ -1652,3 +1663,4 @@ export const Constants = {
     },
   },
 } as const
+

@@ -1,11 +1,13 @@
 # Database
 
-The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Starting data is in [`supabase/seed.sql`](../supabase/seed.sql).
+The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Starting data is in [`supabase/seed.sql`](../supabase/seed.sql): the two competitions, the CP session, and 10 easy CP problems (levels 1-10, 100 points, 2 sample + 4 hidden tests each, published). Re-running the seed skips levels that already exist.
 
 | Migration | What it does |
 |---|---|
 | `20261015000000_init_schema.sql` | Tables, functions, RLS policies, realtime publication |
 | `20261015010000_fix_anon_competitions_read.sql` | Splits the competitions read policy so logged-out visitors don't call `private.is_admin()` (which anon may not execute) |
+| `20261016000000_cp_pause_and_difficulty_enums.sql` | Adds `paused` to `cp_session_status` and the `cp_difficulty` enum (own migration: new enum values must be committed before use) |
+| `20261016000100_cp_pause_and_difficulty.sql` | Contest pause/resume (`paused_at`, `paused_seconds`, trigger), `cp_problems.difficulty`, `admin_save_problem` takes `difficulty` |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -49,8 +51,8 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 
 | Table | What it holds |
 |---|---|
-| `cp_sessions` | One per CP competition. `status` is `scheduled`, `live` or `ended`. The admin's start/end button updates it; `started_at`/`ended_at` are filled automatically. `submission_cooldown_seconds` limits how often a team can submit (default 10). |
-| `cp_problems` | The levels: `level` number, title, markdown statement, input/output format, `constraints`, `time_limit_ms`, `memory_limit_kb`, `points`, `is_published`. A problem can only be published once it has a test case. |
+| `cp_sessions` | One per CP competition. `status` is `scheduled`, `live`, `paused` or `ended`. The admin's start/pause/resume/end buttons update it; `started_at`/`ended_at`/`paused_at` are filled automatically. Only a live contest can be paused. While paused, problems are hidden and submissions are refused (both require `live`) and participants wait in the waiting room. On resume the pause length is added to `paused_seconds` and `scheduled_end_at` moves back by it. `submission_cooldown_seconds` limits how often a team can submit (default 10). |
+| `cp_problems` | The levels: `level` number, `difficulty` (`easy`, `medium`, `hard`; default `easy`), title, markdown statement, input/output format, `constraints`, `time_limit_ms`, `memory_limit_kb`, `points`, `is_published`. A problem can only be published once it has a test case. |
 | `cp_test_cases` | One or more per problem, in order. `is_sample` cases are shown to participants; the rest stay hidden. |
 | `cp_submissions` | Every judged submission: language, code, overall verdict, tests passed out of total, slowest time, highest memory, `efficiency`, `score`, compiler output. |
 | `cp_submission_results` | The result of each test case in a submission. Never stores the expected output of hidden tests. |
@@ -129,7 +131,7 @@ These tables are in the `supabase_realtime` publication:
 
 | Table | Purpose |
 |---|---|
-| `cp_sessions` | Waiting room moves into the contest when the admin presses start, and locks when it ends |
+| `cp_sessions` | Waiting room moves into the contest when the admin presses start or resume; the contest page goes back to the waiting room when it is paused, and locks when it ends |
 | `cp_scores` | Live leaderboard |
 | `registration_events` | Participant dashboard updates when the admin accepts or rejects |
 

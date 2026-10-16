@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Markdown } from "@/components/shared/markdown";
+import { DifficultyBadge } from "@/features/cp/components/difficulty-badge";
 import type { ProblemStatementProps } from "@/types/cp";
 
 export function ProblemStatement({ problem, lang }: ProblemStatementProps) {
@@ -15,7 +16,8 @@ export function ProblemStatement({ problem, lang }: ProblemStatementProps) {
         <CardTitle className="text-xl">
           {t("cp.level", { level: problem.level })} · {problem.title}
         </CardTitle>
-        <CardAction>
+        <CardAction className="flex items-center gap-2">
+          <DifficultyBadge difficulty={problem.difficulty} label={t(`cp.difficulty.${problem.difficulty}`)} />
           <Badge variant="secondary">{t("cp.points", { points: problem.points })}</Badge>
         </CardAction>
       </CardHeader>

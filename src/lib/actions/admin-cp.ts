@@ -31,6 +31,7 @@ export async function saveProblem(input: ProblemInput): Promise<ActionResult<{ i
       id: p.id,
       competition_id: p.competitionId,
       level: p.level,
+      difficulty: p.difficulty,
       title: p.title,
       statement: p.statement,
       input_format: p.inputFormat,
@@ -87,20 +88,22 @@ export async function updateSessionSettings(_prev: FormState, formData: FormData
   return successState("admin.cp.settingsSaved");
 }
 
-// Start / end / reset the contest. Participants' pages react through Realtime on cp_sessions.
+// Start / pause / resume / end / reset the contest. Participants' pages react through Realtime on cp_sessions.
 export async function setContestStatus(competitionId: string, status: CpSessionStatus): Promise<ActionResult> {
   if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
   const parsed = contestStatusSchema.safeParse({ competitionId, status });
   if (!parsed.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
+  const { data: before } = await supabase.from("cp_sessions").select("status").eq("competition_id", competitionId).maybeSingle();
+  // The cp_sessions_prepare trigger handles the timestamps (and pushes the scheduled end back on resume).
   const { error } = await supabase.from("cp_sessions").update({ status }).eq("competition_id", competitionId);
   if (error) return { ok: false, message: databaseErrorMessage(error) };
 
   refresh();
-  return {
-    ok: true,
-    data: undefined,
-    message: status === "live" ? "admin.cp.started" : status === "ended" ? "admin.cp.ended" : "admin.cp.resetDone",
-  };
+  const resumed = status === "live" && before?.status === "paused";
+  const message = resumed
+    ? "admin.cp.resumed"
+    : { live: "admin.cp.started", paused: "admin.cp.pausedDone", ended: "admin.cp.ended", scheduled: "admin.cp.resetDone" }[status];
+  return { ok: true, data: undefined, message };
 }

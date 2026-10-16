@@ -56,20 +56,23 @@ export async function proxy(request: NextRequest) {
     if (matches(path, ["/admin"]) && !isAdmin) return to("/dashboard");
 
     // /cp: accepted competitive programming teams only, and only while the admin has the contest live.
+    // Paused works like ended: waiting room and leaderboard only, until the admin resumes.
     if (matches(path, ["/cp"]) && !isAdmin) {
       const { data: access } = await supabase.rpc("cp_access");
       if (!access || access.length === 0) return to("/dashboard", { notice: "cp-not-registered" });
 
       const status = access.some((row) => row.session_status === "live")
         ? "live"
-        : access.some((row) => row.session_status === "ended")
+        : access.some((row) => row.session_status === "paused")
+          ? "paused"
+          : access.some((row) => row.session_status === "ended")
           ? "ended"
           : "scheduled";
       const onWaiting = path === "/cp/waiting";
       const onLeaderboard = path === "/cp/leaderboard";
 
       if (status === "live" && onWaiting) return to("/cp");
-      if (status === "ended" && !onWaiting && !onLeaderboard) return to("/cp/waiting");
+      if ((status === "paused" || status === "ended") && !onWaiting && !onLeaderboard) return to("/cp/waiting");
       if (status === "scheduled" && !onWaiting) return to("/cp/waiting");
     }
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { PlayIcon, RotateCcwIcon, SquareIcon } from "lucide-react";
+import { PauseIcon, PlayIcon, RotateCcwIcon, SquareIcon } from "lucide-react";
 import { toast } from "sonner";
 import { setContestStatus, updateSessionSettings } from "@/lib/actions/admin-cp";
 import { initialFormState } from "@/lib/form";
@@ -28,7 +28,12 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import type { ContestControlProps, ContestTransition, ContestTransitionButtonProps } from "@/types/cp";
 
-const STATUS_VARIANT = { scheduled: "outline", live: "default", ended: "secondary" } as const;
+const STATUS_BADGE = {
+  scheduled: { variant: "outline", className: undefined },
+  live: { variant: "default", className: undefined },
+  paused: { variant: "outline", className: "border-warning text-warning" },
+  ended: { variant: "secondary", className: undefined },
+} as const;
 
 function ContestTransitionButton({ competitionId, transition: tr }: ContestTransitionButtonProps) {
   const { t } = useI18n();
@@ -71,15 +76,13 @@ export function ContestControl({ contest }: ContestControlProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- toast once per action result
   }, [state]);
 
-  const transitions: ContestTransition[] =
-    session.status === "live"
-      ? [{ to: "ended", label: t("admin.cp.end"), title: t("admin.cp.endTitle"), description: t("admin.cp.endDescription"), icon: SquareIcon, destructive: true }]
-      : [
-          { to: "live", label: t("admin.cp.start"), title: t("admin.cp.startTitle"), description: t("admin.cp.startDescription"), icon: PlayIcon },
-          ...(session.status === "ended"
-            ? [{ to: "scheduled" as const, label: t("admin.cp.reset"), title: t("admin.cp.resetTitle"), description: t("admin.cp.resetDescription"), icon: RotateCcwIcon }]
-            : []),
-        ];
+  const start: ContestTransition = { to: "live", label: t("admin.cp.start"), title: t("admin.cp.startTitle"), description: t("admin.cp.startDescription"), icon: PlayIcon };
+  const pause: ContestTransition = { to: "paused", label: t("admin.cp.pause"), title: t("admin.cp.pauseTitle"), description: t("admin.cp.pauseDescription"), icon: PauseIcon };
+  const resume: ContestTransition = { to: "live", label: t("admin.cp.resume"), title: t("admin.cp.resumeTitle"), description: t("admin.cp.resumeDescription"), icon: PlayIcon };
+  const end: ContestTransition = { to: "ended", label: t("admin.cp.end"), title: t("admin.cp.endTitle"), description: t("admin.cp.endDescription"), icon: SquareIcon, destructive: true };
+  const reset: ContestTransition = { to: "scheduled", label: t("admin.cp.reset"), title: t("admin.cp.resetTitle"), description: t("admin.cp.resetDescription"), icon: RotateCcwIcon };
+  const transitions = { scheduled: [start], live: [pause, end], paused: [resume, end], ended: [start, reset] }[session.status];
+  const badge = STATUS_BADGE[session.status];
 
   return (
     <Card>
@@ -87,7 +90,7 @@ export function ContestControl({ contest }: ContestControlProps) {
         <CardTitle>{t("admin.cp.control")}</CardTitle>
         <CardDescription>{t("admin.cp.controlLead")}</CardDescription>
         <CardAction>
-          <Badge variant={STATUS_VARIANT[session.status]}>{t(`cp.${session.status}`)}</Badge>
+          <Badge variant={badge.variant} className={badge.className}>{t(`cp.${session.status}`)}</Badge>
         </CardAction>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -97,6 +100,8 @@ export function ContestControl({ contest }: ContestControlProps) {
           ))}
           <p className="text-muted-foreground text-sm">
             {session.started_at && t("admin.cp.startedAt", { date: formatDateTime(session.started_at, lang) })}
+            {session.paused_at && ` · ${t("admin.cp.pausedAt", { date: formatDateTime(session.paused_at, lang) })}`}
+            {session.paused_seconds > 0 && ` · ${t("admin.cp.pausedTotal", { minutes: Math.ceil(session.paused_seconds / 60) })}`}
             {session.ended_at && ` · ${t("admin.cp.endedAt", { date: formatDateTime(session.ended_at, lang) })}`}
           </p>
         </div>

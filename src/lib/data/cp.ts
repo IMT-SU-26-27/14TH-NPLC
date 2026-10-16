@@ -51,7 +51,7 @@ export async function listContestProblems(competitionId: string, registrationId:
   const [{ data: problems }, { data: scores }] = await Promise.all([
     supabase
       .from("cp_problems")
-      .select("id, level, title, points")
+      .select("id, level, difficulty, title, points")
       .eq("competition_id", competitionId)
       .eq("is_published", true)
       .order("level"),
@@ -72,7 +72,7 @@ export async function getProblemView(problemId: string): Promise<ProblemView | n
   const supabase = await createSupabaseServerClient();
   const { data: problem } = await supabase
     .from("cp_problems")
-    .select("id, competition_id, level, title, statement, input_format, output_format, constraints, time_limit_ms, memory_limit_kb, points")
+    .select("id, competition_id, level, difficulty, title, statement, input_format, output_format, constraints, time_limit_ms, memory_limit_kb, points")
     .eq("id", problemId)
     .maybeSingle();
   if (!problem) return null;
@@ -125,7 +125,7 @@ export async function getAdminContest(competitionId: string): Promise<AdminConte
     supabase.from("cp_sessions").select("*").eq("competition_id", competitionId).maybeSingle(),
     supabase
       .from("cp_problems")
-      .select("id, level, title, points, is_published, time_limit_ms, memory_limit_kb, cp_test_cases(count)")
+      .select("id, level, difficulty, title, points, is_published, time_limit_ms, memory_limit_kb, cp_test_cases(count)")
       .eq("competition_id", competitionId)
       .order("level"),
   ]);

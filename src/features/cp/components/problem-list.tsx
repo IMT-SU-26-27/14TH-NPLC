@@ -5,6 +5,7 @@ import { formatScore } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { DifficultyBadge } from "@/features/cp/components/difficulty-badge";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from "@/components/ui/item";
 import type { ProblemListProps } from "@/types/cp";
 
@@ -40,6 +41,7 @@ export function ProblemList({ problems, lang }: ProblemListProps) {
             </ItemDescription>
           </ItemContent>
           <ItemActions>
+            <DifficultyBadge difficulty={p.difficulty} label={t(`cp.difficulty.${p.difficulty}`)} />
             {p.solved && <Badge className="bg-success text-success-foreground">{t("cp.solved")}</Badge>}
             <Badge variant="secondary">{t("cp.points", { points: p.points })}</Badge>
           </ItemActions>

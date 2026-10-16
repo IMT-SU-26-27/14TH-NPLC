@@ -12,13 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Markdown } from "@/components/shared/markdown";
+import { CP_DIFFICULTIES } from "@/lib/validations/cp";
 import type { FieldErrors } from "@/types";
-import type { ProblemFormProps } from "@/types/cp";
+import type { CpDifficulty, ProblemFormProps } from "@/types/cp";
 
 export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
   const { t, href, fieldErrors } = useI18n();
@@ -27,6 +29,8 @@ export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [statement, setStatement] = useState(problem?.statement ?? "");
   const [published, setPublished] = useState(problem?.is_published ?? false);
+  const [difficulty, setDifficulty] = useState<CpDifficulty>(problem?.difficulty ?? "easy");
+  const difficultyItems = CP_DIFFICULTIES.map((value) => ({ value, label: t(`cp.difficulty.${value}`) }));
   const tests = useTestCases(
     (problem?.testCases ?? []).map((c) => ({ input: c.input, expectedOutput: c.expected_output, isSample: c.is_sample })),
   );
@@ -39,6 +43,7 @@ export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
         id: problem?.id,
         competitionId,
         level: Number(data.get("level")),
+        difficulty,
         title: String(data.get("title") ?? ""),
         statement,
         inputFormat: String(data.get("inputFormat") ?? ""),
@@ -69,11 +74,27 @@ export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <div className="grid gap-6 sm:grid-cols-[8rem_1fr_8rem]">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-[8rem_10rem_1fr_8rem]">
               <Field data-invalid={!!errors.level}>
                 <FieldLabel htmlFor="level">{t("admin.cp.form.level")}</FieldLabel>
                 <Input id="level" name="level" type="number" min={1} defaultValue={problem?.level ?? 1} required />
                 <FieldError errors={fieldErrors(errors.level)} />
+              </Field>
+              <Field data-invalid={!!errors.difficulty}>
+                <FieldLabel htmlFor="difficulty">{t("admin.cp.form.difficulty")}</FieldLabel>
+                <Select items={difficultyItems} value={difficulty} onValueChange={(v) => v && setDifficulty(v as CpDifficulty)}>
+                  <SelectTrigger id="difficulty" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {difficultyItems.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={fieldErrors(errors.difficulty)} />
               </Field>
               <Field data-invalid={!!errors.title}>
                 <FieldLabel htmlFor="title">{t("admin.cp.form.titleLabel")}</FieldLabel>

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const CP_LANGUAGES = ["python", "cpp", "java"] as const;
+export const CP_DIFFICULTIES = ["easy", "medium", "hard"] as const;
 
 export const codeSubmissionSchema = z.object({
   problemId: z.uuid(),
@@ -21,6 +22,7 @@ export const problemSchema = z.object({
   id: z.uuid().optional(),
   competitionId: z.uuid(),
   level: z.coerce.number().int().min(1, "validation.atLeastOne").max(999),
+  difficulty: z.enum(CP_DIFFICULTIES),
   title: z.string().trim().min(1, "validation.title").max(120),
   statement: z.string().trim().min(1, "validation.statement"),
   inputFormat: z.string().trim().max(5000),
@@ -53,5 +55,5 @@ export const sessionSchema = z
 
 export const contestStatusSchema = z.object({
   competitionId: z.uuid(),
-  status: z.enum(["scheduled", "live", "ended"]),
+  status: z.enum(["scheduled", "live", "paused", "ended"]),
 });

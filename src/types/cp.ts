@@ -6,6 +6,7 @@ import type { codeSubmissionSchema, problemSchema, sessionSchema } from "@/lib/v
 export type CpLanguage = Enums<"cp_language">;
 export type CpVerdict = Enums<"cp_verdict">;
 export type CpSessionStatus = Enums<"cp_session_status">;
+export type CpDifficulty = Enums<"cp_difficulty">;
 
 export type CpSession = Tables<"cp_sessions">;
 export type CpProblem = Tables<"cp_problems">;
@@ -80,7 +81,7 @@ export type CpAccessRow = {
   session_status: CpSessionStatus;
 };
 
-export type ContestProblemListItem = Pick<CpProblem, "id" | "level" | "title" | "points"> & {
+export type ContestProblemListItem = Pick<CpProblem, "id" | "level" | "difficulty" | "title" | "points"> & {
   bestScore: number | null;
   solved: boolean;
 };
@@ -94,7 +95,7 @@ export type ContestContext = {
 
 export type ProblemView = Pick<
   CpProblem,
-  "id" | "competition_id" | "level" | "title" | "statement" | "input_format" | "output_format" | "constraints" | "time_limit_ms" | "memory_limit_kb" | "points"
+  "id" | "competition_id" | "level" | "difficulty" | "title" | "statement" | "input_format" | "output_format" | "constraints" | "time_limit_ms" | "memory_limit_kb" | "points"
 > & {
   samples: Pick<CpTestCase, "id" | "ordinal" | "input" | "expected_output">[];
 };
@@ -111,7 +112,7 @@ export type RecentSubmission = {
 
 export type LeaderboardRow = Pick<CpScore, "registration_id" | "team_name" | "total_points" | "solved" | "last_improved_at">;
 
-export type AdminProblemRow = Pick<CpProblem, "id" | "level" | "title" | "points" | "is_published" | "time_limit_ms" | "memory_limit_kb"> & {
+export type AdminProblemRow = Pick<CpProblem, "id" | "level" | "difficulty" | "title" | "points" | "is_published" | "time_limit_ms" | "memory_limit_kb"> & {
   testCaseCount: number;
 };
 
@@ -165,6 +166,11 @@ export type ResultsPanelProps = {
   result: SubmissionOutcome | null;
   recent: RecentSubmission[];
   pending: boolean;
+};
+
+export type DifficultyBadgeProps = {
+  difficulty: CpDifficulty;
+  label: string;
 };
 
 export type VerdictBadgeProps = {

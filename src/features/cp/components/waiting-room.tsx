@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { HourglassIcon, TrophyIcon } from "lucide-react";
+import { HourglassIcon, PauseIcon, TrophyIcon } from "lucide-react";
 import { toast } from "sonner";
 import { formatDateTime } from "@/lib/format";
 import { useCountdown } from "@/hooks/use-countdown";
@@ -29,12 +29,32 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, teamName 
 
   useCpSessionRealtime(competitionId, (next) => {
     if (next === "live") {
-      toast.success(t("cp.waiting.startedToast"));
+      toast.success(t(status === "paused" ? "cp.waiting.resumedToast" : "cp.waiting.startedToast"));
       router.replace(href("/cp"));
     } else {
       router.refresh();
     }
   });
+
+  if (status === "paused") {
+    return (
+      <Empty className="border">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <PauseIcon />
+          </EmptyMedia>
+          <EmptyTitle>{t("cp.waiting.pausedTitle")}</EmptyTitle>
+          <EmptyDescription>{t("cp.waiting.pausedLead")}</EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          {teamName && <p className="text-sm font-medium">{t("cp.waiting.team", { team: teamName })}</p>}
+          <Link href={href("/cp/leaderboard")} className={buttonVariants({ variant: "outline" })}>
+            {t("cp.leaderboard")}
+          </Link>
+        </EmptyContent>
+      </Empty>
+    );
+  }
 
   if (status === "ended") {
     return (
