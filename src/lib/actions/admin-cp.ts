@@ -1,8 +1,10 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { after } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
+import { notifyContestStatus } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
 import { contestStatusSchema, problemSchema, sessionSchema } from "@/lib/validations/cp";
 import { uuidSchema } from "@/lib/validations/admin";
@@ -102,6 +104,7 @@ export async function setContestStatus(competitionId: string, status: CpSessionS
 
   refresh();
   const resumed = status === "live" && before?.status === "paused";
+  if (before?.status !== status) after(() => notifyContestStatus(competitionId, status, resumed));
   const message = resumed
     ? "admin.cp.resumed"
     : { live: "admin.cp.started", paused: "admin.cp.pausedDone", ended: "admin.cp.ended", scheduled: "admin.cp.resetDone" }[status];

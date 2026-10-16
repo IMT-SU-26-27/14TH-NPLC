@@ -50,6 +50,8 @@ cp .env.local.example .env.local
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Cloudinary → Settings → API Keys. **Secret, server only.** | uploads |
 | `JUDGE0_URL` | Base URL of your Judge0 server, e.g. `http://your-host:2358` | CP contest |
 | `JUDGE0_AUTH_TOKEN` | The `AUTHN_TOKEN` configured in Judge0's `judge0.conf` | CP contest |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Generate once with `pnpm exec web-push generate-vapid-keys`. **The private key is secret, server only.** Optional: without them the notification switch is hidden. | web push |
+| `VAPID_SUBJECT` | A contact for push services: `mailto:you@example.com` or an `https://` URL | web push |
 
 Never commit `.env` / `.env.local`; they are git-ignored. Only `.env.local.example` is tracked.
 

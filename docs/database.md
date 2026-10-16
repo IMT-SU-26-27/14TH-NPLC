@@ -8,6 +8,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261015010000_fix_anon_competitions_read.sql` | Splits the competitions read policy so logged-out visitors don't call `private.is_admin()` (which anon may not execute) |
 | `20261016000000_cp_pause_and_difficulty_enums.sql` | Adds `paused` to `cp_session_status` and the `cp_difficulty` enum (own migration: new enum values must be committed before use) |
 | `20261016000100_cp_pause_and_difficulty.sql` | Contest pause/resume (`paused_at`, `paused_seconds`, trigger), `cp_problems.difficulty`, `admin_save_problem` takes `difficulty` |
+| `20261016120000_push_subscriptions.sql` | `push_subscriptions` for web push notifications |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -46,6 +47,12 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 |---|---|
 | `site_content` | One row: the About NPLC title and body in Indonesian and English. Empty fields fall back to the built-in copy. Anyone can read it; admins edit it on `/admin/content`. |
 | `timeline_events` | The homepage timeline: `starts_on`, optional `ends_on`, title and description in both languages, sorted by start date. Anyone can read; admins add, edit and delete. |
+
+### Notifications
+
+| Table | What it holds |
+|---|---|
+| `push_subscriptions` | One row per browser/device that turned on web push: `user_id`, the push service `endpoint` (unique), its `p256dh`/`auth` keys and the `locale` notifications are written in. The server writes and reads it with the service role (`src/lib/push/`); users can only see and delete their own rows. Rows the push service reports as gone (404/410) are deleted on the next send. |
 
 ### Competitive programming
 
@@ -136,6 +143,19 @@ These tables are in the `supabase_realtime` publication:
 | `registration_events` | Participant dashboard updates when the admin accepts or rejects |
 
 Realtime respects the policies above, so each user only receives changes they're allowed to read.
+
+## Web push notifications
+
+Sent from Server Actions with `after()`, so the user never waits for them (`src/lib/push/notify.ts`):
+
+| Event | Who gets it |
+|---|---|
+| Admin accepts or rejects a team | Every member of that team |
+| New team registered, or a proof re-sent after a rejection | Every admin |
+| Someone joins with the team code | The team leader |
+| Contest started, paused, resumed or ended | Every member of every accepted team in that competition |
+
+Each device gets the text in the language it subscribed with. Needs `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT`; without them nothing is sent and the switch on `/profile` is hidden.
 
 ## Files (Cloudinary)
 

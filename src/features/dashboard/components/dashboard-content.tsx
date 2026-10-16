@@ -11,6 +11,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { AccountCard } from "@/features/dashboard/components/account-card";
 import { TeamCard } from "@/features/dashboard/components/team-card";
 import { RegistrationRealtime } from "@/features/dashboard/components/registration-realtime";
+import { PushPrompt } from "@/features/dashboard/components/push-prompt";
 import type { DashboardContentProps } from "@/types/registration";
 
 export async function DashboardContent({ lang, searchParams }: DashboardContentProps) {
@@ -26,6 +27,8 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
           <AlertDescription>{t("dashboard.cpNoticeDescription")}</AlertDescription>
         </Alert>
       )}
+
+      <PushPrompt hasTeams={teams.length > 0} />
 
       {teams.length === 0 ? (
         <Empty className="border">

@@ -2,10 +2,12 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { assetExists, deleteAsset, newRegistrationProofFolder, paymentProofFolder, signUpload } from "@/lib/cloudinary/server";
 import { databaseErrorMessage, errorState, fieldErrorState } from "@/lib/form";
+import { notifyAdminsPaymentToReview, notifyLeaderMemberJoined } from "@/lib/push/notify";
 import { localePath } from "@/lib/i18n/config";
 import { getRequestLocale } from "@/lib/i18n/server";
 import {
@@ -39,7 +41,7 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("create_registration", {
+  const { data: registrationId, error } = await supabase.rpc("create_registration", {
     p_competition_id: parsed.data.competitionId,
     p_team_name: parsed.data.teamName,
     p_leader_name: parsed.data.leaderName,
@@ -53,6 +55,7 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
     return errorState(databaseErrorMessage(error));
   }
 
+  after(() => notifyAdminsPaymentToReview(registrationId, false));
   redirect(localePath(await getRequestLocale(), "/dashboard"));
 }
 
@@ -66,7 +69,7 @@ export async function joinTeam(_prev: FormState, formData: FormData): Promise<Fo
   if (!parsed.success) return fieldErrorState(parsed.error);
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("join_team", {
+  const { data: registrationId, error } = await supabase.rpc("join_team", {
     p_referral_code: parsed.data.referralCode,
     p_full_name: parsed.data.fullName,
     p_nisn: parsed.data.nisn,
@@ -74,6 +77,7 @@ export async function joinTeam(_prev: FormState, formData: FormData): Promise<Fo
   });
   if (error) return errorState(databaseErrorMessage(error));
 
+  after(() => notifyLeaderMemberJoined(registrationId, parsed.data.fullName));
   redirect(localePath(await getRequestLocale(), "/dashboard"));
 }
 
@@ -151,7 +155,7 @@ export async function submitPayment(input: SubmitPaymentInput): Promise<ActionRe
   const supabase = await createSupabaseServerClient();
   const { data: previous } = await supabase
     .from("registrations")
-    .select("payment_proof_public_id")
+    .select("payment_proof_public_id, status")
     .eq("id", registrationId)
     .single();
 
@@ -166,6 +170,7 @@ export async function submitPayment(input: SubmitPaymentInput): Promise<ActionRe
   if (previous?.payment_proof_public_id && previous.payment_proof_public_id !== publicId) {
     await deleteAsset(previous.payment_proof_public_id, "authenticated");
   }
+  after(() => notifyAdminsPaymentToReview(registrationId, previous?.status === "rejected"));
   refresh();
   return { ok: true, data: undefined, message: "payment.submitted" };
 }

@@ -1,10 +1,12 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { deleteAsset, privateAssetUrl } from "@/lib/cloudinary/server";
+import { notifyRegistrationReviewed } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
 import { localePath } from "@/lib/i18n/config";
 import { getRequestLocale } from "@/lib/i18n/server";
@@ -39,6 +41,7 @@ export async function reviewRegistration(_prev: FormState, formData: FormData): 
     .eq("id", registrationId);
   if (error) return errorState(databaseErrorMessage(error));
 
+  if (status === "accepted" || status === "rejected") after(() => notifyRegistrationReviewed(registrationId));
   refresh();
   return successState(
     status === "accepted" ? "admin.detail.accepted" : status === "rejected" ? "admin.detail.rejected" : "admin.detail.statusUpdated",
