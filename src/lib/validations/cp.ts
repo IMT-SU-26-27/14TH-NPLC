@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Constants } from "@/types/database";
 
 export const CP_LANGUAGES = ["python", "cpp", "java"] as const;
 export const CP_DIFFICULTIES = ["easy", "medium", "hard"] as const;
@@ -56,4 +57,21 @@ export const sessionSchema = z
 export const contestStatusSchema = z.object({
   competitionId: z.uuid(),
   status: z.enum(["scheduled", "live", "paused", "ended"]),
+});
+
+export const CP_VERDICTS = Constants.public.Enums.cp_verdict;
+
+// Admin submissions list. Filters live in the URL; bad values fall back to "no filter".
+export const submissionFiltersSchema = z.object({
+  competition: z.uuid().optional().catch(undefined),
+  problem: z.uuid().optional().catch(undefined),
+  team: z.uuid().optional().catch(undefined),
+  verdict: z.enum(CP_VERDICTS).optional().catch(undefined),
+  q: z
+    .string()
+    .trim()
+    .max(100)
+    .transform((v) => v.replace(/[,()%*\\]/g, " ").trim())
+    .catch(""),
+  page: z.coerce.number().int().min(1).catch(1),
 });

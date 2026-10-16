@@ -18,6 +18,16 @@ export function formatDateTime(value: string | null, lang: Locale): string {
   return `${formatted} WIB`;
 }
 
+// With seconds, for judging records where the order of submissions matters.
+export function formatTimestamp(value: string, lang: Locale): string {
+  const formatted = new Intl.DateTimeFormat(INTL_LOCALE[lang], {
+    dateStyle: "medium",
+    timeStyle: "medium",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(value));
+  return `${formatted} WIB`;
+}
+
 export function formatTeamSize(min: number, max: number, lang: Locale): string {
   const t = getT(lang);
   return min === max ? t("competition.person", { count: min }) : t("competition.people", { min, max });

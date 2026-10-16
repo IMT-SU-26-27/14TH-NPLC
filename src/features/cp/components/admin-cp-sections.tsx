@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, FileCodeIcon, PlusIcon } from "lucide-react";
+import { ArrowLeftIcon, FileCodeIcon, ListChecksIcon, PlusIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
 import { getAdminContest, getAdminProblem, listCpCompetitions } from "@/lib/data/cp";
 import { localePath } from "@/lib/i18n/config";
@@ -41,19 +41,24 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
 
   return (
     <div className="space-y-6">
-      {competitions.length > 1 && (
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap gap-1">
-          {competitions.map((c) => (
-            <Link
-              key={c.id}
-              href={`${localePath(lang, "/admin/cp")}?competition=${c.id}`}
-              className={buttonVariants({ variant: c.id === selected.id ? "secondary" : "ghost", size: "sm" })}
-            >
-              {c.name}
-            </Link>
-          ))}
+          {competitions.length > 1 &&
+            competitions.map((c) => (
+              <Link
+                key={c.id}
+                href={`${localePath(lang, "/admin/cp")}?competition=${c.id}`}
+                className={buttonVariants({ variant: c.id === selected.id ? "secondary" : "ghost", size: "sm" })}
+              >
+                {c.name}
+              </Link>
+            ))}
         </div>
-      )}
+        <Link href={`${localePath(lang, "/admin/cp/submissions")}?competition=${selected.id}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+          <ListChecksIcon />
+          {t("admin.submissions.title")}
+        </Link>
+      </div>
       <ContestControl contest={contest} />
       <Card>
         <CardHeader>

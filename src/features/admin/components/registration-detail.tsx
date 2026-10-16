@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, ReceiptIcon } from "lucide-react";
+import { ArrowLeftIcon, ListChecksIcon, ReceiptIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
 import { getRegistrationDetail } from "@/lib/data/admin";
 import { formatDateTime, formatRupiah } from "@/lib/format";
@@ -46,7 +46,18 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
             {team.competition.name} · {t("admin.detail.code")} <span className="font-mono">{team.referral_code}</span>
           </p>
         </div>
-        <RegistrationStatusBadge status={team.status} />
+        <div className="flex items-center gap-2">
+          {team.competition.type === "competitive_programming" && team.status === "accepted" && (
+            <Link
+              href={`${localePath(lang, "/admin/cp/submissions")}?competition=${team.competition.id}&team=${team.id}`}
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              <ListChecksIcon />
+              {t("admin.submissions.viewTeam")}
+            </Link>
+          )}
+          <RegistrationStatusBadge status={team.status} />
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">

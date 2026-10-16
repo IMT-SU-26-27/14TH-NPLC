@@ -1,7 +1,7 @@
 import type { z } from "zod";
 import type { Enums, Tables } from "@/types/database";
 import type { Locale } from "@/types/i18n";
-import type { codeSubmissionSchema, problemSchema, sessionSchema } from "@/lib/validations/cp";
+import type { codeSubmissionSchema, problemSchema, sessionSchema, submissionFiltersSchema } from "@/lib/validations/cp";
 
 export type CpLanguage = Enums<"cp_language">;
 export type CpVerdict = Enums<"cp_verdict">;
@@ -263,4 +263,75 @@ export type TestCaseDraft = {
   input: string;
   expectedOutput: string;
   isSample: boolean;
+};
+
+// ----- Admin submissions -----
+
+export type SubmissionFilters = z.infer<typeof submissionFiltersSchema>;
+
+export type CpSubmission = Tables<"cp_submissions">;
+
+export type AdminSubmissionRow = Pick<
+  CpSubmission,
+  "id" | "registration_id" | "language" | "verdict" | "passed" | "total" | "score" | "max_time_ms" | "max_memory_kb" | "created_at"
+> & {
+  problem: Pick<CpProblem, "id" | "level" | "title">;
+  team: { team_name: string };
+};
+
+export type AdminSubmissionList = {
+  rows: AdminSubmissionRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
+export type ProblemOption = Pick<CpProblem, "id" | "level" | "title">;
+
+export type AdminSubmissionResult = {
+  id: number;
+  verdict: CpVerdict;
+  time_ms: number | null;
+  memory_kb: number | null;
+  message: string | null;
+  test: Pick<CpTestCase, "ordinal" | "is_sample"> | null;
+};
+
+export type AdminSubmissionDetail = CpSubmission & {
+  problem: Pick<CpProblem, "id" | "level" | "title" | "competition_id" | "time_limit_ms" | "memory_limit_kb" | "points">;
+  team: { id: string; team_name: string };
+  submitter: { full_name: string; email: string } | null;
+  results: AdminSubmissionResult[];
+};
+
+export type AdminSubmissionsPageProps = {
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export type AdminSubmissionsSectionProps = {
+  lang: Locale;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export type AdminSubmissionPageProps = {
+  params: Promise<{ lang: string; id: string }>;
+};
+
+export type SubmissionFiltersFormProps = {
+  filters: SubmissionFilters;
+  competitionId: string;
+  problems: ProblemOption[];
+};
+
+export type AdminSubmissionsTableProps = {
+  list: AdminSubmissionList;
+  filters: SubmissionFilters;
+  competitionId: string;
+  lang: Locale;
+};
+
+export type SubmissionCodeViewerProps = {
+  code: string;
+  language: CpLanguage;
 };

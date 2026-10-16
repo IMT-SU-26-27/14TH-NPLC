@@ -4,6 +4,10 @@ import type { CompetitionOption } from "@/types/admin";
 import type {
   AdminContest,
   AdminProblemDetail,
+  AdminSubmissionDetail,
+  AdminSubmissionList,
+  ProblemOption,
+  SubmissionFilters,
   ContestContext,
   ContestProblemListItem,
   LeaderboardRow,
@@ -151,4 +155,65 @@ export async function getAdminProblem(problemId: string): Promise<AdminProblemDe
     .order("ordinal", { referencedTable: "cp_test_cases" })
     .maybeSingle();
   return data as unknown as AdminProblemDetail | null;
+}
+
+const SUBMISSIONS_PAGE_SIZE = 30;
+
+// Every team's submissions in one competition, newest first. Admin only (RLS returns a team's own rows otherwise).
+export async function listAdminSubmissions(competitionId: string, filters: SubmissionFilters): Promise<AdminSubmissionList> {
+  const supabase = await createSupabaseServerClient();
+  const from = (filters.page - 1) * SUBMISSIONS_PAGE_SIZE;
+
+  let query = supabase
+    .from("cp_submissions")
+    .select(
+      `id, registration_id, language, verdict, passed, total, score, max_time_ms, max_memory_kb, created_at,
+       problem:cp_problems!inner ( id, level, title, competition_id ),
+       team:registrations!inner ( team_name )`,
+      { count: "exact" },
+    )
+    .eq("problem.competition_id", competitionId)
+    .order("created_at", { ascending: false })
+    .range(from, from + SUBMISSIONS_PAGE_SIZE - 1);
+
+  if (filters.problem) query = query.eq("problem_id", filters.problem);
+  if (filters.team) query = query.eq("registration_id", filters.team);
+  if (filters.verdict) query = query.eq("verdict", filters.verdict);
+  if (filters.q) query = query.ilike("team.team_name", `%${filters.q}%`);
+
+  const { data, count, error } = await query;
+  if (error) throw new Error(`Could not load submissions: ${error.message}`);
+  return {
+    rows: (data ?? []) as unknown as AdminSubmissionList["rows"],
+    total: count ?? 0,
+    page: filters.page,
+    pageSize: SUBMISSIONS_PAGE_SIZE,
+  };
+}
+
+export async function listProblemOptions(competitionId: string): Promise<ProblemOption[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.from("cp_problems").select("id, level, title").eq("competition_id", competitionId).order("level");
+  return data ?? [];
+}
+
+// The full record of one judged submission: code, compiler output and every test result (hidden ones included).
+export async function getAdminSubmission(submissionId: string): Promise<AdminSubmissionDetail | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from("cp_submissions")
+    .select(
+      `*,
+       problem:cp_problems ( id, level, title, competition_id, time_limit_ms, memory_limit_kb, points ),
+       team:registrations ( id, team_name ),
+       submitter:profiles ( full_name, email ),
+       results:cp_submission_results ( id, verdict, time_ms, memory_kb, message, test:cp_test_cases ( ordinal, is_sample ) )`,
+    )
+    .eq("id", submissionId)
+    .maybeSingle();
+  if (!data) return null;
+
+  const submission = data as unknown as AdminSubmissionDetail;
+  submission.results.sort((a, b) => (a.test?.ordinal ?? 0) - (b.test?.ordinal ?? 0));
+  return submission;
 }
