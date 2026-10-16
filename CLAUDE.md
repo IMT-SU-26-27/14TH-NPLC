@@ -62,6 +62,36 @@ src/
 - Cloudinary helpers live in `src/lib/cloudinary/`. `CLOUDINARY_API_SECRET` is server-only; uploads are signed by a server action and sent from the browser directly to Cloudinary.
 - Payment proofs use the `authenticated` delivery type. Show them only through a signed, expiring URL created after checking the viewer is an admin or on that team.
 
+## Static images (`public/`)
+**Check this at the start of every task, before anything else.** Only check what is new, to save tokens:
+
+```bash
+git status --porcelain --untracked-files=all -- public/
+```
+
+- If the output is empty, nothing in `public/` changed. Skip the check and carry on with the task.
+- Otherwise, check only the listed files (new `??`, added `A`, modified `M`, renamed `R`) against the rules below. Files already committed were checked when they were added.
+
+Rules for every image in `public/`:
+
+- **Grouped by feature:** `public/<feature>/`, where `<feature>` matches a folder in `src/features/` (e.g. `public/landing/`, `public/registration/`). Use `public/shared/` for an image used by 2+ features. No images loose in the `public/` root.
+- **File name:** lowercase kebab-case. Every space becomes `-` and every letter is lowercase, with no underscores or other symbols: `Hero Banner.PNG` becomes `hero-banner.webp`.
+- **Format:** `.webp` only. Convert PNG, JPG, JPEG, GIF and similar files to WebP.
+- The full path must match `^public/[a-z0-9-]+/[a-z0-9]+(-[a-z0-9]+)*\.webp$`.
+
+When a file breaks a rule:
+
+1. Convert it to WebP if needed.
+2. Move or rename it with `git mv` so history is kept.
+3. Update every reference to it: `grep -rn "<old name>" src`.
+4. Tell the user what was renamed.
+
+Exceptions (not images, or required at the root):
+
+- `public/sw.js` must stay at the root so the push service worker controls the whole site.
+- The favicon lives in `src/app/`.
+- Images uploaded by users never go in `public/`; they go to Cloudinary (see above).
+
 ## Validation
 - Always `import { z } from "zod"`. Use it for forms, Server Action inputs, search params and env vars.
 - Schemas live in `src/lib/validations/<domain>.ts`. Their inferred types live in `src/types/<domain>.ts` via `z.infer<typeof schema>` (use `import type` to import the schema).
