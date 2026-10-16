@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { formatDateTime } from "@/lib/format";
+import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AccountCardProps } from "@/types/registration";
 
@@ -12,10 +15,13 @@ export function AccountCard({ user, lang }: AccountCardProps) {
       <CardHeader>
         <CardTitle>{t("dashboard.account")}</CardTitle>
         <CardDescription>{t("dashboard.accountLead")}</CardDescription>
-        <CardAction>
+        <CardAction className="flex items-center gap-2">
           <Badge variant={user.role === "admin" ? "default" : "secondary"}>
             {user.role === "admin" ? t("dashboard.admin") : t("dashboard.participant")}
           </Badge>
+          <Link href={localePath(lang, "/profile")} className={buttonVariants({ variant: "outline", size: "sm" })}>
+            {t("dashboard.editProfile")}
+          </Link>
         </CardAction>
       </CardHeader>
       <CardContent>

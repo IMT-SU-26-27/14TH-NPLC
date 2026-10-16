@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { redirectWithCookies, updateSession } from "@/lib/supabase/proxy";
 import { DEFAULT_LOCALE, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 
-const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/reset-password"];
+const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/reset-password", "/profile"];
 const SIGNED_OUT_ONLY = ["/login", "/signup", "/forgot-password"];
 
 function matches(path: string, prefixes: string[]) {

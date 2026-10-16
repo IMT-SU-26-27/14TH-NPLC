@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutDashboardIcon, LogOutIcon, ShieldIcon, UsersIcon } from "lucide-react";
+import { LayoutDashboardIcon, LogOutIcon, ShieldIcon, UserRoundIcon, UsersIcon } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,10 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuItem render={<Link href={href("/dashboard")} />}>
           <LayoutDashboardIcon />
           {t("nav.dashboard")}
+        </DropdownMenuItem>
+        <DropdownMenuItem render={<Link href={href("/profile")} />}>
+          <UserRoundIcon />
+          {t("nav.profile")}
         </DropdownMenuItem>
         <DropdownMenuItem render={<Link href={href("/join")} />}>
           <UsersIcon />
