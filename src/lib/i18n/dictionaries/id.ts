@@ -732,13 +732,13 @@ export const id = {
       },
       internal_error: {
         title: "Penilaian gagal di server",
-        description: "Server penilai gagal menjalankan kode. Ini bukan kesalahan kamu, dan kiriman tidak dihitung.",
+        description: "Server penilai gagal menjalankan kode. Ini bukan kesalahan kamu, dan tidak menurunkan skor timmu karena yang dihitung hanya skor terbaik.",
         causes: ["Gangguan sementara di server penilai (Judge0)."],
         fixes: ["Tunggu sebentar lalu kirim lagi.", "Jika terus terjadi, hubungi panitia dan sebutkan soal serta waktunya."],
       },
       exec_format_error: {
         title: "Penilaian gagal di server",
-        description: "Server penilai gagal menjalankan kode. Ini bukan kesalahan kamu, dan kiriman tidak dihitung.",
+        description: "Server penilai gagal menjalankan kode. Ini bukan kesalahan kamu, dan tidak menurunkan skor timmu karena yang dihitung hanya skor terbaik.",
         causes: ["Gangguan sementara di server penilai (Judge0)."],
         fixes: ["Tunggu sebentar lalu kirim lagi.", "Jika terus terjadi, hubungi panitia dan sebutkan soal serta waktunya."],
       },

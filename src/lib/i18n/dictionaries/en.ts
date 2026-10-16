@@ -733,13 +733,13 @@ export const en: Dictionary = {
       },
       internal_error: {
         title: "Judging failed on the server",
-        description: "The judge server failed to run the code. This isn't your fault, and the submission isn't counted.",
+        description: "The judge server failed to run the code. This isn't your fault, and it can't lower your team's score because only the best score counts.",
         causes: ["A temporary problem on the judge server (Judge0)."],
         fixes: ["Wait a moment, then submit again.", "If it keeps happening, contact the committee with the problem and the time."],
       },
       exec_format_error: {
         title: "Judging failed on the server",
-        description: "The judge server failed to run the code. This isn't your fault, and the submission isn't counted.",
+        description: "The judge server failed to run the code. This isn't your fault, and it can't lower your team's score because only the best score counts.",
         causes: ["A temporary problem on the judge server (Judge0)."],
         fixes: ["Wait a moment, then submit again.", "If it keeps happening, contact the committee with the problem and the time."],
       },
