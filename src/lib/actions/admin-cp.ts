@@ -100,11 +100,12 @@ export async function setContestStatus(competitionId: string, status: CpSessionS
   if (!parsed.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
-  const { data: before } = await supabase
+  const { data: before, error: readError } = await supabase
     .from("cp_sessions")
     .select("status, duration_seconds")
     .eq("competition_id", competitionId)
     .maybeSingle();
+  if (readError) return { ok: false, message: databaseErrorMessage(readError) };
   // A fresh start needs a duration: the timer and the automatic end are based on it.
   if (status === "live" && before?.status !== "paused" && !before?.duration_seconds) {
     return { ok: false, message: "admin.cp.durationRequired" };

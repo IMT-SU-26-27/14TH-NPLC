@@ -75,6 +75,8 @@ export function ContestControl({ contest }: ContestControlProps) {
 
   useEffect(() => {
     if (state.status === "success" && state.message) toast.success(t(state.message));
+    // Field errors show under their fields; anything else (e.g. a database error) gets a toast.
+    if (state.status === "error" && state.message && !state.fieldErrors) toast.error(t(state.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- toast once per action result
   }, [state]);
 
