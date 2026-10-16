@@ -28,7 +28,12 @@ export function LoginForm({ next }: AuthFormProps) {
           <FieldError errors={fieldErrors(errors.email)} />
         </Field>
         <Field data-invalid={!!errors.password}>
-          <FieldLabel htmlFor="password">{t("auth.password")}</FieldLabel>
+          <div className="flex items-center justify-between gap-2">
+            <FieldLabel htmlFor="password">{t("auth.password")}</FieldLabel>
+            <Link href={href("/forgot-password")} className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline">
+              {t("auth.forgotPassword")}
+            </Link>
+          </div>
           <Input id="password" name="password" type="password" autoComplete="current-password" aria-invalid={!!errors.password} required />
           <FieldError errors={fieldErrors(errors.password)} />
         </Field>

@@ -3,6 +3,7 @@ import { getT } from "@/lib/i18n/get-dictionary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LoginForm } from "@/features/auth/components/login-form";
 import { SignupForm } from "@/features/auth/components/signup-form";
+import { ForgotPasswordForm } from "@/features/auth/components/forgot-password-form";
 import type { AuthFormLoaderProps } from "@/types/auth";
 
 // Reads searchParams (request-time data), so pages render it inside <Suspense>.
@@ -18,7 +19,13 @@ export async function AuthFormLoader({ mode, lang, searchParams }: AuthFormLoade
           <AlertDescription>{t("auth.confirmLinkInvalid")}</AlertDescription>
         </Alert>
       )}
-      {mode === "login" ? <LoginForm next={next} /> : <SignupForm next={next} />}
+      {error === "recovery" && (
+        <Alert variant="destructive">
+          <OctagonXIcon />
+          <AlertDescription>{t("auth.recoveryLinkInvalid")}</AlertDescription>
+        </Alert>
+      )}
+      {mode === "login" ? <LoginForm next={next} /> : mode === "signup" ? <SignupForm next={next} /> : <ForgotPasswordForm />}
     </div>
   );
 }

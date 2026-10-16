@@ -80,6 +80,7 @@ pnpm db:types
 
 - **Email confirmation** must be on, and SMTP must be configured so confirmation emails are delivered (self-hosted: the `SMTP_*` settings in Supabase's `.env`).
 - **Site URL / redirect URLs:** add your app URL (e.g. `http://localhost:3000`) and `http://localhost:3000/auth/confirm` to the allowed redirect URLs.
+- **Password reset:** `/forgot-password` sends Supabase's *Reset Password* email, whose link goes through `/auth/confirm` to `/reset-password`. With the default template the link only works in the browser that asked for it (PKCE). To make it work on any device, set the template's link to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`.
 - **Google sign-in (optional, later):** enable the Google provider (self-hosted: `GOTRUE_EXTERNAL_GOOGLE_*`). Accounts with the same verified email are linked automatically.
 
 ## 5. Run it
