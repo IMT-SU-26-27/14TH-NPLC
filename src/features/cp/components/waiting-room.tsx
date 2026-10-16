@@ -22,6 +22,8 @@ function clock(seconds: number, daySuffix: string) {
 }
 
 // Moves the team into the contest the moment an admin presses start (Supabase Realtime on cp_sessions).
+// Uses a full page load, not router.replace: the client router can reuse the cached
+// "/cp → /cp/waiting" redirect from before the start and land the team back here.
 export function WaitingRoom({ competitionId, status, scheduledStartAt, teamName }: WaitingRoomProps) {
   const router = useRouter();
   const { t, href, lang } = useI18n();
@@ -30,7 +32,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, teamName 
   useCpSessionRealtime(competitionId, (next) => {
     if (next === "live") {
       toast.success(t(status === "paused" ? "cp.waiting.resumedToast" : "cp.waiting.startedToast"));
-      router.replace(href("/cp"));
+      window.location.replace(href("/cp"));
     } else {
       router.refresh();
     }
