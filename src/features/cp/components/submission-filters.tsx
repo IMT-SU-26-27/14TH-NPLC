@@ -28,12 +28,12 @@ export function SubmissionFilters({ filters, competitionId, problems }: Submissi
       {filters.team && <input type="hidden" name="team" value={filters.team} />}
       <Field>
         <FieldLabel htmlFor="q">{t("admin.submissions.searchTeam")}</FieldLabel>
-        <Input id="q" name="q" defaultValue={filters.q} placeholder={t("admin.submissions.searchPlaceholder")} />
+        <Input id="q" name="q" className="bg-card" defaultValue={filters.q} placeholder={t("admin.submissions.searchPlaceholder")} />
       </Field>
       <Field>
         <FieldLabel htmlFor="problem">{t("admin.submissions.problem")}</FieldLabel>
         <Select name="problem" items={problemItems} defaultValue={filters.problem ?? "all"}>
-          <SelectTrigger id="problem" className="w-full">
+          <SelectTrigger id="problem" className="bg-card w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -48,7 +48,7 @@ export function SubmissionFilters({ filters, competitionId, problems }: Submissi
       <Field>
         <FieldLabel htmlFor="verdict">{t("admin.submissions.verdict")}</FieldLabel>
         <Select name="verdict" items={verdictItems} defaultValue={filters.verdict ?? "all"}>
-          <SelectTrigger id="verdict" className="w-full">
+          <SelectTrigger id="verdict" className="bg-card w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

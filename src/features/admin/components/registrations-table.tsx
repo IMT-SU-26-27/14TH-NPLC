@@ -3,9 +3,9 @@ import { InboxIcon } from "lucide-react";
 import { formatDateTime } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
-import { buttonVariants } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/shared/table-pagination";
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
 import type { RegistrationFilters, RegistrationsTableProps } from "@/types/admin";
 import type { Locale } from "@/types/i18n";
@@ -96,21 +96,14 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
         </Table>
       </div>
 
-      <div className="text-muted-foreground flex items-center justify-between text-sm">
-        <span>{t("admin.registrations.summary", { count: list.total, page: list.page, pages: lastPage })}</span>
-        <div className="flex gap-2">
-          {list.page > 1 && (
-            <Link href={pageHref(lang, filters, list.page - 1)} className={buttonVariants({ variant: "outline", size: "sm" })}>
-              {t("common.previous")}
-            </Link>
-          )}
-          {list.page < lastPage && (
-            <Link href={pageHref(lang, filters, list.page + 1)} className={buttonVariants({ variant: "outline", size: "sm" })}>
-              {t("common.next")}
-            </Link>
-          )}
-        </div>
-      </div>
+      <TablePagination
+        page={list.page}
+        pageCount={lastPage}
+        hrefFor={(page) => pageHref(lang, filters, page)}
+        summary={t("admin.registrations.summary", { count: list.total, page: list.page, pages: lastPage })}
+        previousLabel={t("common.previous")}
+        nextLabel={t("common.next")}
+      />
     </div>
   );
 }

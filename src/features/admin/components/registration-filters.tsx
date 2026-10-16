@@ -25,12 +25,12 @@ export function RegistrationFilters({ filters, competitions }: RegistrationFilte
     <form method="get" className="grid gap-3 md:grid-cols-[1fr_14rem_12rem_auto] md:items-end">
       <Field>
         <FieldLabel htmlFor="q">{t("admin.registrations.search")}</FieldLabel>
-        <Input id="q" name="q" defaultValue={filters.q} placeholder={t("admin.registrations.searchPlaceholder")} />
+        <Input id="q" name="q" className="bg-card" defaultValue={filters.q} placeholder={t("admin.registrations.searchPlaceholder")} />
       </Field>
       <Field>
         <FieldLabel>{t("admin.registrations.competition")}</FieldLabel>
         <Select name="competition" items={competitionItems} defaultValue={filters.competition ?? "all"}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="bg-card w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -45,7 +45,7 @@ export function RegistrationFilters({ filters, competitions }: RegistrationFilte
       <Field>
         <FieldLabel>{t("admin.registrations.status")}</FieldLabel>
         <Select name="status" items={statusItems} defaultValue={filters.status ?? "all"}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="bg-card w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

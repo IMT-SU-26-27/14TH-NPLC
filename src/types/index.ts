@@ -15,3 +15,12 @@ export type FormState = {
 export type ActionResult<T = undefined> =
   | { ok: true; data: T; message?: string; params?: Record<string, string | number> }
   | { ok: false; message: string; params?: Record<string, string | number> };
+
+export type TablePaginationProps = {
+  page: number;
+  pageCount: number;
+  hrefFor: (page: number) => string;
+  summary: string;
+  previousLabel: string;
+  nextLabel: string;
+};

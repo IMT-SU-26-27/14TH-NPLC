@@ -3,9 +3,9 @@ import { FileCodeIcon } from "lucide-react";
 import { formatTimestamp } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
-import { buttonVariants } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/shared/table-pagination";
 import { VerdictBadge } from "@/features/cp/components/verdict-badge";
 import type { AdminSubmissionsTableProps, SubmissionFilters } from "@/types/cp";
 import type { Locale } from "@/types/i18n";
@@ -85,21 +85,14 @@ export function AdminSubmissionsTable({ list, filters, competitionId, lang }: Ad
           </TableBody>
         </Table>
       </div>
-      <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-2 text-sm">
-        <span>{t("admin.submissions.summary", { count: list.total, page: list.page, pages: lastPage })}</span>
-        <div className="flex gap-2">
-          {list.page > 1 && (
-            <Link href={pageHref(lang, competitionId, filters, list.page - 1)} className={buttonVariants({ variant: "outline", size: "sm" })}>
-              {t("common.previous")}
-            </Link>
-          )}
-          {list.page < lastPage && (
-            <Link href={pageHref(lang, competitionId, filters, list.page + 1)} className={buttonVariants({ variant: "outline", size: "sm" })}>
-              {t("common.next")}
-            </Link>
-          )}
-        </div>
-      </div>
+      <TablePagination
+        page={list.page}
+        pageCount={lastPage}
+        hrefFor={(page) => pageHref(lang, competitionId, filters, page)}
+        summary={t("admin.submissions.summary", { count: list.total, page: list.page, pages: lastPage })}
+        previousLabel={t("common.previous")}
+        nextLabel={t("common.next")}
+      />
     </div>
   );
 }
