@@ -28,6 +28,8 @@ Everything else must match exactly, including spaces inside a line and letter ca
 
 The submission's verdict is the verdict of the **first** test case that did not pass, or `accepted` when all passed. Each verdict is shown in a toast with the explanation below.
 
+Error toasts have a **View guide** button. It opens the judging results guide (`src/features/cp/components/verdict-guide.tsx`) at that verdict, with its common causes and what to try. The same guide opens from the floating **?** button at the bottom right of every `/cp` page. The text lives in the dictionaries under `cp.verdict.<verdict>` (`title`, `description`, `causes`, `fixes`).
+
 | Judge0 status | Verdict | Why it happens | What the player sees (toast) |
 |---|---|---|---|
 | 3 Accepted, output matches | `accepted` | The program ran within the limits and printed the expected output. | Accepted: every test passed, with the score. |

@@ -336,3 +336,18 @@ export type SubmissionCodeViewerProps = {
   language: CpLanguage;
   label: string;
 };
+
+// ----- Verdict guide -----
+
+export type VerdictGuideState = {
+  open: boolean;
+  target: CpVerdict | null;
+  onOpenChange: (open: boolean) => void;
+};
+
+export type VerdictGuideEntry = {
+  title: string;
+  description: string;
+  causes?: string[];
+  fixes?: string[];
+};

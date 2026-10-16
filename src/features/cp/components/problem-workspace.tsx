@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { runSamples, submitSolution } from "@/lib/actions/cp";
+import { openVerdictGuide } from "@/lib/cp/verdict-guide";
 import { useCodeEditor } from "@/hooks/use-code-editor";
 import { useCooldown } from "@/hooks/use-cooldown";
 import { useI18n } from "@/hooks/use-i18n";
@@ -25,7 +26,12 @@ export function ProblemWorkspace({ problemId, statement, recent, cooldownSeconds
     const title = t(`cp.verdict.${outcome.verdict}.title`);
     const description = `${t("cp.passed", { passed: outcome.passed, total: outcome.total })}. ${t(`cp.verdict.${outcome.verdict}.description`)}`;
     if (outcome.verdict === "accepted") toast.success(title, { description });
-    else toast.error(title, { description, duration: 8000 });
+    else
+      toast.error(title, {
+        description,
+        duration: 10000,
+        action: { label: t("cp.viewGuide"), onClick: () => openVerdictGuide(outcome.verdict) },
+      });
   }
 
   function run() {
