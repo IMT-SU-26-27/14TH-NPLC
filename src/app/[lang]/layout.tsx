@@ -43,7 +43,8 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           <SiteHeader lang={lang} />
           {children}
           <SiteFooter lang={lang} />
-          <Toaster position="top-right" />
+          {/* Light only, like the rest of the app: following the OS theme gave near-white text on the white card. */}
+          <Toaster position="top-right" theme="light" />
         </I18nProvider>
       </body>
     </html>

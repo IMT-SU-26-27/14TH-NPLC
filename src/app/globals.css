@@ -152,3 +152,9 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/* Toast descriptions use the theme's secondary text colour instead of Sonner's built-in grey.
+   Outside @layer so it outranks Sonner's own (unlayered) styles. */
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-description] {
+  color: var(--muted-foreground);
+}
