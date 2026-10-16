@@ -9,6 +9,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261016000000_cp_pause_and_difficulty_enums.sql` | Adds `paused` to `cp_session_status` and the `cp_difficulty` enum (own migration: new enum values must be committed before use) |
 | `20261016000100_cp_pause_and_difficulty.sql` | Contest pause/resume (`paused_at`, `paused_seconds`, trigger), `cp_problems.difficulty`, `admin_save_problem` takes `difficulty` |
 | `20261016120000_push_subscriptions.sql` | `push_subscriptions` for web push notifications |
+| `20261016130000_cp_leaderboard_freeze.sql` | Leaderboard freeze (`cp_sessions.leaderboard_frozen_at`, `cp_leaderboard_snapshots`) and hiding the leaderboard from participants after the contest ends |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -65,6 +66,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | `cp_submission_results` | The result of each test case in a submission. Never stores the expected output of hidden tests. |
 | `cp_problem_scores` | A team's best score on each problem, and whether it solved it. |
 | `cp_scores` | The leaderboard: one row per accepted CP team, with total points, problems solved and `last_improved_at` for tie-breaks. |
+| `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when an admin freezes the leaderboard (`cp_sessions.leaderboard_frozen_at` set), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
 
 ### Views and functions
 
@@ -109,7 +111,8 @@ members join with the referral code at any point while the competition's registr
 | CP problems | Members of accepted CP teams, **only while the contest is live** | All |
 | CP test cases | Sample cases only, only while live | All |
 | Submissions and results | Their own team's | All |
-| Leaderboard | Members of accepted CP teams | All |
+| Leaderboard (`cp_scores`) | Members of accepted CP teams, **only while the contest hasn't ended and the leaderboard isn't frozen** | All, always live |
+| Frozen leaderboard (`cp_leaderboard_snapshots`) | Members of accepted CP teams, only while frozen and the contest hasn't ended | All |
 
 Submissions can't be written from the browser at all. The server judges the code with Judge0 and records the result using the service role. The database also rejects submissions when the contest isn't live, the team isn't accepted, or the cooldown hasn't passed.
 

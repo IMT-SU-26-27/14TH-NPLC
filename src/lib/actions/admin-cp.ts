@@ -6,7 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { notifyContestStatus } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
-import { contestStatusSchema, problemSchema, sessionSchema } from "@/lib/validations/cp";
+import { contestStatusSchema, leaderboardFreezeSchema, problemSchema, sessionSchema } from "@/lib/validations/cp";
 import { uuidSchema } from "@/lib/validations/admin";
 import type { ActionResult, FieldErrors, FormState } from "@/types";
 import type { CpSessionStatus, ProblemInput } from "@/types/cp";
@@ -99,7 +99,11 @@ export async function setContestStatus(competitionId: string, status: CpSessionS
   const supabase = await createSupabaseServerClient();
   const { data: before } = await supabase.from("cp_sessions").select("status").eq("competition_id", competitionId).maybeSingle();
   // The cp_sessions_prepare trigger handles the timestamps (and pushes the scheduled end back on resume).
-  const { error } = await supabase.from("cp_sessions").update({ status }).eq("competition_id", competitionId);
+  // Resetting to "not started" also unfreezes the leaderboard.
+  const { error } = await supabase
+    .from("cp_sessions")
+    .update(status === "scheduled" ? { status, leaderboard_frozen_at: null } : { status })
+    .eq("competition_id", competitionId);
   if (error) return { ok: false, message: databaseErrorMessage(error) };
 
   refresh();
@@ -109,4 +113,22 @@ export async function setContestStatus(competitionId: string, status: CpSessionS
     ? "admin.cp.resumed"
     : { live: "admin.cp.started", paused: "admin.cp.pausedDone", ended: "admin.cp.ended", scheduled: "admin.cp.resetDone" }[status];
   return { ok: true, data: undefined, message };
+}
+
+// Freeze: participants keep seeing the standings from this moment (a snapshot is taken by a trigger)
+// while scoring goes on. Unfreeze: they see the live standings again. Admins always see live scores.
+export async function setLeaderboardFrozen(competitionId: string, frozen: boolean): Promise<ActionResult> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  const parsed = leaderboardFreezeSchema.safeParse({ competitionId, frozen });
+  if (!parsed.success) return { ok: false, message: "errors.invalidRequest" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("cp_sessions")
+    .update({ leaderboard_frozen_at: parsed.data.frozen ? new Date().toISOString() : null })
+    .eq("competition_id", parsed.data.competitionId);
+  if (error) return { ok: false, message: databaseErrorMessage(error) };
+
+  refresh();
+  return { ok: true, data: undefined, message: parsed.data.frozen ? "admin.cp.leaderboardFrozenDone" : "admin.cp.leaderboardUnfrozenDone" };
 }

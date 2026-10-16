@@ -181,6 +181,19 @@ export type LeaderboardTableProps = {
   initialRows: LeaderboardRow[];
   competitionId: string;
   highlightRegistrationId: string | null;
+  // Who is looking: admins always get live scores; participants get the snapshot while frozen.
+  viewer: "admin" | "participant";
+  frozenAt: string | null;
+};
+
+export type LeaderboardFreezeButtonProps = {
+  competitionId: string;
+  frozen: boolean;
+};
+
+export type AdminLeaderboardCardProps = {
+  contest: AdminContest;
+  rows: LeaderboardRow[];
 };
 
 export type ContestStatusProps = {

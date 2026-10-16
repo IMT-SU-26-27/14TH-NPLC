@@ -59,6 +59,11 @@ export const contestStatusSchema = z.object({
   status: z.enum(["scheduled", "live", "paused", "ended"]),
 });
 
+export const leaderboardFreezeSchema = z.object({
+  competitionId: z.uuid(),
+  frozen: z.boolean(),
+});
+
 export const CP_VERDICTS = Constants.public.Enums.cp_verdict;
 
 // Admin submissions list. Filters live in the URL; bad values fall back to "no filter".

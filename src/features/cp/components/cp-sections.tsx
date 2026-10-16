@@ -70,10 +70,22 @@ export async function ContestWaiting({ lang }: LangProps) {
 }
 
 export async function ContestLeaderboard({ lang }: LangProps) {
-  const { context, empty } = await loadContext(lang);
+  const { user, context, empty } = await loadContext(lang);
   if (!context) return empty;
-  const rows = await getLeaderboard(context.competitionId);
-  return <LeaderboardTable initialRows={rows} competitionId={context.competitionId} highlightRegistrationId={context.registrationId} />;
+  const viewer = user.role === "admin" ? "admin" : "participant";
+  const frozenAt = context.session.leaderboard_frozen_at;
+  // Participants see the snapshot while frozen; admins always see live scores.
+  const rows = await getLeaderboard(context.competitionId, viewer === "participant" && frozenAt ? "snapshot" : "live");
+  return (
+    <LeaderboardTable
+      key={frozenAt ?? "live"}
+      initialRows={rows}
+      competitionId={context.competitionId}
+      highlightRegistrationId={context.registrationId}
+      viewer={viewer}
+      frozenAt={frozenAt}
+    />
+  );
 }
 
 export async function ContestProblem({ params }: CpProblemPageProps) {

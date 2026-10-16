@@ -157,6 +157,48 @@ export type Database = {
         }
         Relationships: []
       }
+      cp_leaderboard_snapshots: {
+        Row: {
+          competition_id: string
+          last_improved_at: string | null
+          registration_id: string
+          solved: number
+          team_name: string
+          total_points: number
+        }
+        Insert: {
+          competition_id: string
+          last_improved_at?: string | null
+          registration_id: string
+          solved?: number
+          team_name: string
+          total_points?: number
+        }
+        Update: {
+          competition_id?: string
+          last_improved_at?: string | null
+          registration_id?: string
+          solved?: number
+          team_name?: string
+          total_points?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cp_leaderboard_snapshots_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cp_leaderboard_snapshots_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: true
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cp_problem_scores: {
         Row: {
           achieved_at: string
@@ -337,6 +379,7 @@ export type Database = {
           created_at: string
           ended_at: string | null
           id: string
+          leaderboard_frozen_at: string | null
           paused_at: string | null
           paused_seconds: number
           scheduled_end_at: string | null
@@ -352,6 +395,7 @@ export type Database = {
           created_at?: string
           ended_at?: string | null
           id?: string
+          leaderboard_frozen_at?: string | null
           paused_at?: string | null
           paused_seconds?: number
           scheduled_end_at?: string | null
@@ -367,6 +411,7 @@ export type Database = {
           created_at?: string
           ended_at?: string | null
           id?: string
+          leaderboard_frozen_at?: string | null
           paused_at?: string | null
           paused_seconds?: number
           scheduled_end_at?: string | null

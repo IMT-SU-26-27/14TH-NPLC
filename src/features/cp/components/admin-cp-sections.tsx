@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeftIcon, FileCodeIcon, ListChecksIcon, PlusIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
-import { getAdminContest, getAdminProblem, listCpCompetitions } from "@/lib/data/cp";
+import { getAdminContest, getAdminProblem, getLeaderboard, listCpCompetitions } from "@/lib/data/cp";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
@@ -16,6 +16,8 @@ import { ContestControl } from "@/features/cp/components/contest-control";
 import { DifficultyBadge } from "@/features/cp/components/difficulty-badge";
 import { DeleteProblemButton } from "@/features/cp/components/delete-problem-button";
 import { ProblemForm } from "@/features/cp/components/problem-form";
+import { LeaderboardFreezeButton } from "@/features/cp/components/leaderboard-freeze-button";
+import { LeaderboardTable } from "@/features/cp/components/leaderboard-table";
 import type { AdminCpSectionProps, AdminProblemPageProps } from "@/types/cp";
 
 export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps) {
@@ -36,7 +38,7 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
       </Empty>
     );
   }
-  const contest = await getAdminContest(selected.id);
+  const [contest, leaderboard] = await Promise.all([getAdminContest(selected.id), getLeaderboard(selected.id)]);
   if (!contest) notFound();
 
   return (
@@ -55,6 +57,25 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
         </div>
       )}
       <ContestControl contest={contest} />
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("cp.leaderboard")}</CardTitle>
+          <CardDescription>{t("admin.cp.leaderboardLead")}</CardDescription>
+          <CardAction>
+            <LeaderboardFreezeButton competitionId={contest.competitionId} frozen={!!contest.session.leaderboard_frozen_at} />
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <LeaderboardTable
+            key={contest.session.leaderboard_frozen_at ?? "live"}
+            initialRows={leaderboard}
+            competitionId={contest.competitionId}
+            highlightRegistrationId={null}
+            viewer="admin"
+            frozenAt={contest.session.leaderboard_frozen_at}
+          />
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>{t("admin.cp.problems")}</CardTitle>

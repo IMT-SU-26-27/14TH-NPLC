@@ -24,9 +24,16 @@ function visiblePages(page: number, pageCount: number): (number | "gap")[] {
 }
 
 // Result count on the left, page links on the right. Always shown, so it's clear the list is paginated.
-export function TablePagination({ page, pageCount, hrefFor, summary, previousLabel, nextLabel }: TablePaginationProps) {
+export function TablePagination({ page, pageCount, hrefFor, summary, previousLabel, nextLabel, onSelect }: TablePaginationProps) {
   const first = page <= 1;
   const last = page >= pageCount;
+  const select = (target: number) =>
+    onSelect
+      ? (event: React.MouseEvent<HTMLAnchorElement>) => {
+          event.preventDefault();
+          onSelect(target);
+        }
+      : undefined;
 
   return (
     <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-2 text-sm">
@@ -38,6 +45,7 @@ export function TablePagination({ page, pageCount, hrefFor, summary, previousLab
               text={previousLabel}
               aria-label={previousLabel}
               href={first ? undefined : hrefFor(page - 1)}
+              onClick={first ? undefined : select(page - 1)}
               aria-disabled={first}
               className={cn(first && "pointer-events-none opacity-50")}
             />
@@ -49,7 +57,7 @@ export function TablePagination({ page, pageCount, hrefFor, summary, previousLab
               </PaginationItem>
             ) : (
               <PaginationItem key={p}>
-                <PaginationLink href={hrefFor(p)} isActive={p === page} className="tabular-nums">
+                <PaginationLink href={hrefFor(p)} onClick={select(p)} isActive={p === page} className="tabular-nums">
                   {p}
                 </PaginationLink>
               </PaginationItem>
@@ -60,6 +68,7 @@ export function TablePagination({ page, pageCount, hrefFor, summary, previousLab
               text={nextLabel}
               aria-label={nextLabel}
               href={last ? undefined : hrefFor(page + 1)}
+              onClick={last ? undefined : select(page + 1)}
               aria-disabled={last}
               className={cn(last && "pointer-events-none opacity-50")}
             />

@@ -23,4 +23,6 @@ export type TablePaginationProps = {
   summary: string;
   previousLabel: string;
   nextLabel: string;
+  // When set, pages change in the browser (client components) instead of following the link.
+  onSelect?: (page: number) => void;
 };

@@ -14,11 +14,13 @@ function rank(rows: LeaderboardRow[]): LeaderboardRow[] {
 }
 
 // Live leaderboard: applies inserts, updates and deletes on cp_scores as they happen.
-export function useLeaderboardRealtime(competitionId: string, initialRows: LeaderboardRow[]) {
+// Disabled for participants while the leaderboard is frozen (they see the snapshot).
+export function useLeaderboardRealtime(competitionId: string, initialRows: LeaderboardRow[], enabled = true) {
   const [rows, setRows] = useState(() => rank(initialRows));
   const [changedId, setChangedId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) return;
     return subscribeAuthed(`cp-scores:${competitionId}`, (channel) =>
       channel.on(
         "postgres_changes",
@@ -35,7 +37,7 @@ export function useLeaderboardRealtime(competitionId: string, initialRows: Leade
         },
       ),
     );
-  }, [competitionId]);
+  }, [competitionId, enabled]);
 
   return { rows, changedId };
 }

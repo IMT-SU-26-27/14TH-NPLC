@@ -103,10 +103,12 @@ export async function getRecentSubmissions(problemId: string, registrationId: st
   return data ?? [];
 }
 
-export async function getLeaderboard(competitionId: string): Promise<LeaderboardRow[]> {
+// "live" reads cp_scores (admins, or participants while not frozen); "snapshot" reads the standings
+// captured when the admin froze the leaderboard. RLS enforces the same rules.
+export async function getLeaderboard(competitionId: string, source: "live" | "snapshot" = "live"): Promise<LeaderboardRow[]> {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
-    .from("cp_scores")
+    .from(source === "live" ? "cp_scores" : "cp_leaderboard_snapshots")
     .select("registration_id, team_name, total_points, solved, last_improved_at")
     .eq("competition_id", competitionId)
     .order("total_points", { ascending: false })

@@ -68,11 +68,11 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, teamName 
           <EmptyTitle>{t("cp.waiting.endedTitle")}</EmptyTitle>
           <EmptyDescription>{t("cp.waiting.endedLead")}</EmptyDescription>
         </EmptyHeader>
-        <EmptyContent>
-          <Link href={href("/cp/leaderboard")} className={buttonVariants()}>
-            {t("cp.leaderboard")}
-          </Link>
-        </EmptyContent>
+        {teamName && (
+          <EmptyContent>
+            <p className="text-sm font-medium">{t("cp.waiting.team", { team: teamName })}</p>
+          </EmptyContent>
+        )}
       </Empty>
     );
   }

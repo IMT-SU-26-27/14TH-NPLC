@@ -93,7 +93,7 @@ export function notifyContestStatus(competitionId: string, status: CpSessionStat
         title: `push.${key}Title`,
         body: `push.${key}Body`,
         params: { competition: competition?.name ?? "" },
-        url: status === "live" ? "/cp" : status === "ended" ? "/cp/leaderboard" : "/cp/waiting",
+        url: status === "live" ? "/cp" : "/cp/waiting",
         tag: `contest-${competitionId}`,
       },
     );
