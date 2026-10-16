@@ -671,6 +671,7 @@ export const en: Dictionary = {
     backHome: "Go to home",
     errorTitle: "Something went wrong",
     errorDescription: "This page failed to load. Try again; if it keeps failing, contact the committee and include the code below.",
+    backAdmin: "Back to admin",
     retry: "Try again",
     errorReference: "Error code:",
   },

@@ -41,30 +41,29 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      {competitions.length > 1 && (
         <div className="flex flex-wrap gap-1">
-          {competitions.length > 1 &&
-            competitions.map((c) => (
-              <Link
-                key={c.id}
-                href={`${localePath(lang, "/admin/cp")}?competition=${c.id}`}
-                className={buttonVariants({ variant: c.id === selected.id ? "secondary" : "ghost", size: "sm" })}
-              >
-                {c.name}
-              </Link>
-            ))}
+          {competitions.map((c) => (
+            <Link
+              key={c.id}
+              href={`${localePath(lang, "/admin/cp")}?competition=${c.id}`}
+              className={buttonVariants({ variant: c.id === selected.id ? "secondary" : "ghost", size: "sm" })}
+            >
+              {c.name}
+            </Link>
+          ))}
         </div>
-        <Link href={`${localePath(lang, "/admin/cp/submissions")}?competition=${selected.id}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
-          <ListChecksIcon />
-          {t("admin.submissions.title")}
-        </Link>
-      </div>
+      )}
       <ContestControl contest={contest} />
       <Card>
         <CardHeader>
           <CardTitle>{t("admin.cp.problems")}</CardTitle>
           <CardDescription>{t("admin.cp.problemsLead")}</CardDescription>
-          <CardAction>
+          <CardAction className="flex gap-2">
+            <Link href={`${localePath(lang, "/admin/cp/submissions")}?competition=${contest.competitionId}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+              <ListChecksIcon />
+              {t("admin.submissions.title")}
+            </Link>
             <Link href={`${localePath(lang, "/admin/cp/problems/new")}?competition=${contest.competitionId}`} className={buttonVariants({ size: "sm" })}>
               <PlusIcon />
               {t("admin.cp.newProblem")}

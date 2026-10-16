@@ -17,7 +17,9 @@ export function NotFoundView() {
           <EmptyMedia variant="icon">
             <FileQuestionIcon />
           </EmptyMedia>
-          <EmptyTitle>{t("system.notFoundTitle")}</EmptyTitle>
+          <EmptyTitle>
+            <h1>{t("system.notFoundTitle")}</h1>
+          </EmptyTitle>
           <EmptyDescription>{t("system.notFoundDescription")}</EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="flex-row justify-center">

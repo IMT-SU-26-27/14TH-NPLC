@@ -334,4 +334,5 @@ export type AdminSubmissionsTableProps = {
 export type SubmissionCodeViewerProps = {
   code: string;
   language: CpLanguage;
+  label: string;
 };

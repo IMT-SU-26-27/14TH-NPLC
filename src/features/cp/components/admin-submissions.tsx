@@ -160,7 +160,7 @@ export async function AdminSubmissionDetailSection({ params }: AdminSubmissionPa
           <CardTitle>{t("admin.submissions.code")}</CardTitle>
         </CardHeader>
         <CardContent className="px-0">
-          <SubmissionCodeViewer code={s.source_code} language={s.language} />
+          <SubmissionCodeViewer code={s.source_code} language={s.language} label={t("admin.submissions.code")} />
         </CardContent>
       </Card>
 

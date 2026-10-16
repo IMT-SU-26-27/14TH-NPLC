@@ -16,7 +16,9 @@ export default function GlobalError({ error, retry }: RouteErrorProps) {
             <EmptyMedia variant="icon">
               <TriangleAlertIcon />
             </EmptyMedia>
-            <EmptyTitle>Terjadi kesalahan</EmptyTitle>
+            <EmptyTitle>
+              <h1>Terjadi kesalahan</h1>
+            </EmptyTitle>
             <EmptyDescription>
               Halaman ini gagal dimuat. Coba lagi sebentar lagi.
               <span className="mt-1 block">Something went wrong loading this page. Please try again.</span>

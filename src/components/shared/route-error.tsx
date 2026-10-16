@@ -10,7 +10,7 @@ import type { RouteErrorProps } from "@/types/system";
 
 // Shared body of the error.tsx boundaries. Server errors only carry a digest, which the
 // committee can match against the server logs.
-export function RouteError({ error, retry }: RouteErrorProps) {
+export function RouteError({ error, retry, homeHref = "/", homeLabel = "system.backHome" }: RouteErrorProps) {
   const { t, href } = useI18n();
 
   useEffect(() => {
@@ -23,7 +23,9 @@ export function RouteError({ error, retry }: RouteErrorProps) {
         <EmptyMedia variant="icon">
           <TriangleAlertIcon />
         </EmptyMedia>
-        <EmptyTitle>{t("system.errorTitle")}</EmptyTitle>
+        <EmptyTitle>
+          <h1>{t("system.errorTitle")}</h1>
+        </EmptyTitle>
         <EmptyDescription>{t("system.errorDescription")}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center">
@@ -31,8 +33,8 @@ export function RouteError({ error, retry }: RouteErrorProps) {
           <RotateCwIcon />
           {t("system.retry")}
         </Button>
-        <Link href={href("/")} className={buttonVariants({ variant: "outline" })}>
-          {t("system.backHome")}
+        <Link href={href(homeHref)} className={buttonVariants({ variant: "outline" })}>
+          {t(homeLabel)}
         </Link>
       </EmptyContent>
       {error.digest && (

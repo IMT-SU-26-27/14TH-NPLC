@@ -670,6 +670,7 @@ export const id = {
     backHome: "Ke beranda",
     errorTitle: "Terjadi kesalahan",
     errorDescription: "Halaman ini gagal dimuat. Coba lagi; jika masih gagal, hubungi panitia dan sertakan kode di bawah.",
+    backAdmin: "Kembali ke admin",
     retry: "Coba lagi",
     errorReference: "Kode kesalahan:",
   },

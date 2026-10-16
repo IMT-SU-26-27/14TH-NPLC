@@ -31,9 +31,9 @@ export function SubmissionFilters({ filters, competitionId, problems }: Submissi
         <Input id="q" name="q" defaultValue={filters.q} placeholder={t("admin.submissions.searchPlaceholder")} />
       </Field>
       <Field>
-        <FieldLabel>{t("admin.submissions.problem")}</FieldLabel>
+        <FieldLabel htmlFor="problem">{t("admin.submissions.problem")}</FieldLabel>
         <Select name="problem" items={problemItems} defaultValue={filters.problem ?? "all"}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="problem" className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -46,9 +46,9 @@ export function SubmissionFilters({ filters, competitionId, problems }: Submissi
         </Select>
       </Field>
       <Field>
-        <FieldLabel>{t("admin.submissions.verdict")}</FieldLabel>
+        <FieldLabel htmlFor="verdict">{t("admin.submissions.verdict")}</FieldLabel>
         <Select name="verdict" items={verdictItems} defaultValue={filters.verdict ?? "all"}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="verdict" className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

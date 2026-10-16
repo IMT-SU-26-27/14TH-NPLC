@@ -9,7 +9,7 @@ import type { SubmissionCodeViewerProps } from "@/types/cp";
 const LINE_HEIGHT = 20;
 
 // Read-only view of submitted code with the same highlighting participants saw while writing it.
-export function SubmissionCodeViewer({ code, language }: SubmissionCodeViewerProps) {
+export function SubmissionCodeViewer({ code, language, label }: SubmissionCodeViewerProps) {
   const lines = code.split("\n").length;
   const height = Math.min(Math.max(lines, 8), 40) * LINE_HEIGHT + 24;
 
@@ -22,6 +22,7 @@ export function SubmissionCodeViewer({ code, language }: SubmissionCodeViewerPro
       value={code}
       loading={<Skeleton className="m-4 h-48" />}
       options={{
+        ariaLabel: label,
         readOnly: true,
         domReadOnly: true,
         minimap: { enabled: false },
