@@ -26,7 +26,7 @@ export function CompetitionsTable({ competitions, lang }: CompetitionsTableProps
   }
 
   return (
-    <div className="rounded-xl border">
+    <div className="bg-card overflow-hidden rounded-xl border">
       <Table>
         <TableHeader>
           <TableRow>

@@ -40,7 +40,7 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
   return (
     <div className="space-y-3">
       {/* Phones: one stacked row per team. */}
-      <ul className="divide-y rounded-xl border md:hidden">
+      <ul className="bg-card divide-y overflow-hidden rounded-xl border md:hidden">
         {list.rows.map((row) => (
           <li key={row.id}>
             <Link href={localePath(lang, `/admin/registrations/${row.id}`)} className="hover:bg-muted/50 flex flex-col gap-1.5 p-3">
@@ -57,7 +57,7 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
         ))}
       </ul>
 
-      <div className="hidden rounded-xl border md:block">
+      <div className="bg-card hidden overflow-hidden rounded-xl border md:block">
         <Table>
           <TableHeader>
             <TableRow>

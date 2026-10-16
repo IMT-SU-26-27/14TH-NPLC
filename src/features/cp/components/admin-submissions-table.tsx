@@ -41,7 +41,7 @@ export function AdminSubmissionsTable({ list, filters, competitionId, lang }: Ad
 
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border">
+      <div className="bg-card overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
             <TableRow>

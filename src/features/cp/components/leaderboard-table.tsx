@@ -28,7 +28,7 @@ export function LeaderboardTable({ initialRows, competitionId, highlightRegistra
   }
 
   return (
-    <div className="bg-card rounded-xl border">
+    <div className="bg-card overflow-hidden rounded-xl border">
       <Table>
         <TableHeader>
           <TableRow>
