@@ -603,6 +603,15 @@ export const id = {
     account: "Akun",
     rights: "© {year} 14th NPLC. Hak cipta dilindungi.",
   },
+  system: {
+    notFoundTitle: "Halaman tidak ditemukan",
+    notFoundDescription: "Alamat ini salah atau halamannya sudah dipindahkan. Periksa lagi tautannya, atau kembali ke beranda.",
+    backHome: "Ke beranda",
+    errorTitle: "Terjadi kesalahan",
+    errorDescription: "Halaman ini gagal dimuat. Coba lagi; jika masih gagal, hubungi panitia dan sertakan kode di bawah.",
+    retry: "Coba lagi",
+    errorReference: "Kode kesalahan:",
+  },
   validation: {
     email: "Masukkan alamat email yang valid",
     passwordRequired: "Masukkan kata sandi",

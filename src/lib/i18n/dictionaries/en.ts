@@ -604,6 +604,15 @@ export const en: Dictionary = {
     account: "Account",
     rights: "© {year} 14th NPLC. All rights reserved.",
   },
+  system: {
+    notFoundTitle: "Page not found",
+    notFoundDescription: "This address is wrong or the page has moved. Check the link, or go back to the home page.",
+    backHome: "Go to home",
+    errorTitle: "Something went wrong",
+    errorDescription: "This page failed to load. Try again; if it keeps failing, contact the committee and include the code below.",
+    retry: "Try again",
+    errorReference: "Error code:",
+  },
   validation: {
     email: "Enter a valid email address",
     passwordRequired: "Enter your password",
