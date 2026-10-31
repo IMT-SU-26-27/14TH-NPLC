@@ -28,6 +28,14 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
         </Alert>
       )}
 
+      {notice === "already-registered" && (
+        <Alert>
+          <InfoIcon />
+          <AlertTitle>{t("dashboard.alreadyRegisteredTitle")}</AlertTitle>
+          <AlertDescription>{t("dashboard.alreadyRegisteredDescription")}</AlertDescription>
+        </Alert>
+      )}
+
       <PushPrompt hasTeams={teams.length > 0} />
 
       {teams.length === 0 ? (

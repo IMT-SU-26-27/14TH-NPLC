@@ -1,11 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
-import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardActions } from "@/features/dashboard/components/dashboard-actions";
 import { DashboardContent } from "@/features/dashboard/components/dashboard-content";
 import type { DashboardPageProps } from "@/types/registration";
 
@@ -25,14 +23,9 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
           <h1 className="font-heading text-2xl font-semibold tracking-tight">{t("dashboard.title")}</h1>
           <p className="text-muted-foreground">{t("dashboard.lead")}</p>
         </div>
-        <div className="flex gap-2">
-          <Link href={localePath(lang, "/join")} className={buttonVariants({ variant: "outline" })}>
-            {t("nav.joinTeam")}
-          </Link>
-          <Link href={localePath(lang, "/register")} className={buttonVariants()}>
-            {t("nav.registerTeam")}
-          </Link>
-        </div>
+        <Suspense fallback={null}>
+          <DashboardActions lang={lang} />
+        </Suspense>
       </div>
       <Suspense
         fallback={

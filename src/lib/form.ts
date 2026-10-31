@@ -51,7 +51,7 @@ export function databaseErrorMessage(error: { code?: string; message: string }):
     if (error.message.includes("team_name")) return "errors.duplicateTeamName";
     if (error.message.includes("competition_level")) return "errors.duplicateLevel";
     if (error.message.includes("slug")) return "errors.duplicateSlug";
-    if (error.message.includes("competition_user") || error.message.includes("competition_leader")) return "errors.alreadyOnTeam";
+    if (error.message.includes("members_user") || error.message.includes("competition_leader")) return "errors.alreadyOnTeam";
   }
   if (error.code === "42501") return "errors.permission";
   return error.message;

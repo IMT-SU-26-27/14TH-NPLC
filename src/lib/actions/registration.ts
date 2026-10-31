@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
+import { hasRegistration } from "@/lib/data/registrations";
 import { assetExists, deleteAsset, newRegistrationProofFolder, paymentProofFolder, signUpload } from "@/lib/cloudinary/server";
 import { databaseErrorMessage, errorState, fieldErrorState } from "@/lib/form";
 import { notifyAdminsPaymentToReview, notifyLeaderMemberJoined } from "@/lib/push/notify";
@@ -36,6 +37,10 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
   const user = await getCurrentUser();
   if (!user) return errorState("errors.signInAgain");
   const { paymentProofPublicId: publicId, paymentProofFormat: format } = parsed.data;
+  if (await hasRegistration(user.id)) {
+    if (publicId.startsWith(`${newRegistrationProofFolder(user.id)}/`)) await deleteAsset(publicId, "authenticated");
+    return errorState("errors.alreadyOnTeam");
+  }
   if (!publicId.startsWith(`${newRegistrationProofFolder(user.id)}/`) || !(await assetExists(publicId, "authenticated"))) {
     return errorState("errors.uploadMissing");
   }
@@ -67,6 +72,10 @@ export async function joinTeam(_prev: FormState, formData: FormData): Promise<Fo
     phone: formData.get("phone") ?? "",
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
+
+  const user = await getCurrentUser();
+  if (!user) return errorState("errors.signInAgain");
+  if (await hasRegistration(user.id)) return errorState("errors.alreadyOnTeam");
 
   const supabase = await createSupabaseServerClient();
   const { data: registrationId, error } = await supabase.rpc("join_team", {
@@ -117,6 +126,7 @@ export async function deleteRegistration(registrationId: string): Promise<Action
 export async function getNewRegistrationUploadSignature(): Promise<ActionResult<CloudinaryUploadSignature>> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, message: "errors.signInAgain" };
+  if (await hasRegistration(user.id)) return { ok: false, message: "errors.alreadyOnTeam" };
   return { ok: true, data: signUpload(newRegistrationProofFolder(user.id), "authenticated", PAYMENT_PROOF_FORMATS.join(",")) };
 }
 

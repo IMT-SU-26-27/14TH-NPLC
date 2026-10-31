@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useState } from "react";
-import { OctagonXIcon } from "lucide-react";
+import { OctagonXIcon, TriangleAlertIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature } from "@/lib/actions/registration";
 import { initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
@@ -61,6 +61,11 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
     <form onSubmit={handleSubmit}>
       <input type="hidden" name="competitionId" value={competition.id} />
       <FieldGroup>
+        <Alert>
+          <TriangleAlertIcon />
+          <AlertDescription>{t("register.oneCompetitionWarning")}</AlertDescription>
+        </Alert>
+
         <Field data-invalid={!!errors.teamName}>
           <FieldLabel htmlFor="teamName">{t("register.teamName")}</FieldLabel>
           <Input id="teamName" name="teamName" maxLength={60} aria-invalid={!!errors.teamName} required />
