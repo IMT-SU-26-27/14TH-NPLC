@@ -10,7 +10,7 @@ import { databaseErrorMessage, errorState, fieldErrorState, successState } from 
 import { localePath } from "@/lib/i18n/config";
 import { getRequestLocale } from "@/lib/i18n/server";
 import { uuidSchema } from "@/lib/validations/admin";
-import { loAccountSchema, rallyPostSchema } from "@/lib/validations/rally";
+import { loAccountSchema, rallyCorrectionSchema, rallyDeleteResultSchema, rallyPostSchema } from "@/lib/validations/rally";
 import type { ActionResult, FormState } from "@/types";
 
 async function isAdmin() {
@@ -98,6 +98,43 @@ export async function regenerateRallyQr(registrationId: string): Promise<ActionR
 
   refresh();
   return { ok: true, data: undefined };
+}
+
+export async function correctRallyResult(_prev: FormState, formData: FormData): Promise<FormState> {
+  if (!(await isAdmin())) return errorState(NOT_ADMIN);
+  const parsed = rallyCorrectionSchema.safeParse({
+    resultId: formData.get("resultId"),
+    outcome: formData.get("outcome"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.rpc("rally_admin_correct_result", {
+    p_result_id: parsed.data.resultId,
+    p_outcome: parsed.data.outcome,
+    p_reason: parsed.data.reason,
+  });
+  if (error) return errorState(databaseErrorMessage(error));
+
+  refresh();
+  return successState("rally.results.corrected");
+}
+
+export async function deleteRallyResult(_prev: FormState, formData: FormData): Promise<FormState> {
+  if (!(await isAdmin())) return errorState(NOT_ADMIN);
+  const parsed = rallyDeleteResultSchema.safeParse({
+    resultId: formData.get("resultId"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.rpc("rally_admin_delete_result", { p_result_id: parsed.data.resultId, p_reason: parsed.data.reason });
+  if (error) return errorState(databaseErrorMessage(error));
+
+  refresh();
+  return successState("rally.results.deleted");
 }
 
 export async function createLoAccount(_prev: FormState, formData: FormData): Promise<FormState> {

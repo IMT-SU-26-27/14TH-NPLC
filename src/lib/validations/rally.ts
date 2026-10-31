@@ -38,3 +38,29 @@ export const rallyRecordSchema = z.object({
   outcome: rallyOutcomeSchema,
   clientRequestId: z.uuid(),
 });
+
+const reason = z.string().trim().min(5, "rally.errors.reasonRequired").max(500, "rally.errors.reasonRequired");
+
+export const rallyCorrectionSchema = z.object({
+  resultId: z.uuid(),
+  outcome: rallyOutcomeSchema,
+  reason,
+});
+
+export const rallyDeleteResultSchema = z.object({
+  resultId: z.uuid(),
+  reason,
+});
+
+// Search params for the results and log pages. Anything invalid falls back to "no filter".
+export const rallyFiltersSchema = z.object({
+  q: z
+    .string()
+    .trim()
+    .max(100)
+    .transform((v) => v.replace(/[,()%*\\]/g, " ").trim())
+    .catch(""),
+  post: z.uuid().optional().catch(undefined),
+  team: z.uuid().optional().catch(undefined),
+  page: z.coerce.number().int().min(1).catch(1),
+});
