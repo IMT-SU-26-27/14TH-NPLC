@@ -35,6 +35,7 @@ const RAISED: [string, string][] = [
   ["Admins only", "errors.adminOnly"],
   ["Upload the payment proof before submitting", "errors.proofRequired"],
   ["School and LINE ID are required", "validation.fixFields"],
+  ["Upload the twibbon proof before submitting", "errors.twibbonRequired"],
   ["This competition needs", "errors.teamSize"],
   ["A team needs exactly one leader", "errors.teamSize"],
   ["The team leader cannot be removed", "errors.leaderProtected"],

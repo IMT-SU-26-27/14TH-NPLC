@@ -6,7 +6,7 @@ import type { PublicCompetition, RegistrationWindow } from "@/types/competition"
 export const COMPETITIONS_TAG = "competitions";
 
 const PUBLIC_COLUMNS =
-  "id, slug, name, type, description, min_members, max_members, fee, qris_public_id, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at";
+  "id, slug, name, type, description, min_members, max_members, fee, twibbon_url, qris_public_id, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at";
 
 // Public list for the landing and register pages. Admin edits call updateTag(COMPETITIONS_TAG).
 export async function getActiveCompetitions(): Promise<PublicCompetition[]> {

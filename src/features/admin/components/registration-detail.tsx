@@ -16,6 +16,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
 import { TeamTimeline } from "@/features/dashboard/components/team-timeline";
 import { AdminMembersTable } from "@/features/admin/components/admin-members-table";
+import { AdminTwibbonProofs } from "@/features/admin/components/admin-twibbon-proofs";
 import { AdminDeleteButton } from "@/features/admin/components/admin-delete-button";
 import { PaymentProofButton } from "@/features/admin/components/payment-proof-button";
 import { ReviewForm } from "@/features/admin/components/review-form";
@@ -83,6 +84,7 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
               <TeamNameForm registrationId={team.id} teamName={team.team_name} />
             </CardContent>
           </Card>
+          <AdminTwibbonProofs team={team} lang={lang} />
           <Card>
             <CardHeader>
               <CardTitle>{t("dashboard.progress")}</CardTitle>

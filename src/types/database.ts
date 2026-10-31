@@ -114,6 +114,7 @@ export type Database = {
           registration_closes_at: string | null
           registration_opens_at: string | null
           slug: string
+          twibbon_url: string | null
           type: Database["public"]["Enums"]["competition_type"]
           updated_at: string
         }
@@ -133,6 +134,7 @@ export type Database = {
           registration_closes_at?: string | null
           registration_opens_at?: string | null
           slug: string
+          twibbon_url?: string | null
           type: Database["public"]["Enums"]["competition_type"]
           updated_at?: string
         }
@@ -152,6 +154,7 @@ export type Database = {
           registration_closes_at?: string | null
           registration_opens_at?: string | null
           slug?: string
+          twibbon_url?: string | null
           type?: Database["public"]["Enums"]["competition_type"]
           updated_at?: string
         }
@@ -733,6 +736,8 @@ export type Database = {
           nisn: string
           phone: string | null
           registration_id: string
+          twibbon_proof_format: string | null
+          twibbon_proof_public_id: string | null
           updated_at: string
           user_id: string
         }
@@ -746,6 +751,8 @@ export type Database = {
           nisn: string
           phone?: string | null
           registration_id: string
+          twibbon_proof_format?: string | null
+          twibbon_proof_public_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -759,6 +766,8 @@ export type Database = {
           nisn?: string
           phone?: string | null
           registration_id?: string
+          twibbon_proof_format?: string | null
+          twibbon_proof_public_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1010,6 +1019,8 @@ export type Database = {
           p_payment_proof_public_id: string
           p_school: string
           p_team_name: string
+          p_twibbon_proof_format?: string
+          p_twibbon_proof_public_id?: string
         }
         Returns: string
       }
@@ -1019,6 +1030,8 @@ export type Database = {
           p_nisn: string
           p_phone?: string
           p_referral_code: string
+          p_twibbon_proof_format?: string
+          p_twibbon_proof_public_id?: string
         }
         Returns: string
       }
@@ -1031,6 +1044,7 @@ export type Database = {
           max_members: number
           member_count: number
           team_name: string
+          twibbon_url: string
         }[]
       }
     }

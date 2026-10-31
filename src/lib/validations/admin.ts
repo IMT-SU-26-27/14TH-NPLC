@@ -68,6 +68,12 @@ export const competitionSchema = z
     minMembers: z.coerce.number().int().min(1, "validation.atLeastOne").max(10, "validation.atMostTen"),
     maxMembers: z.coerce.number().int().min(1, "validation.atLeastOne").max(10, "validation.atMostTen"),
     fee: z.coerce.number().int().min(0, "validation.nonNegative"),
+    twibbonUrl: z
+      .string()
+      .trim()
+      .max(500, "validation.twibbonUrl")
+      .regex(/^(https:\/\/\S+)?$/, "validation.twibbonUrl")
+      .transform((v) => v || null),
     registrationOpensAt: wibDateTime,
     registrationClosesAt: wibDateTime,
     isActive: z.boolean(),

@@ -14,6 +14,7 @@ export type PublicCompetition = Pick<
   | "min_members"
   | "max_members"
   | "fee"
+  | "twibbon_url"
   | "qris_public_id"
   | "payment_method"
   | "bank_account_number"

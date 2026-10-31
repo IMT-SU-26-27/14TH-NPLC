@@ -145,6 +145,17 @@ export const id = {
     paymentLead: "Bayar biaya pendaftaran sesuai instruksi di bawah, lalu unggah buktinya. Tim dibuat setelah bukti terkirim, dan anggota bisa bergabung dengan kode tim sampai pendaftaran ditutup.",
     paymentRequired: "Unggah bukti pembayaran untuk membuat tim",
   },
+  twibbon: {
+    proof: "Bukti post twibbon",
+    proofOptional: "Bukti post twibbon (opsional)",
+    open: "Buka twibbon",
+    noLink: "Link twibbon belum tersedia. Kamu boleh mengosongkan bagian ini dulu.",
+    hint: "Screenshot post twibbon kamu. JPG, PNG atau WEBP, maksimal 5 MB.",
+    adminTitle: "Bukti twibbon",
+    adminCount: "{sent} dari {total} anggota sudah mengirim.",
+    adminAlt: "Bukti twibbon {name}",
+    adminNone: "Belum ada bukti",
+  },
   join: {
     alreadyTitle: "Kamu sudah terdaftar di satu lomba",
     alreadyDescription: "Kamu sudah masuk tim {team} di {competition}. Satu akun hanya boleh ikut satu lomba, jadi kamu tidak bisa bergabung ke tim lain.",
@@ -357,6 +368,8 @@ export const id = {
       chooseCompetition: "Pilih lomba",
     },
     competitions: {
+      twibbonUrl: "Link twibbon",
+      twibbonUrlHint: "Tautan twibbon untuk peserta. Selama kosong, bukti twibbon tidak wajib. Setelah diisi, bukti wajib untuk pendaftar dan anggota baru.",
       title: "Lomba",
       lead: "Atur ukuran tim, biaya, jadwal pendaftaran, dan kode QRIS.",
       new: "Lomba baru",
@@ -841,6 +854,7 @@ export const id = {
     contestEndedBody: "{competition} sudah selesai. Hasil akhir akan diumumkan oleh panitia.",
   },
   validation: {
+    twibbonUrl: "Masukkan tautan lengkap yang diawali https://",
     school: "Isi asal sekolah (2-120 karakter)",
     lineId: "Line ID harus 4-20 karakter: huruf, angka, titik, strip atau garis bawah",
     email: "Masukkan alamat email yang valid",
@@ -883,6 +897,7 @@ export const id = {
     bankAccountHolder: "Masukkan nama pemilik rekening",
   },
   errors: {
+    twibbonRequired: "Unggah bukti post twibbon kamu",
     generic: "Terjadi kesalahan. Coba lagi.",
     permission: "Kamu tidak punya izin untuk melakukan ini",
     signInAgain: "Masuk lagi untuk melanjutkan",

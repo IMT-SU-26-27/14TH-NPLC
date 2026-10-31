@@ -146,6 +146,17 @@ export const en: Dictionary = {
     paymentLead: "Pay the registration fee using the instructions below, then upload the proof. The team is created once the proof is sent, and teammates can join with the team code until registration closes.",
     paymentRequired: "Upload the payment proof to create the team",
   },
+  twibbon: {
+    proof: "Twibbon post proof",
+    proofOptional: "Twibbon post proof (optional)",
+    open: "Open twibbon",
+    noLink: "The twibbon link isn't available yet. You can leave this empty for now.",
+    hint: "A screenshot of your twibbon post. JPG, PNG or WEBP, up to 5 MB.",
+    adminTitle: "Twibbon proofs",
+    adminCount: "{sent} of {total} members have sent theirs.",
+    adminAlt: "Twibbon proof of {name}",
+    adminNone: "No proof yet",
+  },
   join: {
     alreadyTitle: "You're already registered in a competition",
     alreadyDescription: "You're already on team {team} in {competition}. One account can enter only one competition, so you can't join another team.",
@@ -358,6 +369,8 @@ export const en: Dictionary = {
       chooseCompetition: "Choose a competition",
     },
     competitions: {
+      twibbonUrl: "Twibbon link",
+      twibbonUrlHint: "The twibbon link for participants. While empty, the proof is optional. Once set, it's required for new registrations and members.",
       title: "Competitions",
       lead: "Set team size, fee, registration window and the QRIS code.",
       new: "New competition",
@@ -842,6 +855,7 @@ export const en: Dictionary = {
     contestEndedBody: "{competition} has ended. The committee will announce the final results.",
   },
   validation: {
+    twibbonUrl: "Enter a full link starting with https://",
     school: "Enter the school name (2-120 characters)",
     lineId: "LINE ID must be 4-20 characters: letters, numbers, dots, hyphens or underscores",
     email: "Enter a valid email address",
@@ -884,6 +898,7 @@ export const en: Dictionary = {
     bankAccountHolder: "Enter the account holder's name",
   },
   errors: {
+    twibbonRequired: "Upload your twibbon post proof",
     generic: "Something went wrong. Try again.",
     permission: "You don't have permission to do that",
     signInAgain: "Sign in again to continue",

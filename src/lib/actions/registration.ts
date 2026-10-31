@@ -6,7 +6,7 @@ import { after } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { hasRegistration } from "@/lib/data/registrations";
-import { assetExists, deleteAsset, newRegistrationProofFolder, paymentProofFolder, signUpload } from "@/lib/cloudinary/server";
+import { assetExists, deleteAsset, newRegistrationProofFolder, paymentProofFolder, signUpload, twibbonProofFolder } from "@/lib/cloudinary/server";
 import { databaseErrorMessage, errorState, fieldErrorState } from "@/lib/form";
 import { notifyAdminsPaymentToReview, notifyLeaderMemberJoined } from "@/lib/push/notify";
 import { localePath } from "@/lib/i18n/config";
@@ -17,10 +17,17 @@ import {
   PAYMENT_PROOF_FORMATS,
   registrationIdSchema,
   submitPaymentSchema,
+  TWIBBON_PROOF_FORMATS,
 } from "@/lib/validations/registration";
 import type { ActionResult, FormState } from "@/types";
 import type { CloudinaryUploadSignature } from "@/types/cloudinary";
 import type { SubmitPaymentInput } from "@/types/registration";
+
+// The proof must be the caller's own upload, and must really exist on Cloudinary.
+async function twibbonProofIsValid(userId: string, publicId: string | undefined) {
+  if (!publicId) return true;
+  return publicId.startsWith(`${twibbonProofFolder(userId)}/`) && (await assetExists(publicId, "authenticated"));
+}
 
 export async function createRegistration(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = createRegistrationSchema.safeParse({
@@ -33,19 +40,23 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
     leaderName: formData.get("leaderName"),
     leaderPhone: formData.get("leaderPhone"),
     leaderNisn: formData.get("leaderNisn"),
+    twibbonProofPublicId: formData.get("twibbonProofPublicId") ?? undefined,
+    twibbonProofFormat: formData.get("twibbonProofFormat") ?? undefined,
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
 
   const user = await getCurrentUser();
   if (!user) return errorState("errors.signInAgain");
-  const { paymentProofPublicId: publicId, paymentProofFormat: format } = parsed.data;
+  const { paymentProofPublicId: publicId, paymentProofFormat: format, twibbonProofPublicId, twibbonProofFormat } = parsed.data;
   if (await hasRegistration(user.id)) {
     if (publicId.startsWith(`${newRegistrationProofFolder(user.id)}/`)) await deleteAsset(publicId, "authenticated");
+    if (twibbonProofPublicId?.startsWith(`${twibbonProofFolder(user.id)}/`)) await deleteAsset(twibbonProofPublicId, "authenticated");
     return errorState("errors.alreadyOnTeam");
   }
   if (!publicId.startsWith(`${newRegistrationProofFolder(user.id)}/`) || !(await assetExists(publicId, "authenticated"))) {
     return errorState("errors.uploadMissing");
   }
+  if (!(await twibbonProofIsValid(user.id, twibbonProofPublicId))) return errorState("errors.uploadMissing");
 
   const supabase = await createSupabaseServerClient();
   const { data: registrationId, error } = await supabase.rpc("create_registration", {
@@ -58,9 +69,12 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
     p_leader_nisn: parsed.data.leaderNisn,
     p_payment_proof_public_id: publicId,
     p_payment_proof_format: format,
+    p_twibbon_proof_public_id: twibbonProofPublicId,
+    p_twibbon_proof_format: twibbonProofFormat,
   });
   if (error) {
     await deleteAsset(publicId, "authenticated");
+    if (twibbonProofPublicId) await deleteAsset(twibbonProofPublicId, "authenticated");
     return errorState(databaseErrorMessage(error));
   }
 
@@ -74,12 +88,19 @@ export async function joinTeam(_prev: FormState, formData: FormData): Promise<Fo
     fullName: formData.get("fullName"),
     nisn: formData.get("nisn"),
     phone: formData.get("phone") ?? "",
+    twibbonProofPublicId: formData.get("twibbonProofPublicId") ?? undefined,
+    twibbonProofFormat: formData.get("twibbonProofFormat") ?? undefined,
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
 
   const user = await getCurrentUser();
   if (!user) return errorState("errors.signInAgain");
-  if (await hasRegistration(user.id)) return errorState("errors.alreadyOnTeam");
+  const { twibbonProofPublicId, twibbonProofFormat } = parsed.data;
+  if (await hasRegistration(user.id)) {
+    if (twibbonProofPublicId?.startsWith(`${twibbonProofFolder(user.id)}/`)) await deleteAsset(twibbonProofPublicId, "authenticated");
+    return errorState("errors.alreadyOnTeam");
+  }
+  if (!(await twibbonProofIsValid(user.id, twibbonProofPublicId))) return errorState("errors.uploadMissing");
 
   const supabase = await createSupabaseServerClient();
   const { data: registrationId, error } = await supabase.rpc("join_team", {
@@ -87,8 +108,13 @@ export async function joinTeam(_prev: FormState, formData: FormData): Promise<Fo
     p_full_name: parsed.data.fullName,
     p_nisn: parsed.data.nisn,
     p_phone: parsed.data.phone,
+    p_twibbon_proof_public_id: twibbonProofPublicId,
+    p_twibbon_proof_format: twibbonProofFormat,
   });
-  if (error) return errorState(databaseErrorMessage(error));
+  if (error) {
+    if (twibbonProofPublicId) await deleteAsset(twibbonProofPublicId, "authenticated");
+    return errorState(databaseErrorMessage(error));
+  }
 
   after(() => notifyLeaderMemberJoined(registrationId, parsed.data.fullName));
   redirect(localePath(await getRequestLocale(), "/dashboard"));
@@ -100,9 +126,10 @@ export async function removeMember(memberId: string): Promise<ActionResult> {
   if (!id.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.from("registration_members").delete().eq("id", id.data).select("id");
+  const { data, error } = await supabase.from("registration_members").delete().eq("id", id.data).select("twibbon_proof_public_id");
   if (error) return { ok: false, message: databaseErrorMessage(error) };
   if (!data?.length) return { ok: false, message: "errors.cannotRemoveMember" };
+  if (data[0].twibbon_proof_public_id) await deleteAsset(data[0].twibbon_proof_public_id, "authenticated");
 
   refresh();
   return { ok: true, data: undefined };
@@ -113,6 +140,8 @@ export async function deleteRegistration(registrationId: string): Promise<Action
   if (!id.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
+  // Read before deleting: members go with the registration.
+  const { data: members } = await supabase.from("registration_members").select("twibbon_proof_public_id").eq("registration_id", id.data);
   const { data, error } = await supabase
     .from("registrations")
     .delete()
@@ -122,8 +151,19 @@ export async function deleteRegistration(registrationId: string): Promise<Action
   if (!data?.length) return { ok: false, message: "errors.deleteOnlyUnpaid" };
 
   if (data[0].payment_proof_public_id) await deleteAsset(data[0].payment_proof_public_id, "authenticated");
+  for (const member of members ?? []) {
+    if (member.twibbon_proof_public_id) await deleteAsset(member.twibbon_proof_public_id, "authenticated");
+  }
   refresh();
   return { ok: true, data: undefined };
+}
+
+// Signature for the twibbon proof uploaded while registering or joining.
+export async function getTwibbonUploadSignature(): Promise<ActionResult<CloudinaryUploadSignature>> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, message: "errors.signInAgain" };
+  if (await hasRegistration(user.id)) return { ok: false, message: "errors.alreadyOnTeam" };
+  return { ok: true, data: signUpload(twibbonProofFolder(user.id), "authenticated", TWIBBON_PROOF_FORMATS.join(",")) };
 }
 
 // Signature for the payment proof uploaded with a new registration (before the team exists).
