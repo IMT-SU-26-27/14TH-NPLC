@@ -1,6 +1,9 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { MapPinIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
 import { listMyLoPosts } from "@/lib/data/rally";
+import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
@@ -26,10 +29,13 @@ export async function LoPostsSection({ lang }: LangProps) {
     );
   }
 
+  // Nothing to choose with a single post.
+  if (posts.length === 1) redirect(localePath(lang, `/lo/posts/${posts[0].id}`));
+
   return (
     <ItemGroup className="gap-2">
       {posts.map((post) => (
-        <Item key={post.id} variant="outline" className="bg-card">
+        <Item key={post.id} variant="outline" className="bg-card" render={<Link href={localePath(lang, `/lo/posts/${post.id}`)} />}>
           <ItemMedia variant="icon">
             <MapPinIcon />
           </ItemMedia>

@@ -24,3 +24,17 @@ export const loAccountSchema = z.object({
   email: z.email("validation.email").trim().toLowerCase(),
   password: z.string().min(8, "validation.passwordMin").max(72),
 });
+
+export const rallyOutcomeSchema = z.enum(["win", "lose", "draw"]);
+
+export const rallyLookupSchema = z.object({
+  postId: z.uuid(),
+  code: z.string().trim().min(1, "rally.errors.teamNotFound").max(100, "rally.errors.teamNotFound"),
+});
+
+export const rallyRecordSchema = z.object({
+  postId: z.uuid(),
+  registrationId: z.uuid(),
+  outcome: rallyOutcomeSchema,
+  clientRequestId: z.uuid(),
+});
