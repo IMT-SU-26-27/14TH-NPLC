@@ -1,6 +1,5 @@
 "use client";
 
-import Editor from "@monaco-editor/react";
 import { PlayIcon, RotateCcwIcon, SendIcon } from "lucide-react";
 import { MONACO_LANGUAGE } from "@/lib/cp/templates";
 import { defineMonacoTheme, MONACO_THEME } from "@/lib/cp/monaco-theme";
@@ -10,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import { MonacoEditor } from "@/features/cp/components/monaco-editor";
 import type { CodeEditorPanelProps, CpLanguage } from "@/types/cp";
 
 const LANGUAGES: CpLanguage[] = ["python", "cpp", "java"];
@@ -51,7 +51,7 @@ export function CodeEditorPanel({
         </Button>
       </CardHeader>
       <CardContent className="px-0">
-        <Editor
+        <MonacoEditor
           height="26rem"
           language={MONACO_LANGUAGE[language]}
           theme={MONACO_THEME}
