@@ -19,8 +19,8 @@ async function HeaderActions({ lang }: LangProps) {
       <LanguageSwitcher />
       {user ? (
         <>
-          <Link href={localePath(lang, "/dashboard")} className={buttonVariants({ variant: "ghost", className: "max-sm:hidden" })}>
-            {t("nav.dashboard")}
+          <Link href={localePath(lang, user.role === "lo" ? "/lo" : "/dashboard")} className={buttonVariants({ variant: "ghost", className: "max-sm:hidden" })}>
+            {t(user.role === "lo" ? "nav.loPosts" : "nav.dashboard")}
           </Link>
           {user.role === "admin" && (
             <Link href={localePath(lang, "/admin")} className={buttonVariants({ variant: "ghost", className: "max-sm:hidden" })}>

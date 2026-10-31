@@ -2,7 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { redirectWithCookies, updateSession } from "@/lib/supabase/proxy";
 import { DEFAULT_LOCALE, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 
-const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/reset-password", "/profile"];
+const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/lo", "/reset-password", "/profile"];
+// LO accounts run posts only: they never register, compete or administer.
+const NOT_FOR_LO = ["/dashboard", "/register", "/join", "/admin", "/cp"];
 const SIGNED_OUT_ONLY = ["/login", "/signup", "/forgot-password"];
 
 function matches(path: string, prefixes: string[]) {
@@ -49,10 +51,13 @@ export async function proxy(request: NextRequest) {
 
   if (matches(path, SIGNED_OUT_ONLY)) return to("/dashboard");
 
-  if (matches(path, ["/admin", "/cp"])) {
+  if (matches(path, [...NOT_FOR_LO, "/lo"])) {
     const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
     const isAdmin = profile?.role === "admin";
+    const isLo = profile?.role === "lo";
 
+    if (isLo && matches(path, NOT_FOR_LO)) return to("/lo");
+    if (matches(path, ["/lo"]) && !isLo && !isAdmin) return to("/dashboard");
     if (matches(path, ["/admin"]) && !isAdmin) return to("/dashboard");
 
     // /cp: accepted competitive programming teams only, and only while the admin has the contest live.

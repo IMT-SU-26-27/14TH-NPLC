@@ -3,6 +3,7 @@
 import { Trash2Icon } from "lucide-react";
 import { adminDeleteRegistration } from "@/lib/actions/admin-registrations";
 import { deleteCompetition } from "@/lib/actions/admin-competitions";
+import { deleteLoAccount, deleteRallyPost } from "@/lib/actions/admin-rally";
 import { useConfirmAction } from "@/hooks/use-confirm-action";
 import { useI18n } from "@/hooks/use-i18n";
 import {
@@ -30,6 +31,16 @@ const TARGETS = {
     action: deleteCompetition,
     title: "admin.competitions.deleteTitle",
     description: "admin.competitions.deleteDescription",
+  },
+  rallyPost: {
+    action: deleteRallyPost,
+    title: "rally.admin.deletePostTitle",
+    description: "rally.admin.deletePostDescription",
+  },
+  loAccount: {
+    action: deleteLoAccount,
+    title: "rally.admin.deleteLoTitle",
+    description: "rally.admin.deleteLoDescription",
   },
 } as const;
 

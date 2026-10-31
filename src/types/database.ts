@@ -679,6 +679,92 @@ export type Database = {
           },
         ]
       }
+      rally_post_assignments: {
+        Row: {
+          created_at: string
+          lo_id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          lo_id: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          lo_id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rally_post_assignments_lo_id_fkey"
+            columns: ["lo_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_post_assignments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "rally_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rally_posts: {
+        Row: {
+          allow_draw: boolean
+          competition_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          kind: Database["public"]["Enums"]["rally_post_kind"]
+          location: string | null
+          name: string
+          points_draw: number
+          points_lose: number
+          points_win: number
+          updated_at: string
+        }
+        Insert: {
+          allow_draw?: boolean
+          competition_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["rally_post_kind"]
+          location?: string | null
+          name: string
+          points_draw?: number
+          points_lose?: number
+          points_win?: number
+          updated_at?: string
+        }
+        Update: {
+          allow_draw?: boolean
+          competition_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["rally_post_kind"]
+          location?: string | null
+          name?: string
+          points_draw?: number
+          points_lose?: number
+          points_win?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rally_posts_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registration_events: {
         Row: {
           actor_id: string | null
@@ -1067,12 +1153,13 @@ export type Database = {
         | "internal_error"
         | "exec_format_error"
       payment_method: "qris" | "bank_transfer"
+      rally_post_kind: "physical" | "digital"
       registration_status:
         | "pending_payment"
         | "under_review"
         | "accepted"
         | "rejected"
-      user_role: "participant" | "admin"
+      user_role: "participant" | "admin" | "lo"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1765,13 +1852,14 @@ export const Constants = {
         "exec_format_error",
       ],
       payment_method: ["qris", "bank_transfer"],
+      rally_post_kind: ["physical", "digital"],
       registration_status: [
         "pending_payment",
         "under_review",
         "accepted",
         "rejected",
       ],
-      user_role: ["participant", "admin"],
+      user_role: ["participant", "admin", "lo"],
     },
   },
   storage: {
