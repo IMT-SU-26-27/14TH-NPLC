@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState, useState } from "react";
 import { OctagonXIcon, TriangleAlertIcon } from "lucide-react";
-import { createRegistration, getNewRegistrationUploadSignature } from "@/lib/actions/registration";
+import { createRegistration, getNewRegistrationUploadSignature, getTwibbonUploadSignature } from "@/lib/actions/registration";
 import { initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
@@ -14,9 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
+import { TwibbonProofField } from "@/features/registration/components/twibbon-proof-field";
 import type { RegisterTeamFormProps } from "@/types/registration";
 
 const ACCEPT = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+const TWIBBON_ACCEPT = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
 
 // Registering = creating the team AND paying: the proof is uploaded first, then the team is created with it.
@@ -30,8 +32,11 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
     maxBytes: MAX_BYTES,
     accept: ACCEPT,
   });
+  const [twibbonFile, setTwibbonFile] = useState<File | null>(null);
+  const [missingTwibbon, setMissingTwibbon] = useState(false);
+  const twibbon = useCloudinaryUpload({ getSignature: getTwibbonUploadSignature, maxBytes: MAX_BYTES, accept: TWIBBON_ACCEPT });
   const errors = state.fieldErrors ?? {};
-  const busy = uploading || pending;
+  const busy = uploading || twibbon.uploading || pending;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,9 +46,20 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
       return;
     }
     setMissingProof(false);
+    if (competition.twibbon_url && !twibbonFile) {
+      setMissingTwibbon(true);
+      return;
+    }
+    setMissingTwibbon(false);
+    const uploadedTwibbon = twibbonFile ? await twibbon.upload(twibbonFile) : null;
+    if (twibbonFile && !uploadedTwibbon) return;
     const uploaded = await upload(file);
     if (!uploaded) return;
     const data = new FormData(form);
+    if (uploadedTwibbon) {
+      data.set("twibbonProofPublicId", uploadedTwibbon.publicId);
+      data.set("twibbonProofFormat", uploadedTwibbon.format);
+    }
     data.set("paymentProofPublicId", uploaded.publicId);
     data.set("paymentProofFormat", uploaded.format);
     startTransition(() => action(data));
@@ -56,6 +72,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
       : errors.paymentProofPublicId
         ? t(errors.paymentProofPublicId[0].message)
         : null;
+  const twibbonError = missingTwibbon ? t("errors.twibbonRequired") : twibbon.error ? t(twibbon.error, twibbon.errorParams) : null;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -113,6 +130,17 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
                 <FieldError errors={fieldErrors(errors.leaderNisn)} />
               </Field>
             </div>
+            <TwibbonProofField
+              twibbonUrl={competition.twibbon_url}
+              disabled={busy}
+              error={twibbonError}
+              uploading={twibbon.uploading}
+              progress={twibbon.progress}
+              onFileChange={(next) => {
+                setTwibbonFile(next);
+                setMissingTwibbon(false);
+              }}
+            />
           </FieldGroup>
         </FieldSet>
 

@@ -145,3 +145,8 @@ export type PaymentSettingsDialogProps = {
   competition: Competition;
   qrisUrl: string | null;
 };
+
+export type AdminTwibbonProofsProps = {
+  team: AdminTeam;
+  lang: Locale;
+};

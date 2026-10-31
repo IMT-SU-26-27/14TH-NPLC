@@ -81,6 +81,12 @@ export function CompetitionForm({ competition }: CompetitionFormProps) {
             <FieldError errors={fieldErrors(errors.fee)} />
           </Field>
         </div>
+        <Field data-invalid={!!errors.twibbonUrl}>
+          <FieldLabel htmlFor="twibbonUrl">{t("admin.competitions.twibbonUrl")}</FieldLabel>
+          <Input id="twibbonUrl" name="twibbonUrl" type="url" placeholder="https://" defaultValue={competition?.twibbon_url ?? ""} aria-invalid={!!errors.twibbonUrl} />
+          <FieldDescription>{t("admin.competitions.twibbonUrlHint")}</FieldDescription>
+          <FieldError errors={fieldErrors(errors.twibbonUrl)} />
+        </Field>
         <div className="grid gap-6 sm:grid-cols-2">
           <Field data-invalid={!!errors.registrationOpensAt}>
             <FieldLabel htmlFor="registrationOpensAt">{t("admin.competitions.opensAt")}</FieldLabel>

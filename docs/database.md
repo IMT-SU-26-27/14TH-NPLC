@@ -38,9 +38,9 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | Table | What it holds |
 |---|---|
 | `profiles` | One row per account, created automatically on sign-up. `role` is `participant` or `admin`. Users can edit their name and avatar but not their role or email. |
-| `competitions` | Each competition: `type` (`competitive_programming` or `logic`), team size (`min_members` to `max_members`, leader included), `fee` in rupiah, `qris_public_id` (Cloudinary), registration window, `is_active`. |
+| `competitions` | Each competition: `type` (`competitive_programming` or `logic`), team size (`min_members` to `max_members`, leader included), `fee` in rupiah, `twibbon_url` (optional), `qris_public_id` (Cloudinary), registration window, `is_active`. |
 | `registrations` | One team in one competition: `team_name`, `school`, `line_id` (the contact person's LINE ID; both required for new teams, empty on older ones, and fixed for participants), `leader_id`, `referral_code` (unique 8-character code members join with), `status`, payment proof (Cloudinary `public_id` + format), `rejection_reason`, reviewer. Team names are unique per competition (case-insensitive) and can't be changed by participants. |
-| `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (required for the leader), 10-digit NISN. A person (account, NISN or email) can be on only one team across all competitions, enforced by unique indexes. |
+| `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (required for the leader), 10-digit NISN, twibbon post proof (Cloudinary `public_id` + format; required on join and register once the competition has a `twibbon_url`). A person (account, NISN or email) can be on only one team across all competitions, enforced by unique indexes. |
 | `registration_events` | The timeline on the participant dashboard. Written automatically on every status change; the rejection reason is stored as the event's `note`. |
 
 ### Homepage content
@@ -95,6 +95,7 @@ under_review ──(admin)──▶ accepted
 members join with the referral code at any point while the competition's registration window is open
 ```
 
+- Each person uploads a proof of posting the twibbon when registering or joining (`14th-nplc/twibbon-proofs/<user id>/`). It is required only once the competition has a `twibbon_url`. Members who joined before the link was set keep an empty proof, and admins see that in the registration detail.
 - Paying is part of registering: the register form takes the team details and the payment proof together. The proof is uploaded to Cloudinary first (`14th-nplc/payment-proofs/new/<user id>/`), then `create_registration()` creates the team as `under_review` with the referral code.
 - Members join with the code, and the leader can remove members (or a member can leave), while the competition's registration window is open, whatever the status. Nobody, admins included, can remove the leader row.
 - Participants can't change the team name, competition or referral code. Admins can fix the name.
@@ -167,4 +168,5 @@ Each device gets the text in the language it subscribed with. Needs `NEXT_PUBLIC
 Only Cloudinary `public_id`s are stored in the database:
 
 - `competitions.qris_public_id`: public image in the `14th-nplc/qris` folder.
+- `registration_members.twibbon_proof_public_id`: `authenticated` delivery type in `14th-nplc/twibbon-proofs`. Only admins can view these, through signed links on the registration detail page.
 - `registrations.payment_proof_public_id`: `authenticated` delivery type in `14th-nplc/payment-proofs`. Viewing one needs a signed link from a server action that checks the viewer is an admin or on that team.

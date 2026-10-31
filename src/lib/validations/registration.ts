@@ -25,6 +25,14 @@ export const referralCodeSchema = z
   .toUpperCase()
   .regex(/^[A-Z0-9]{8}$/, "validation.referralCode");
 
+export const TWIBBON_PROOF_FORMATS = ["jpg", "jpeg", "png", "webp"] as const;
+
+// Empty while the competition has no twibbon link yet; the database requires it once a link is set.
+const twibbonProof = {
+  twibbonProofPublicId: z.string().min(1).optional(),
+  twibbonProofFormat: z.enum(TWIBBON_PROOF_FORMATS).optional(),
+};
+
 export const PAYMENT_PROOF_FORMATS_LIST = ["jpg", "jpeg", "png", "webp", "pdf"] as const;
 
 export const createRegistrationSchema = z.object({
@@ -37,6 +45,7 @@ export const createRegistrationSchema = z.object({
   leaderName: fullName,
   leaderPhone: phone,
   leaderNisn: nisn,
+  ...twibbonProof,
 });
 
 export const joinTeamSchema = z.object({
@@ -44,6 +53,7 @@ export const joinTeamSchema = z.object({
   fullName,
   nisn,
   phone: z.union([z.literal("").transform(() => undefined), phone]).optional(),
+  ...twibbonProof,
 });
 
 export const PAYMENT_PROOF_FORMATS = PAYMENT_PROOF_FORMATS_LIST;

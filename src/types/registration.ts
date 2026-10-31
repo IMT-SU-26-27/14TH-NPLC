@@ -28,7 +28,8 @@ export type TeamCompetition = Pick<
 export type TeamMember = Pick<
   RegistrationMember,
   "id" | "user_id" | "full_name" | "email" | "phone" | "nisn" | "is_leader" | "created_at"
->;
+> &
+  Partial<Pick<RegistrationMember, "twibbon_proof_public_id" | "twibbon_proof_format">>;
 
 export type TeamEvent = Pick<RegistrationEvent, "id" | "status" | "note" | "created_at">;
 
@@ -59,6 +60,7 @@ export type TeamPreview = {
   member_count: number;
   max_members: number;
   is_joinable: boolean;
+  twibbon_url: string | null;
 };
 
 // ----- Component props -----
@@ -91,6 +93,15 @@ export type JoinTeamFormProps = {
   referralCode: string;
   preview: TeamPreview;
   user: CurrentUser;
+};
+
+export type TwibbonProofFieldProps = {
+  twibbonUrl: string | null;
+  disabled: boolean;
+  error: string | null;
+  uploading: boolean;
+  progress: number;
+  onFileChange: (file: File | null) => void;
 };
 
 export type JoinCodeFormProps = {

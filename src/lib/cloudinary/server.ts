@@ -7,6 +7,8 @@ export const CLOUDINARY_ROOT = "14th-nplc";
 export const paymentProofFolder = (registrationId: string) => `${CLOUDINARY_ROOT}/payment-proofs/${registrationId}`;
 // Proofs uploaded while registering, before the team (and its id) exists.
 export const newRegistrationProofFolder = (userId: string) => `${CLOUDINARY_ROOT}/payment-proofs/new/${userId}`;
+// Twibbon posts are uploaded while registering or joining, before the membership exists.
+export const twibbonProofFolder = (userId: string) => `${CLOUDINARY_ROOT}/twibbon-proofs/${userId}`;
 export const QRIS_FOLDER = `${CLOUDINARY_ROOT}/qris`;
 
 function client() {
@@ -60,7 +62,7 @@ export function publicImageUrl(publicId: string): string {
   return client().url(publicId, { secure: true, fetch_format: "auto", quality: "auto" });
 }
 
-// Expiring link to a private (authenticated) payment proof. Callers must check access first.
+// Expiring link to a private (authenticated) payment or twibbon proof. Callers must check access first.
 export function privateAssetUrl(publicId: string, format: string, ttlSeconds = 600): string {
   return client().utils.private_download_url(publicId, format, {
     type: "authenticated",

@@ -114,8 +114,9 @@ export async function adminRemoveMember(memberId: string): Promise<ActionResult>
   if (!id.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.from("registration_members").delete().eq("id", id.data);
+  const { data, error } = await supabase.from("registration_members").delete().eq("id", id.data).select("twibbon_proof_public_id");
   if (error) return { ok: false, message: databaseErrorMessage(error) };
+  if (data?.[0]?.twibbon_proof_public_id) await deleteAsset(data[0].twibbon_proof_public_id, "authenticated");
 
   refresh();
   return { ok: true, data: undefined };
@@ -127,9 +128,14 @@ export async function adminDeleteRegistration(registrationId: string): Promise<A
   if (!id.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
+  // Read before deleting: members go with the registration.
+  const { data: members } = await supabase.from("registration_members").select("twibbon_proof_public_id").eq("registration_id", id.data);
   const { data, error } = await supabase.from("registrations").delete().eq("id", id.data).select("payment_proof_public_id");
   if (error) return { ok: false, message: databaseErrorMessage(error) };
   if (data?.[0]?.payment_proof_public_id) await deleteAsset(data[0].payment_proof_public_id, "authenticated");
+  for (const member of members ?? []) {
+    if (member.twibbon_proof_public_id) await deleteAsset(member.twibbon_proof_public_id, "authenticated");
+  }
 
   redirect(localePath(await getRequestLocale(), "/admin/registrations"));
 }
