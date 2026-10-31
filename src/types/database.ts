@@ -679,6 +679,125 @@ export type Database = {
           },
         ]
       }
+      rally_leaderboard_snapshots: {
+        Row: {
+          competition_id: string
+          last_result_at: string | null
+          posts_finished: number
+          registration_id: string
+          school: string | null
+          team_name: string
+          total_points: number
+        }
+        Insert: {
+          competition_id: string
+          last_result_at?: string | null
+          posts_finished?: number
+          registration_id: string
+          school?: string | null
+          team_name: string
+          total_points?: number
+        }
+        Update: {
+          competition_id?: string
+          last_result_at?: string | null
+          posts_finished?: number
+          registration_id?: string
+          school?: string | null
+          team_name?: string
+          total_points?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rally_leaderboard_snapshots_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_leaderboard_snapshots_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rally_scores: {
+        Row: {
+          competition_id: string
+          last_result_at: string | null
+          posts_finished: number
+          registration_id: string
+          school: string | null
+          team_name: string
+          total_points: number
+        }
+        Insert: {
+          competition_id: string
+          last_result_at?: string | null
+          posts_finished?: number
+          registration_id: string
+          school?: string | null
+          team_name: string
+          total_points?: number
+        }
+        Update: {
+          competition_id?: string
+          last_result_at?: string | null
+          posts_finished?: number
+          registration_id?: string
+          school?: string | null
+          team_name?: string
+          total_points?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rally_scores_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_scores_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rally_sessions: {
+        Row: {
+          competition_id: string
+          leaderboard_frozen_at: string | null
+          status: Database["public"]["Enums"]["rally_session_status"]
+          updated_at: string
+        }
+        Insert: {
+          competition_id: string
+          leaderboard_frozen_at?: string | null
+          status?: Database["public"]["Enums"]["rally_session_status"]
+          updated_at?: string
+        }
+        Update: {
+          competition_id?: string
+          leaderboard_frozen_at?: string | null
+          status?: Database["public"]["Enums"]["rally_session_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rally_sessions_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rally_post_assignments: {
         Row: {
           created_at: string
@@ -1368,6 +1487,7 @@ export type Database = {
       rally_log_action: "recorded" | "undone" | "corrected" | "deleted"
       rally_outcome: "win" | "lose" | "draw"
       rally_post_kind: "physical" | "digital"
+      rally_session_status: "not_open" | "open" | "closed"
       registration_status:
         | "pending_payment"
         | "under_review"
@@ -2069,6 +2189,7 @@ export const Constants = {
       rally_log_action: ["recorded", "undone", "corrected", "deleted"],
       rally_outcome: ["win", "lose", "draw"],
       rally_post_kind: ["physical", "digital"],
+      rally_session_status: ["not_open", "open", "closed"],
       registration_status: [
         "pending_payment",
         "under_review",

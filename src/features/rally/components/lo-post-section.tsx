@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeftIcon, CircleOffIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
-import { listMyLoPosts, listRecentRallyResults } from "@/lib/data/rally";
+import { getRallySession, listMyLoPosts, listRecentRallyResults } from "@/lib/data/rally";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
@@ -39,7 +39,7 @@ export async function LoPostSection({ params }: LoPostPageProps) {
         </p>
       </div>
       {post.is_active ? (
-        <LoStation post={post} recent={await listRecentRallyResults(post.id)} />
+        <LoStation post={post} recent={await listRecentRallyResults(post.id)} sessionStatus={(await getRallySession(post.competition_id)).status} />
       ) : (
         <Empty className="border">
           <EmptyHeader>

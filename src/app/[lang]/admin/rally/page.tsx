@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { HistoryIcon, ListChecksIcon, PlusIcon, ScanLineIcon } from "lucide-react";
+import { HistoryIcon, ListChecksIcon, PlusIcon, ScanLineIcon, TrophyIcon } from "lucide-react";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
@@ -27,6 +27,10 @@ export default async function AdminRallyPage({ params }: LangPageProps) {
           <p className="text-muted-foreground">{t("rally.admin.lead")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link href={localePath(lang, "/admin/rally/leaderboard")} className={buttonVariants({ variant: "outline" })}>
+            <TrophyIcon />
+            {t("rally.leaderboard.title")}
+          </Link>
           <Link href={localePath(lang, "/admin/rally/results")} className={buttonVariants({ variant: "outline" })}>
             <ListChecksIcon />
             {t("rally.results.title")}
