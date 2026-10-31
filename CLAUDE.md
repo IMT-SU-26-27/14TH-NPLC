@@ -89,6 +89,7 @@ When a file breaks a rule:
 Exceptions (not images, or required at the root):
 
 - `public/sw.js` must stay at the root so the push service worker controls the whole site.
+- `public/zxing/zxing_reader.wasm` is the QR decoder, self-hosted so the scanner doesn't depend on a CDN. It must match the installed `zxing-wasm` version.
 - The favicon lives in `src/app/`.
 - Images uploaded by users never go in `public/`; they go to Cloudinary (see above).
 
