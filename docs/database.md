@@ -49,6 +49,20 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 |---|---|
 | `rally_posts` | One post of the competition of type `logic` (Category 2): `name`, `kind` (`physical` or `digital`, recorded the same way), `location`, `points_win`, `points_lose`, `points_draw` (placeholders 100, 25 and 50 until the Divisi Event sets them), `allow_draw`, `is_active`. Names are unique per competition. |
 | `rally_post_assignments` | Which LO runs which post. A trigger accepts only accounts with the role `lo`. |
+| `rally_results` | One team's result at one post: `outcome` (`win`, `lose`, `draw`), `points` copied from the post when recorded, who recorded it. Never deleted: undo and admin changes fill `voided_at`. For now one active result per team per post (`rally_results_one_active`); replays would change this index. |
+| `rally_result_log` | Append-only audit log: action, who, when, team, post, old and new outcome and points, reason. Admins read it; nobody can change it. |
+
+`registrations.rally_qr_token` is what the team's QR holds, separate from the referral code so an admin can replace it. Teams, posts and LOs with history cannot be deleted.
+
+All changes to results go through these functions, and direct writes are refused:
+
+| Function | Who | What |
+|---|---|---|
+| `rally_lookup_team(post, code)` | LO of the post | Finds a team by QR or team code. Refuses unaccepted teams and teams of other competitions. Returns the team name, school and any existing result, never NISN, phone or email. |
+| `rally_record_result(post, team, outcome, request id)` | LO of the post | Saves the result with points from the post. Repeating a request id returns the saved result. |
+| `rally_recent_results(post)` | LO of the post | The latest 10 active results, with team names only. |
+| `rally_undo_result(result)` | The LO who recorded it | Within `private.rally_undo_window()`, 5 minutes for now. |
+| `rally_admin_correct_result`, `rally_admin_delete_result` | Admin | Reason required. |
 
 `profiles.role` also has the value `lo`. Admins create these accounts with the service role. A trigger stops LO accounts joining a team, and `src/proxy.ts` keeps them out of the participant and admin pages. Routes and replays are not built yet: see `docs/rally-games-plan.md`.
 

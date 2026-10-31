@@ -81,7 +81,7 @@ export async function deleteRallyPost(postId: string): Promise<ActionResult> {
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.from("rally_posts").delete().eq("id", id.data);
-  if (error) return { ok: false, message: databaseErrorMessage(error) };
+  if (error) return { ok: false, message: error.code === "23503" ? "rally.errors.postHasResults" : databaseErrorMessage(error) };
 
   redirect(localePath(await getRequestLocale(), "/admin/rally"));
 }
@@ -123,6 +123,10 @@ export async function deleteLoAccount(userId: string): Promise<ActionResult> {
   const admin = createSupabaseAdminClient();
   const { data: profile } = await admin.from("profiles").select("role").eq("id", id.data).maybeSingle();
   if (profile?.role !== "lo") return { ok: false, message: "errors.invalidRequest" };
+
+  // Results keep who recorded them, so an LO with history stays. Remove them from their posts instead.
+  const { count } = await admin.from("rally_result_log").select("id", { count: "exact", head: true }).eq("actor_id", id.data);
+  if (count) return { ok: false, message: "rally.errors.loHasResults" };
 
   const { error } = await admin.auth.admin.deleteUser(id.data);
   if (error) return { ok: false, message: error.message };

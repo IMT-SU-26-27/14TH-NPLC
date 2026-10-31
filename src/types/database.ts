@@ -765,6 +765,151 @@ export type Database = {
           },
         ]
       }
+      rally_result_log: {
+        Row: {
+          action: Database["public"]["Enums"]["rally_log_action"]
+          actor_id: string
+          created_at: string
+          id: number
+          new_outcome: Database["public"]["Enums"]["rally_outcome"] | null
+          new_points: number | null
+          old_outcome: Database["public"]["Enums"]["rally_outcome"] | null
+          old_points: number | null
+          post_id: string
+          reason: string | null
+          registration_id: string
+          result_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["rally_log_action"]
+          actor_id: string
+          created_at?: string
+          id?: number
+          new_outcome?: Database["public"]["Enums"]["rally_outcome"] | null
+          new_points?: number | null
+          old_outcome?: Database["public"]["Enums"]["rally_outcome"] | null
+          old_points?: number | null
+          post_id: string
+          reason?: string | null
+          registration_id: string
+          result_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["rally_log_action"]
+          actor_id?: string
+          created_at?: string
+          id?: number
+          new_outcome?: Database["public"]["Enums"]["rally_outcome"] | null
+          new_points?: number | null
+          old_outcome?: Database["public"]["Enums"]["rally_outcome"] | null
+          old_points?: number | null
+          post_id?: string
+          reason?: string | null
+          registration_id?: string
+          result_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rally_result_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_result_log_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "rally_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_result_log_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_result_log_result_id_fkey"
+            columns: ["result_id"]
+            isOneToOne: false
+            referencedRelation: "rally_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rally_results: {
+        Row: {
+          client_request_id: string
+          id: string
+          outcome: Database["public"]["Enums"]["rally_outcome"]
+          points: number
+          post_id: string
+          recorded_at: string
+          recorded_by: string
+          registration_id: string
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          client_request_id: string
+          id?: string
+          outcome: Database["public"]["Enums"]["rally_outcome"]
+          points: number
+          post_id: string
+          recorded_at?: string
+          recorded_by: string
+          registration_id: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          client_request_id?: string
+          id?: string
+          outcome?: Database["public"]["Enums"]["rally_outcome"]
+          points?: number
+          post_id?: string
+          recorded_at?: string
+          recorded_by?: string
+          registration_id?: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rally_results_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "rally_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_results_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_results_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rally_results_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registration_events: {
         Row: {
           actor_id: string | null
@@ -887,6 +1032,7 @@ export type Database = {
           payment_proof_format: string | null
           payment_proof_public_id: string | null
           payment_submitted_at: string | null
+          rally_qr_token: string
           referral_code: string
           rejection_reason: string | null
           reviewed_at: string | null
@@ -905,6 +1051,7 @@ export type Database = {
           payment_proof_format?: string | null
           payment_proof_public_id?: string | null
           payment_submitted_at?: string | null
+          rally_qr_token?: string
           referral_code?: string
           rejection_reason?: string | null
           reviewed_at?: string | null
@@ -923,6 +1070,7 @@ export type Database = {
           payment_proof_format?: string | null
           payment_proof_public_id?: string | null
           payment_submitted_at?: string | null
+          rally_qr_token?: string
           referral_code?: string
           rejection_reason?: string | null
           reviewed_at?: string | null
@@ -1121,6 +1269,57 @@ export type Database = {
         }
         Returns: string
       }
+      rally_admin_correct_result: {
+        Args: { p_outcome: Database["public"]["Enums"]["rally_outcome"]; p_reason: string; p_result_id: string }
+        Returns: string
+      }
+      rally_admin_delete_result: {
+        Args: { p_reason: string; p_result_id: string }
+        Returns: undefined
+      }
+      rally_lookup_team: {
+        Args: { p_code: string; p_post_id: string }
+        Returns: {
+          outcome: Database["public"]["Enums"]["rally_outcome"] | null
+          points: number | null
+          recorded_at: string | null
+          registration_id: string
+          result_id: string | null
+          school: string | null
+          team_name: string
+          undo_until: string | null
+        }[]
+      }
+      rally_recent_results: {
+        Args: { p_post_id: string }
+        Returns: {
+          outcome: Database["public"]["Enums"]["rally_outcome"]
+          points: number
+          recorded_at: string
+          result_id: string
+          team_name: string
+          undo_until: string | null
+        }[]
+      }
+      rally_record_result: {
+        Args: {
+          p_client_request_id: string
+          p_outcome: Database["public"]["Enums"]["rally_outcome"]
+          p_post_id: string
+          p_registration_id: string
+        }
+        Returns: {
+          outcome: Database["public"]["Enums"]["rally_outcome"]
+          points: number
+          recorded_at: string
+          result_id: string
+          undo_until: string
+        }[]
+      }
+      rally_undo_result: {
+        Args: { p_result_id: string }
+        Returns: undefined
+      }
       preview_team: {
         Args: { p_referral_code: string }
         Returns: {
@@ -1153,6 +1352,8 @@ export type Database = {
         | "internal_error"
         | "exec_format_error"
       payment_method: "qris" | "bank_transfer"
+      rally_log_action: "recorded" | "undone" | "corrected" | "deleted"
+      rally_outcome: "win" | "lose" | "draw"
       rally_post_kind: "physical" | "digital"
       registration_status:
         | "pending_payment"
@@ -1852,6 +2053,8 @@ export const Constants = {
         "exec_format_error",
       ],
       payment_method: ["qris", "bank_transfer"],
+      rally_log_action: ["recorded", "undone", "corrected", "deleted"],
+      rally_outcome: ["win", "lose", "draw"],
       rally_post_kind: ["physical", "digital"],
       registration_status: [
         "pending_payment",

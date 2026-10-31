@@ -159,6 +159,23 @@ export const en: Dictionary = {
     adminNone: "No proof yet",
   },
   rally: {
+    errors: {
+      notAssigned: "You aren't assigned to this post",
+      postInactive: "This post is inactive",
+      teamNotFound: "No team has this code",
+      wrongCompetition: "This team isn't in Rally Games",
+      notAccepted: "This team hasn't been accepted, so its result can't be recorded yet",
+      noDraw: "This post doesn't allow a draw",
+      duplicate: "This team already has a result at this post",
+      notOwner: "Only the LO who recorded this result can undo it",
+      alreadyCancelled: "This result was already cancelled",
+      undoExpired: "The time to undo has passed. Ask an admin to correct it",
+      reasonRequired: "Enter a reason of at least 5 characters",
+      sameOutcome: "The new result is the same as the old one",
+      postHasResults: "This post has result history, so it can't be deleted. Deactivate it instead",
+      loHasResults: "This LO has recorded results, so the account can't be deleted. Remove them from their posts instead",
+      teamHasResults: "This team has Rally Games history, so it can't be deleted",
+    },
     kind: {
       physical: "Physical",
       digital: "Digital",
