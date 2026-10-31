@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/data/auth";
 import { localePath } from "@/lib/i18n/config";
@@ -43,11 +44,20 @@ async function HeaderActions({ lang }: LangProps) {
 }
 
 export function SiteHeader({ lang }: LangProps) {
+  const t = getT(lang);
+
   return (
     <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href={localePath(lang, "/")} className="font-heading font-semibold tracking-tight">
-          14th NPLC
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 min-[360px]:gap-4">
+        <Link href={localePath(lang, "/")} className="shrink-0">
+          <Image
+            src="/shared/logo-nplc-xiv.webp"
+            alt={t("meta.siteName")}
+            width={128}
+            height={26}
+            preload
+            className="h-5 w-auto min-[360px]:h-6.5"
+          />
         </Link>
         <Suspense fallback={<Skeleton className="h-8 w-48" />}>
           <HeaderActions lang={lang} />

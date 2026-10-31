@@ -32,8 +32,10 @@ Registration and contest platform for the 14th NPLC (National Programming & Logi
 
 ## Brand Commitments
 
-- Name: "14th NPLC". No logo, color or typography assets exist yet; a logo may be added later, so layouts should leave room for one.
-- **Standing visual preference (chosen 2026-10-15):** the category standard, executed at full craft: a clean product dashboard, not a themed or illustrative world. Quality bar: Stripe Dashboard and the official shadcn/ui examples.
+- Name: "14th NPLC", with the logo "NPLC XIV" and the theme "Decode the Unknown". The final logo, mascot, palette and decorative assets come from the event's master design (masdes).
+- **Visual direction (replaces the 2026-10-15 "clean dashboard" preference):** the masdes world on public first impressions, and a calm, dense product dashboard on working screens. Home, sign-in and sign-up carry the wave, sparkle and mascot artwork. Dashboard, admin and contest screens stay clean, with brand expressed through the logo, palette and type.
+- **Source of truth:** the Figma file [NPLC XIV – Website (Final)](https://www.figma.com/design/KmXmjSDV3syoSzru6OZ6PJ).
+- **Font licensing:** the masdes display fonts (Neuropol, Ethnocentric, Xirod, Bitsumishi) must not be installed on the web. They appear only inside the logo image.
 - The admin dashboard must show registrations over time for Competitive Programming and Category 2.
 
 ## Evidence on Hand
