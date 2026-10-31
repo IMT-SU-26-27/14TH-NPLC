@@ -32,9 +32,7 @@ export function LoSavedStep({ team, result, undoing, error, onUndo, onNext }: Lo
           {t("rally.lo.nextTeam")}
           <ArrowRightIcon />
         </Button>
-        <div className="flex justify-center">
-          <LoUndoButton until={result.undo_until} pending={undoing} onUndo={onUndo} />
-        </div>
+        <LoUndoButton until={result.undo_until} pending={undoing} onUndo={onUndo} />
       </div>
     </div>
   );

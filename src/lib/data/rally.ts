@@ -1,4 +1,5 @@
 import "server-only";
+import { rankRallyScores } from "@/lib/rally/ranking";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {
   LoAccount,
@@ -12,6 +13,8 @@ import type {
   RallyRecentResult,
   RallyResultList,
   RallyResultRow,
+  RallyScore,
+  RallySession,
 } from "@/types/rally";
 
 const POST_SELECT = `
@@ -58,7 +61,7 @@ export async function listMyLoPosts(userId: string): Promise<LoPost[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("rally_post_assignments")
-    .select("post:rally_posts ( id, name, kind, location, allow_draw, is_active, points_win, points_lose, points_draw )")
+    .select("post:rally_posts ( id, competition_id, name, kind, location, allow_draw, is_active, points_win, points_lose, points_draw )")
     .eq("lo_id", userId);
   if (error) throw new Error(`Could not load your posts: ${error.message}`);
   return (data as unknown as { post: LoPost | null }[]).flatMap((row) => (row.post ? [row.post] : []));
@@ -90,7 +93,8 @@ export async function listRallyResults(filters: RallyFilters): Promise<RallyResu
       `id, outcome, points, recorded_at,
        post:rally_posts ( id, name, allow_draw ),
        registration:registrations!inner ( id, team_name, school ),
-       recorder:profiles!rally_results_recorded_by_fkey ( full_name )`,
+       recorder:profiles!rally_results_recorded_by_fkey ( full_name ),
+       corrector:profiles!rally_results_corrected_by_fkey ( full_name )`,
       { count: "exact" },
     )
     .is("voided_at", null)
@@ -127,4 +131,25 @@ export async function listRallyLog(filters: RallyFilters): Promise<RallyLogList>
   const { data, count, error } = await query;
   if (error) throw new Error(`Could not load the log: ${error.message}`);
   return { rows: data as unknown as RallyLogEntry[], total: count ?? 0, page: filters.page, pageSize: RALLY_PAGE_SIZE };
+}
+
+const SCORE_COLUMNS = "registration_id, team_name, school, total_points, posts_finished, last_result_at";
+
+// A trigger creates the session with every Rally competition.
+export async function getRallySession(competitionId: string): Promise<RallySession> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.from("rally_sessions").select("competition_id, status, leaderboard_frozen_at").eq("competition_id", competitionId).single();
+  if (error) throw new Error(`Could not load the Rally session: ${error.message}`);
+  return data;
+}
+
+// RLS decides who may read which: participants get the live scores, or the snapshot while frozen.
+export async function getRallyLeaderboard(competitionId: string, source: "live" | "snapshot" = "live"): Promise<RallyScore[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from(source === "live" ? "rally_scores" : "rally_leaderboard_snapshots")
+    .select(SCORE_COLUMNS)
+    .eq("competition_id", competitionId);
+  if (error) throw new Error(`Could not load the leaderboard: ${error.message}`);
+  return rankRallyScores(data);
 }

@@ -49,7 +49,10 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 |---|---|
 | `rally_posts` | One post of the competition of type `logic` (Category 2): `name`, `kind` (`physical` or `digital`, recorded the same way), `location`, `points_win`, `points_lose`, `points_draw` (placeholders 100, 25 and 50 until the Divisi Event sets them), `allow_draw`, `is_active`. Names are unique per competition. |
 | `rally_post_assignments` | Which LO runs which post. A trigger accepts only accounts with the role `lo`. |
-| `rally_results` | One team's result at one post: `outcome` (`win`, `lose`, `draw`), `points` copied from the post when recorded, who recorded it. Never deleted: undo and admin changes fill `voided_at`. For now one active result per team per post (`rally_results_one_active`); replays would change this index. |
+| `rally_results` | One team's result at one post: `outcome` (`win`, `lose`, `draw`), `points` copied from the post when recorded, who recorded it and, after an admin correction, who corrected it (`corrected_by`, `corrected_at`; the original `recorded_by` and `recorded_at` stay). Never deleted: undo and admin changes fill `voided_at`. For now one active result per team per post (`rally_results_one_active`); replays would change this index. |
+| `rally_sessions` | One per Rally competition: `status` (`not_open`, `open`, `closed`) and `leaderboard_frozen_at`. LOs can look up, record and undo only while `open`; admins can correct at any time. |
+| `rally_scores` | One row per accepted team with `total_points`, `posts_finished` and `last_result_at`, kept up to date by triggers from active results only. The order is defined in `src/lib/rally/ranking.ts`. |
+| `rally_leaderboard_snapshots` | Copy of `rally_scores` taken when an admin freezes the leaderboard. Participants read this while frozen; admins always read the live scores. |
 | `rally_result_log` | Append-only audit log: action, who, when, team, post, old and new outcome and points, reason. Admins read it; nobody can change it. |
 
 `registrations.rally_qr_token` is what the team's QR holds, separate from the referral code so an admin can replace it. Teams, posts and LOs with history cannot be deleted.
@@ -170,6 +173,8 @@ These tables are in the `supabase_realtime` publication:
 | `cp_sessions` | Waiting room moves into the contest when the admin presses start or resume; the contest page goes back to the waiting room when it is paused, and locks when it ends |
 | `cp_scores` | Live leaderboard |
 | `registration_events` | Participant dashboard updates when the admin accepts or rejects |
+| `rally_sessions` | LO screen follows the session; leaderboards refresh on freeze and unfreeze |
+| `rally_scores` | Live Rally leaderboard |
 
 Realtime respects the policies above, so each user only receives changes they're allowed to read.
 

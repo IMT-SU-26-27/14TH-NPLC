@@ -64,3 +64,13 @@ export const rallyFiltersSchema = z.object({
   team: z.uuid().optional().catch(undefined),
   page: z.coerce.number().int().min(1).catch(1),
 });
+
+export const rallySessionStatusSchema = z.object({
+  competitionId: z.uuid(),
+  status: z.enum(["not_open", "open", "closed"]),
+});
+
+export const rallyFreezeSchema = z.object({
+  competitionId: z.uuid(),
+  frozen: z.boolean(),
+});
