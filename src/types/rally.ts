@@ -1,7 +1,7 @@
 import type { z } from "zod";
 import type { Database, Enums, Tables } from "@/types/database";
-import type { Locale } from "@/types/i18n";
-import type { loAccountSchema, rallyLookupSchema, rallyPostSchema, rallyRecordSchema } from "@/lib/validations/rally";
+import type { LangParams, Locale } from "@/types/i18n";
+import type { loAccountSchema, rallyFiltersSchema, rallyLookupSchema, rallyPostSchema, rallyRecordSchema } from "@/lib/validations/rally";
 
 export type RallyPost = Tables<"rally_posts">;
 export type RallyPostKind = Enums<"rally_post_kind">;
@@ -130,4 +130,60 @@ export type LoRecentResultsProps = {
 export type LoOutcomeBadgeProps = {
   outcome: RallyOutcome;
   points: number;
+};
+
+export type RallyFilters = z.infer<typeof rallyFiltersSchema>;
+export type RallyLogAction = Enums<"rally_log_action">;
+export type RallyPostOption = Pick<RallyPost, "id" | "name" | "allow_draw">;
+
+export type RallyResultRow = Pick<Tables<"rally_results">, "id" | "outcome" | "points" | "recorded_at"> & {
+  post: RallyPostOption;
+  registration: Pick<Tables<"registrations">, "id" | "team_name" | "school">;
+  recorder: Pick<Tables<"profiles">, "full_name"> | null;
+};
+
+export type RallyLogEntry = Pick<
+  Tables<"rally_result_log">,
+  "id" | "action" | "old_outcome" | "new_outcome" | "old_points" | "new_points" | "reason" | "created_at"
+> & {
+  post: Pick<RallyPost, "name">;
+  registration: Pick<Tables<"registrations">, "id" | "team_name">;
+  actor: Pick<Tables<"profiles">, "full_name"> | null;
+};
+
+export type RallyResultList = { rows: RallyResultRow[]; total: number; page: number; pageSize: number };
+export type RallyLogList = { rows: RallyLogEntry[]; total: number; page: number; pageSize: number };
+
+export type RallySearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export type RallyListPageProps = {
+  params: LangParams;
+  searchParams: RallySearchParams;
+};
+
+export type RallyListSectionProps = {
+  lang: Locale;
+  searchParams: RallySearchParams;
+};
+
+export type RallyFiltersFormProps = {
+  filters: RallyFilters;
+  posts: RallyPostOption[];
+  resetHref: string;
+};
+
+export type RallyResultsTableProps = {
+  list: RallyResultList;
+  filters: RallyFilters;
+  lang: Locale;
+};
+
+export type RallyLogTableProps = {
+  list: RallyLogList;
+  filters: RallyFilters;
+  lang: Locale;
+};
+
+export type RallyResultActionsProps = {
+  result: RallyResultRow;
 };
