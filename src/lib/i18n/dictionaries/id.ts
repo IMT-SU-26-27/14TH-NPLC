@@ -156,6 +156,22 @@ export const id = {
     adminAlt: "Bukti twibbon {name}",
     adminNone: "Belum ada bukti",
   },
+  rally: {
+    scanTest: {
+      title: "Uji scan QR",
+      lead: "Uji kamera dan pemindai di HP sebelum Rally Games. Halaman ini hanya untuk admin.",
+      cameraTitle: "Kamera",
+      cameraLead: "Nyalakan kamera di HP, lalu arahkan ke QR contoh di layar lain.",
+      sampleTitle: "QR contoh",
+      sampleLead: "Buka halaman ini di laptop supaya QR bisa dipindai dari HP. Kode ini tidak terhubung ke tim mana pun.",
+      start: "Nyalakan kamera",
+      again: "Pindai lagi",
+      detected: "Terbaca dalam {seconds} detik",
+      match: "Sesuai QR contoh",
+      mismatch: "Bukan QR contoh",
+      cameraError: "Kamera atau pemindai gagal",
+    },
+  },
   join: {
     alreadyTitle: "Kamu sudah terdaftar di satu lomba",
     alreadyDescription: "Kamu sudah masuk tim {team} di {competition}. Satu akun hanya boleh ikut satu lomba, jadi kamu tidak bisa bergabung ke tim lain.",

@@ -157,6 +157,22 @@ export const en: Dictionary = {
     adminAlt: "Twibbon proof of {name}",
     adminNone: "No proof yet",
   },
+  rally: {
+    scanTest: {
+      title: "QR scan test",
+      lead: "Test the camera and scanner on a phone before Rally Games. This page is for admins only.",
+      cameraTitle: "Camera",
+      cameraLead: "Turn on the camera on your phone, then point it at the sample QR on another screen.",
+      sampleTitle: "Sample QR",
+      sampleLead: "Open this page on a laptop so you can scan the QR from a phone. This code isn't linked to any team.",
+      start: "Turn on camera",
+      again: "Scan again",
+      detected: "Read in {seconds} seconds",
+      match: "Matches the sample QR",
+      mismatch: "Not the sample QR",
+      cameraError: "The camera or scanner failed",
+    },
+  },
   join: {
     alreadyTitle: "You're already registered in a competition",
     alreadyDescription: "You're already on team {team} in {competition}. One account can enter only one competition, so you can't join another team.",
