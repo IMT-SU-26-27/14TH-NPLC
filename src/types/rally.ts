@@ -140,6 +140,7 @@ export type RallyResultRow = Pick<Tables<"rally_results">, "id" | "outcome" | "p
   post: RallyPostOption;
   registration: Pick<Tables<"registrations">, "id" | "team_name" | "school">;
   recorder: Pick<Tables<"profiles">, "full_name"> | null;
+  corrector: Pick<Tables<"profiles">, "full_name"> | null;
 };
 
 export type RallyLogEntry = Pick<

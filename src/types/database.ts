@@ -842,6 +842,8 @@ export type Database = {
       rally_results: {
         Row: {
           client_request_id: string
+          corrected_at: string | null
+          corrected_by: string | null
           id: string
           outcome: Database["public"]["Enums"]["rally_outcome"]
           points: number
@@ -855,6 +857,8 @@ export type Database = {
         }
         Insert: {
           client_request_id: string
+          corrected_at?: string | null
+          corrected_by?: string | null
           id?: string
           outcome: Database["public"]["Enums"]["rally_outcome"]
           points: number
@@ -868,6 +872,8 @@ export type Database = {
         }
         Update: {
           client_request_id?: string
+          corrected_at?: string | null
+          corrected_by?: string | null
           id?: string
           outcome?: Database["public"]["Enums"]["rally_outcome"]
           points?: number
@@ -880,6 +886,13 @@ export type Database = {
           voided_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "rally_results_corrected_by_fkey"
+            columns: ["corrected_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "rally_results_post_id_fkey"
             columns: ["post_id"]
