@@ -158,6 +158,23 @@ export const id = {
     adminNone: "Belum ada bukti",
   },
   rally: {
+    errors: {
+      notAssigned: "Kamu tidak ditugaskan di pos ini",
+      postInactive: "Pos ini sedang nonaktif",
+      teamNotFound: "Tidak ada tim dengan kode ini",
+      wrongCompetition: "Tim ini bukan peserta Rally Games",
+      notAccepted: "Tim ini belum diterima, jadi hasilnya belum bisa dicatat",
+      noDraw: "Pos ini tidak mengizinkan hasil seri",
+      duplicate: "Tim ini sudah punya hasil di pos ini",
+      notOwner: "Hanya LO yang mencatat hasil ini yang bisa membatalkannya",
+      alreadyCancelled: "Hasil ini sudah dibatalkan",
+      undoExpired: "Waktu pembatalan sudah habis. Minta admin mengoreksinya",
+      reasonRequired: "Tulis alasan, minimal 5 karakter",
+      sameOutcome: "Hasil baru sama dengan hasil lama",
+      postHasResults: "Pos ini sudah punya riwayat hasil, jadi tidak bisa dihapus. Nonaktifkan saja",
+      loHasResults: "LO ini sudah punya riwayat input, jadi tidak bisa dihapus. Lepaskan saja dari posnya",
+      teamHasResults: "Tim ini sudah punya riwayat Rally Games, jadi tidak bisa dihapus",
+    },
     kind: {
       physical: "Fisik",
       digital: "Digital",

@@ -131,7 +131,7 @@ export async function adminDeleteRegistration(registrationId: string): Promise<A
   // Read before deleting: members go with the registration.
   const { data: members } = await supabase.from("registration_members").select("twibbon_proof_public_id").eq("registration_id", id.data);
   const { data, error } = await supabase.from("registrations").delete().eq("id", id.data).select("payment_proof_public_id");
-  if (error) return { ok: false, message: databaseErrorMessage(error) };
+  if (error) return { ok: false, message: error.code === "23503" ? "rally.errors.teamHasResults" : databaseErrorMessage(error) };
   if (data?.[0]?.payment_proof_public_id) await deleteAsset(data[0].payment_proof_public_id, "authenticated");
   for (const member of members ?? []) {
     if (member.twibbon_proof_public_id) await deleteAsset(member.twibbon_proof_public_id, "authenticated");
