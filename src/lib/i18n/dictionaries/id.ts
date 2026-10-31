@@ -159,6 +159,7 @@ export const id = {
   },
   rally: {
     results: {
+      correctedBy: "dikoreksi oleh {name}",
       title: "Hasil pos",
       lead: "Hasil aktif tiap tim. Mengubah atau menghapus hasil wajib disertai alasan.",
       allPosts: "Semua pos",
@@ -277,6 +278,7 @@ export const id = {
       deletePostDescription: "Pos dan penugasan LO-nya dihapus permanen.",
     },
     lo: {
+      feedbackTip: "Nyalakan getar sentuh/haptic & izinkan kamera. Sentuh layar sekali supaya bunyi aktif.",
       stationTitle: "Input hasil",
       points: "{points} poin",
       reading: "QR terbaca, mencari tim...",

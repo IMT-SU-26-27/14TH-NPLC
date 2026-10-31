@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { lookupRallyTeam, recordRallyResult, undoRallyResult } from "@/lib/actions/rally";
-import { vibrate, VIBRATE_ERROR, VIBRATE_READ, VIBRATE_SAVED } from "@/lib/rally/feedback";
+import { feedbackError, feedbackRead, feedbackSaved, feedbackUndone } from "@/lib/rally/feedback";
 import type { RallyOutcome, RallyStationView } from "@/types/rally";
 
 // The LO's flow at one post: scan, confirm the team, record, then undo or move to the next team.
@@ -13,7 +13,7 @@ export function useRallyStation(postId: string) {
   const [, startTransition] = useTransition();
 
   function fail(message: string) {
-    vibrate(VIBRATE_ERROR);
+    feedbackError();
     setError(message);
   }
 
@@ -24,7 +24,7 @@ export function useRallyStation(postId: string) {
 
   function lookUp(code: string) {
     if (view.step !== "scan") return;
-    vibrate(VIBRATE_READ);
+    feedbackRead();
     setError(null);
     setView({ step: "looking" });
     startTransition(async () => {
@@ -51,7 +51,7 @@ export function useRallyStation(postId: string) {
       try {
         const saved = await recordRallyResult({ postId, registrationId: current.team.registration_id, outcome, clientRequestId: current.requestId });
         if (saved.ok) {
-          vibrate(VIBRATE_SAVED);
+          feedbackSaved();
           setView({ step: "saved", team: current.team, result: saved.data, undoing: false });
         } else {
           fail(saved.message);
@@ -73,7 +73,7 @@ export function useRallyStation(postId: string) {
       try {
         const undone = await undoRallyResult(current.result.result_id);
         if (undone.ok) {
-          vibrate(VIBRATE_READ);
+          feedbackUndone();
           // Back to the same team with a new request id, so the LO can press the right button.
           setView({ step: "team", team: { ...current.team, result_id: null, outcome: null, points: null, recorded_at: null, undo_until: null }, requestId: crypto.randomUUID(), saving: null });
         } else {
@@ -94,7 +94,7 @@ export function useRallyStation(postId: string) {
       try {
         const undone = await undoRallyResult(resultId);
         if (undone.ok) {
-          vibrate(VIBRATE_READ);
+          feedbackUndone();
           setView((now) =>
             now.step === "team" && now.team.result_id === resultId
               ? { ...now, team: { ...now.team, result_id: null, outcome: null, points: null, recorded_at: null, undo_until: null }, requestId: crypto.randomUUID() }

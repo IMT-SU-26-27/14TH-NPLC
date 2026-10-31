@@ -40,12 +40,12 @@ export function LoTeamStep({ post, team, saving, error, onRecord, onUndo, onNext
               <LoOutcomeBadge outcome={team.outcome} points={team.points} />
             </AlertDescription>
           </Alert>
-          <div className="flex flex-wrap justify-center gap-2">
-            {team.undo_until && <LoUndoButton until={team.undo_until} pending={false} onUndo={() => onUndo(team.result_id!)} />}
-            <Button onClick={onNext}>
+          <div className="flex flex-col gap-3">
+            <Button className="h-14 w-full text-base" onClick={onNext}>
               {t("rally.lo.nextTeam")}
               <ArrowRightIcon />
             </Button>
+            {team.undo_until && <LoUndoButton until={team.undo_until} pending={false} onUndo={() => onUndo(team.result_id!)} />}
           </div>
         </>
       ) : (

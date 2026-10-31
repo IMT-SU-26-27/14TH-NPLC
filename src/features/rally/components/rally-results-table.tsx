@@ -65,7 +65,12 @@ export function RallyResultsTable({ list, filters, lang }: RallyResultsTableProp
                 <TableCell>
                   <LoOutcomeBadge outcome={row.outcome} points={row.points} />
                 </TableCell>
-                <TableCell>{row.recorder?.full_name ?? "—"}</TableCell>
+                <TableCell>
+                  {row.recorder?.full_name ?? "—"}
+                  {row.corrector && (
+                    <span className="text-muted-foreground block text-xs">{t("rally.results.correctedBy", { name: row.corrector.full_name })}</span>
+                  )}
+                </TableCell>
                 <TableCell className="text-muted-foreground text-xs">{formatDateTime(row.recorded_at, lang)}</TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">

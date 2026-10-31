@@ -15,7 +15,7 @@ export function LoUndoButton({ until, pending, onUndo }: LoUndoButtonProps) {
   if (left === null || left <= 0) return null;
 
   return (
-    <Button variant="outline" onClick={onUndo} disabled={pending}>
+    <Button variant="outline" className="w-full tabular-nums" onClick={onUndo} disabled={pending}>
       {pending ? <Spinner /> : <Undo2Icon />}
       {t("rally.lo.undo", { time: formatDuration(left, lang) })}
     </Button>

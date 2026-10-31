@@ -53,7 +53,10 @@ export function LoScanStep({ busy, error, onCode }: LoScanStepProps) {
           <QrScanner onDetect={onCode} onError={setCameraError} />
         ) : null}
       </div>
-      <p className="text-muted-foreground text-center text-sm">{t("rally.lo.scanHint")}</p>
+      <div className="text-muted-foreground space-y-1 text-center text-sm">
+        <p>{t("rally.lo.scanHint")}</p>
+        <p>{t("rally.lo.feedbackTip")}</p>
+      </div>
 
       <form
         onSubmit={(e) => {
