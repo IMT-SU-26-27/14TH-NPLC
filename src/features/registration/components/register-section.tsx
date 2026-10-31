@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { CircleOffIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
 import { getActiveCompetitionBySlug, isRegistrationOpen } from "@/lib/data/competitions";
+import { hasRegistration } from "@/lib/data/registrations";
 import { formatRupiah, formatTeamSize } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { publicImageUrl } from "@/lib/cloudinary/server";
@@ -18,6 +20,7 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
   const t = getT(lang);
   const { slug } = await params;
   const [user, competition] = await Promise.all([requireUser(`/register/${slug}`), getActiveCompetitionBySlug(slug)]);
+  if (await hasRegistration(user.id)) redirect(`${localePath(lang, "/dashboard")}?notice=already-registered`);
 
   if (!competition || !isRegistrationOpen(competition)) {
     return (

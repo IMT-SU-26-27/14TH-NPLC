@@ -1,10 +1,13 @@
+import Link from "next/link";
 import { OctagonXIcon, UsersIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
-import { previewTeam } from "@/lib/data/registrations";
+import { getMyTeams, previewTeam } from "@/lib/data/registrations";
+import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { referralCodeSchema } from "@/lib/validations/registration";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { JoinCodeForm } from "@/features/registration/components/join-code-form";
@@ -14,7 +17,27 @@ import type { JoinSectionProps } from "@/types/registration";
 export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
   const t = getT(lang);
   const { code } = await searchParams;
-  const user = await requireUser(code ? `/join?code=${encodeURIComponent(code)}` : "/join");
+  const [user, [myTeam]] = await Promise.all([requireUser(code ? `/join?code=${encodeURIComponent(code)}` : "/join"), getMyTeams()]);
+
+  if (myTeam) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">{t("join.title")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <Alert variant="destructive">
+            <OctagonXIcon />
+            <AlertTitle>{t("join.alreadyTitle")}</AlertTitle>
+            <AlertDescription>{t("join.alreadyDescription", { team: myTeam.team_name, competition: myTeam.competition.name })}</AlertDescription>
+          </Alert>
+          <Link href={localePath(lang, "/dashboard")} className={buttonVariants({ variant: "outline" })}>
+            {t("join.toDashboard")}
+          </Link>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const codeCard = (message?: string) => (
     <Card>

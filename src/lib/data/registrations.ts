@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import type { Team, TeamPreview } from "@/types/registration";
@@ -13,7 +14,7 @@ const TEAM_SELECT = `
 
 // Every team the signed-in user belongs to; leaders are members too.
 // Filtered on membership because RLS also lets admins read every team. `mine` narrows the rows, `members` still lists the whole team.
-export async function getMyTeams(): Promise<Team[]> {
+export const getMyTeams = cache(async (): Promise<Team[]> => {
   const user = await getCurrentUser();
   if (!user) return [];
 
@@ -28,6 +29,17 @@ export async function getMyTeams(): Promise<Team[]> {
     .order("created_at", { referencedTable: "events" });
   if (error) throw new Error(`Could not load your teams: ${error.message}`);
   return data as unknown as Team[];
+});
+
+// One account can be on only one team across all competitions.
+export async function hasRegistration(userId: string): Promise<boolean> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("registration_members")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId);
+  if (error) throw new Error(`Could not check your registration: ${error.message}`);
+  return (count ?? 0) > 0;
 }
 
 export async function previewTeam(referralCode: string): Promise<TeamPreview | null> {

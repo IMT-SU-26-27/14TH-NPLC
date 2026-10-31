@@ -5,6 +5,7 @@ import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
+import { hasRegistration } from "@/lib/data/registrations";
 import { deleteAsset, privateAssetUrl } from "@/lib/cloudinary/server";
 import { notifyRegistrationReviewed } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
@@ -77,6 +78,9 @@ export async function adminCreateRegistration(_prev: FormState, formData: FormDa
   const { data: leader } = await supabase.from("profiles").select("id, email").eq("email", input.leaderEmail).maybeSingle();
   if (!leader) {
     return { status: "error", fieldErrors: { leaderEmail: [{ message: "admin.create.noLeaderAccount" }] } };
+  }
+  if (await hasRegistration(leader.id)) {
+    return { status: "error", fieldErrors: { leaderEmail: [{ message: "admin.create.leaderAlreadyRegistered" }] } };
   }
 
   const { data: registration, error } = await supabase

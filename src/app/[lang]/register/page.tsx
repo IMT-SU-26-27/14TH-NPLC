@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CompetitionList } from "@/features/competitions/components/competition-list";
+import { RegisterIndexSection } from "@/features/registration/components/register-index-section";
 import type { LangPageProps } from "@/types/i18n";
 
 export async function generateMetadata({ params }: LangPageProps): Promise<Metadata> {
@@ -22,7 +22,7 @@ export default async function RegisterIndexPage({ params }: LangPageProps) {
         <p className="text-muted-foreground">{t("register.pageLead")}</p>
       </div>
       <Suspense fallback={<Skeleton className="h-72" />}>
-        <CompetitionList lang={lang} />
+        <RegisterIndexSection lang={lang} />
       </Suspense>
     </main>
   );
