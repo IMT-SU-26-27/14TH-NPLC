@@ -73,6 +73,20 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
           <FieldError errors={fieldErrors(errors.teamName)} />
         </Field>
 
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Field data-invalid={!!errors.school}>
+            <FieldLabel htmlFor="school">{t("register.school")}</FieldLabel>
+            <Input id="school" name="school" maxLength={120} autoComplete="organization" aria-invalid={!!errors.school} required />
+            <FieldError errors={fieldErrors(errors.school)} />
+          </Field>
+          <Field data-invalid={!!errors.lineId}>
+            <FieldLabel htmlFor="lineId">{t("register.lineId")}</FieldLabel>
+            <Input id="lineId" name="lineId" maxLength={21} autoCapitalize="none" spellCheck={false} aria-invalid={!!errors.lineId} required />
+            <FieldDescription>{t("register.lineIdHint")}</FieldDescription>
+            <FieldError errors={fieldErrors(errors.lineId)} />
+          </Field>
+        </div>
+
         <FieldSet>
           <FieldLegend>{t("register.leader")}</FieldLegend>
           <FieldDescription>{t("register.leaderHint")}</FieldDescription>

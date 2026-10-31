@@ -28,6 +28,8 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
     paymentProofPublicId: formData.get("paymentProofPublicId"),
     paymentProofFormat: formData.get("paymentProofFormat"),
     teamName: formData.get("teamName"),
+    school: formData.get("school"),
+    lineId: formData.get("lineId"),
     leaderName: formData.get("leaderName"),
     leaderPhone: formData.get("leaderPhone"),
     leaderNisn: formData.get("leaderNisn"),
@@ -49,6 +51,8 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
   const { data: registrationId, error } = await supabase.rpc("create_registration", {
     p_competition_id: parsed.data.competitionId,
     p_team_name: parsed.data.teamName,
+    p_school: parsed.data.school,
+    p_line_id: parsed.data.lineId,
     p_leader_name: parsed.data.leaderName,
     p_leader_phone: parsed.data.leaderPhone,
     p_leader_nisn: parsed.data.leaderNisn,
