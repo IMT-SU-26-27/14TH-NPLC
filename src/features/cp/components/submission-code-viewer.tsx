@@ -1,9 +1,9 @@
 "use client";
 
-import Editor from "@monaco-editor/react";
 import { MONACO_LANGUAGE } from "@/lib/cp/templates";
 import { defineMonacoTheme, MONACO_THEME } from "@/lib/cp/monaco-theme";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MonacoEditor } from "@/features/cp/components/monaco-editor";
 import type { SubmissionCodeViewerProps } from "@/types/cp";
 
 const LINE_HEIGHT = 20;
@@ -14,7 +14,7 @@ export function SubmissionCodeViewer({ code, language, label }: SubmissionCodeVi
   const height = Math.min(Math.max(lines, 8), 40) * LINE_HEIGHT + 24;
 
   return (
-    <Editor
+    <MonacoEditor
       height={height}
       language={MONACO_LANGUAGE[language]}
       theme={MONACO_THEME}
