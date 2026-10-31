@@ -1,6 +1,6 @@
 import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { LoAccount, LoPost, RallyCompetition, RallyPostWithLos } from "@/types/rally";
+import type { LoAccount, LoPost, RallyCompetition, RallyPostWithLos, RallyRecentResult } from "@/types/rally";
 
 const POST_SELECT = `
   id, name, kind, location, points_win, points_lose, points_draw, allow_draw, is_active,
@@ -46,8 +46,15 @@ export async function listMyLoPosts(userId: string): Promise<LoPost[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("rally_post_assignments")
-    .select("post:rally_posts ( id, name, kind, location, allow_draw, is_active )")
+    .select("post:rally_posts ( id, name, kind, location, allow_draw, is_active, points_win, points_lose, points_draw )")
     .eq("lo_id", userId);
   if (error) throw new Error(`Could not load your posts: ${error.message}`);
   return (data as unknown as { post: LoPost | null }[]).flatMap((row) => (row.post ? [row.post] : []));
+}
+
+export async function listRecentRallyResults(postId: string): Promise<RallyRecentResult[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("rally_recent_results", { p_post_id: postId });
+  if (error) throw new Error(`Could not load the latest results: ${error.message}`);
+  return data;
 }
