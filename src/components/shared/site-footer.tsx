@@ -1,4 +1,5 @@
 import { cacheLife } from "next/cache";
+import Image from "next/image";
 import Link from "next/link";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -24,8 +25,8 @@ export async function SiteFooter({ lang }: LangProps) {
     <footer className="bg-background mt-auto border-t">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-[1fr_auto]">
         <div className="space-y-2">
-          <Link href={localePath(lang, "/")} className="font-heading font-semibold tracking-tight">
-            14th NPLC
+          <Link href={localePath(lang, "/")} className="inline-block">
+            <Image src="/shared/logo-nplc-xiv.webp" alt={t("meta.siteName")} width={138} height={28} />
           </Link>
           <p className="text-muted-foreground max-w-sm text-sm">{t("footer.tagline")}</p>
         </div>
