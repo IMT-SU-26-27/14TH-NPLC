@@ -56,7 +56,7 @@ export async function listRegistrations(filters: RegistrationFilters): Promise<R
   if (filters.q) {
     const like = `%${filters.q}%`;
     query = query.or(
-      ["team_name", "leader_name", "leader_email", "leader_nisn", "leader_phone", "referral_code"]
+      ["team_name", "school", "leader_name", "leader_email", "leader_nisn", "leader_phone", "referral_code"]
         .map((column) => `${column}.ilike.${like}`)
         .join(","),
     );
@@ -72,7 +72,7 @@ export async function getRegistrationDetail(id: string): Promise<AdminTeam | nul
   const { data } = await supabase
     .from("registrations")
     .select(
-      `id, team_name, referral_code, status, leader_id, payment_proof_public_id, payment_proof_format, payment_submitted_at,
+      `id, team_name, school, line_id, referral_code, status, leader_id, payment_proof_public_id, payment_proof_format, payment_submitted_at,
        rejection_reason, reviewed_at, created_at,
        competition:competitions ( id, slug, name, type, min_members, max_members, fee, qris_public_id, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at ),
        members:registration_members ( id, user_id, full_name, email, phone, nisn, is_leader, created_at ),

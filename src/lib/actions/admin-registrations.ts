@@ -85,7 +85,7 @@ export async function adminCreateRegistration(_prev: FormState, formData: FormDa
 
   const { data: registration, error } = await supabase
     .from("registrations")
-    .insert({ competition_id: input.competitionId, leader_id: leader.id, team_name: input.teamName })
+    .insert({ competition_id: input.competitionId, leader_id: leader.id, team_name: input.teamName, school: input.school, line_id: input.lineId })
     .select("id")
     .single();
   if (error) return errorState(databaseErrorMessage(error));

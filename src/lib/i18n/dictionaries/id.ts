@@ -124,6 +124,9 @@ export const id = {
     emptyDescription: "Cek lagi nanti. Lomba muncul di sini setelah pendaftaran diumumkan.",
   },
   register: {
+    school: "Asal sekolah",
+    lineId: "Line ID contact person",
+    lineIdHint: "4-20 karakter, tanpa spasi. Panitia menghubungi tim lewat Line ini.",
     oneCompetitionWarning: "Jika memilih lomba ini, kamu tidak bisa mendaftar lomba lain.",
     pageTitle: "Daftar tim",
     pageLead: "Pilih lomba. Kamu akan menjadi ketua tim.",
@@ -838,6 +841,8 @@ export const id = {
     contestEndedBody: "{competition} sudah selesai. Hasil akhir akan diumumkan oleh panitia.",
   },
   validation: {
+    school: "Isi asal sekolah (2-120 karakter)",
+    lineId: "Line ID harus 4-20 karakter: huruf, angka, titik, strip atau garis bawah",
     email: "Masukkan alamat email yang valid",
     passwordRequired: "Masukkan kata sandi",
     passwordMin: "Gunakan minimal 8 karakter",

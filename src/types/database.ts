@@ -796,6 +796,8 @@ export type Database = {
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          line_id: string | null
+          school: string | null
           status: Database["public"]["Enums"]["registration_status"]
           team_name: string
           updated_at: string
@@ -812,6 +814,8 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          line_id?: string | null
+          school?: string | null
           status?: Database["public"]["Enums"]["registration_status"]
           team_name: string
           updated_at?: string
@@ -828,6 +832,8 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          line_id?: string | null
+          school?: string | null
           status?: Database["public"]["Enums"]["registration_status"]
           team_name?: string
           updated_at?: string
@@ -949,12 +955,14 @@ export type Database = {
           leader_name: string | null
           leader_nisn: string | null
           leader_phone: string | null
+          line_id: string | null
           member_count: number | null
           payment_proof_public_id: string | null
           payment_submitted_at: string | null
           referral_code: string | null
           rejection_reason: string | null
           reviewed_at: string | null
+          school: string | null
           status: Database["public"]["Enums"]["registration_status"] | null
           team_name: string | null
         }
@@ -997,8 +1005,10 @@ export type Database = {
           p_leader_name: string
           p_leader_nisn: string
           p_leader_phone: string
+          p_line_id: string
           p_payment_proof_format: string
           p_payment_proof_public_id: string
+          p_school: string
           p_team_name: string
         }
         Returns: string

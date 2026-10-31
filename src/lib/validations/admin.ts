@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { lineIdSchema, schoolSchema } from "@/lib/validations/registration";
 
 export const REGISTRATION_STATUSES = ["pending_payment", "under_review", "accepted", "rejected"] as const;
 
@@ -34,6 +35,8 @@ export const updateTeamNameSchema = z.object({
 export const adminCreateRegistrationSchema = z.object({
   competitionId: z.uuid("validation.chooseCompetition"),
   teamName: z.string().trim().min(2, "validation.teamNameMin").max(60, "validation.teamNameMax"),
+  school: schoolSchema,
+  lineId: lineIdSchema,
   leaderEmail: z.email("validation.email").trim().toLowerCase(),
   leaderName: z.string().trim().min(2, "validation.fullName").max(100),
   leaderPhone: z

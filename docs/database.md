@@ -39,7 +39,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 |---|---|
 | `profiles` | One row per account, created automatically on sign-up. `role` is `participant` or `admin`. Users can edit their name and avatar but not their role or email. |
 | `competitions` | Each competition: `type` (`competitive_programming` or `logic`), team size (`min_members` to `max_members`, leader included), `fee` in rupiah, `qris_public_id` (Cloudinary), registration window, `is_active`. |
-| `registrations` | One team in one competition: `team_name`, `leader_id`, `referral_code` (unique 8-character code members join with), `status`, payment proof (Cloudinary `public_id` + format), `rejection_reason`, reviewer. Team names are unique per competition (case-insensitive) and can't be changed by participants. |
+| `registrations` | One team in one competition: `team_name`, `school`, `line_id` (the contact person's LINE ID; both required for new teams, empty on older ones, and fixed for participants), `leader_id`, `referral_code` (unique 8-character code members join with), `status`, payment proof (Cloudinary `public_id` + format), `rejection_reason`, reviewer. Team names are unique per competition (case-insensitive) and can't be changed by participants. |
 | `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (required for the leader), 10-digit NISN. A person (account, NISN or email) can be on only one team across all competitions, enforced by unique indexes. |
 | `registration_events` | The timeline on the participant dashboard. Written automatically on every status change; the rejection reason is stored as the event's `note`. |
 

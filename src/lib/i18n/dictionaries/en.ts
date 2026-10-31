@@ -125,6 +125,9 @@ export const en: Dictionary = {
     emptyDescription: "Check back soon. Competitions appear here once registration is announced.",
   },
   register: {
+    school: "School",
+    lineId: "Contact person's LINE ID",
+    lineIdHint: "4-20 characters, no spaces. The committee contacts the team on this LINE account.",
     oneCompetitionWarning: "If you choose this competition, you can't register for another one.",
     pageTitle: "Register a team",
     pageLead: "Choose a competition. You'll be the team leader.",
@@ -839,6 +842,8 @@ export const en: Dictionary = {
     contestEndedBody: "{competition} has ended. The committee will announce the final results.",
   },
   validation: {
+    school: "Enter the school name (2-120 characters)",
+    lineId: "LINE ID must be 4-20 characters: letters, numbers, dots, hyphens or underscores",
     email: "Enter a valid email address",
     passwordRequired: "Enter your password",
     passwordMin: "Use at least 8 characters",

@@ -37,6 +37,8 @@ export type Team = Pick<
   Registration,
   | "id"
   | "team_name"
+  | "school"
+  | "line_id"
   | "referral_code"
   | "status"
   | "leader_id"

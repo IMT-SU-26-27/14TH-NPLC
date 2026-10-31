@@ -69,6 +69,16 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="text-muted-foreground">{t("register.school")}</dt>
+                  <dd className="font-medium">{team.school ?? "—"}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">{t("register.lineId")}</dt>
+                  <dd className="font-mono font-medium">{team.line_id ?? "—"}</dd>
+                </div>
+              </dl>
               <AdminMembersTable team={team} />
               <TeamNameForm registrationId={team.id} teamName={team.team_name} />
             </CardContent>

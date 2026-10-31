@@ -32,6 +32,22 @@ export function TeamCard({ team, userId, qrisUrl, lang }: TeamCardProps) {
           {team.competition.name}
           {typeLabel.toLowerCase() !== team.competition.name.toLowerCase() && ` · ${typeLabel}`}
         </CardDescription>
+        {(team.school || team.line_id) && (
+          <dl className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            {team.school && (
+              <div className="flex gap-1">
+                <dt>{t("register.school")}:</dt>
+                <dd className="text-foreground">{team.school}</dd>
+              </div>
+            )}
+            {team.line_id && (
+              <div className="flex gap-1">
+                <dt>{t("register.lineId")}:</dt>
+                <dd className="text-foreground font-mono">{team.line_id}</dd>
+              </div>
+            )}
+          </dl>
+        )}
         <CardAction>
           <RegistrationStatusBadge status={team.status} />
         </CardAction>
