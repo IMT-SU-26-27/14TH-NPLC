@@ -17,7 +17,7 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   if (!parsed.success) return fieldErrorState(parsed.error);
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
     if (error.code === "email_not_confirmed") {
       return errorState("auth.errors.emailNotConfirmed");
@@ -25,7 +25,10 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
     return errorState("auth.errors.wrongCredentials");
   }
 
-  redirect(localePath(await getRequestLocale(), nextPathSchema.parse(formData.get("next"))));
+  // LO accounts only have the post pages. Going there directly keeps the URL right, unlike a second redirect from the proxy.
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+  const target = profile?.role === "lo" ? "/lo" : nextPathSchema.parse(formData.get("next"));
+  redirect(localePath(await getRequestLocale(), target));
 }
 
 export async function signUp(_prev: FormState, formData: FormData): Promise<FormState> {

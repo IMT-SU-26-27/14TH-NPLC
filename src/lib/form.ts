@@ -36,6 +36,8 @@ const RAISED: [string, string][] = [
   ["Upload the payment proof before submitting", "errors.proofRequired"],
   ["School and LINE ID are required", "validation.fixFields"],
   ["Upload the twibbon proof before submitting", "errors.twibbonRequired"],
+  ["LO accounts cannot join a team", "errors.loCannotJoin"],
+  ["Only LO accounts can be assigned to a post", "errors.invalidRequest"],
   ["This competition needs", "errors.teamSize"],
   ["A team needs exactly one leader", "errors.teamSize"],
   ["The team leader cannot be removed", "errors.leaderProtected"],
@@ -53,6 +55,7 @@ export function databaseErrorMessage(error: { code?: string; message: string }):
     if (error.message.includes("team_name")) return "errors.duplicateTeamName";
     if (error.message.includes("competition_level")) return "errors.duplicateLevel";
     if (error.message.includes("slug")) return "errors.duplicateSlug";
+    if (error.message.includes("rally_posts_competition_name")) return "errors.duplicateRallyPost";
     if (error.message.includes("members_user") || error.message.includes("competition_leader")) return "errors.alreadyOnTeam";
   }
   if (error.code === "42501") return "errors.permission";

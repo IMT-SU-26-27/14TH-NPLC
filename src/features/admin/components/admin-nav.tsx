@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/admin/registrations", key: "admin.nav.registrations" },
   { href: "/admin/competitions", key: "admin.nav.competitions" },
   { href: "/admin/cp", key: "admin.nav.contest" },
+  { href: "/admin/rally", key: "admin.nav.rally" },
   { href: "/admin/content", key: "admin.nav.content" },
 ];
 

@@ -37,11 +37,20 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 
 | Table | What it holds |
 |---|---|
-| `profiles` | One row per account, created automatically on sign-up. `role` is `participant` or `admin`. Users can edit their name and avatar but not their role or email. |
+| `profiles` | One row per account, created automatically on sign-up. `role` is `participant`, `admin` or `lo`. Users can edit their name and avatar but not their role or email. |
 | `competitions` | Each competition: `type` (`competitive_programming` or `logic`), team size (`min_members` to `max_members`, leader included), `fee` in rupiah, `twibbon_url` (optional), `qris_public_id` (Cloudinary), registration window, `is_active`. |
 | `registrations` | One team in one competition: `team_name`, `school`, `line_id` (the contact person's LINE ID; both required for new teams, empty on older ones, and fixed for participants), `leader_id`, `referral_code` (unique 8-character code members join with), `status`, payment proof (Cloudinary `public_id` + format), `rejection_reason`, reviewer. Team names are unique per competition (case-insensitive) and can't be changed by participants. |
 | `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (required for the leader), 10-digit NISN, twibbon post proof (Cloudinary `public_id` + format; required on join and register once the competition has a `twibbon_url`). A person (account, NISN or email) can be on only one team across all competitions, enforced by unique indexes. |
 | `registration_events` | The timeline on the participant dashboard. Written automatically on every status change; the rejection reason is stored as the event's `note`. |
+
+### Rally Games
+
+| Table | What it holds |
+|---|---|
+| `rally_posts` | One post of the competition of type `logic` (Category 2): `name`, `kind` (`physical` or `digital`, recorded the same way), `location`, `points_win`, `points_lose`, `points_draw` (placeholders 100, 25 and 50 until the Divisi Event sets them), `allow_draw`, `is_active`. Names are unique per competition. |
+| `rally_post_assignments` | Which LO runs which post. A trigger accepts only accounts with the role `lo`. |
+
+`profiles.role` also has the value `lo`. Admins create these accounts with the service role. A trigger stops LO accounts joining a team, and `src/proxy.ts` keeps them out of the participant and admin pages. Routes and replays are not built yet: see `docs/rally-games-plan.md`.
 
 ### Homepage content
 

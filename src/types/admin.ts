@@ -122,7 +122,7 @@ export type QrisUploaderProps = {
 export type AdminDeleteButtonProps = {
   id: string;
   label: string;
-  target: "registration" | "competition";
+  target: "registration" | "competition" | "rallyPost" | "loAccount";
 };
 
 export type AdminRemoveMemberButtonProps = {
