@@ -14,7 +14,7 @@ export function ContestHeader({ lang, context, showBackToProblems }: ContestHead
         <h1 className="font-heading text-2xl font-semibold tracking-tight">{t("cp.title")}</h1>
         {context.teamName && <p className="text-muted-foreground">{t("cp.waiting.team", { team: context.teamName })}</p>}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <ContestClock
           competitionId={context.competitionId}
           status={context.session.status}
