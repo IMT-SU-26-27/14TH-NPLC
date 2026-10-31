@@ -53,3 +53,13 @@ export type ScanTestDetection = {
   text: string;
   elapsedMs: number;
 };
+
+export type RallyTeamQrProps = {
+  token: string;
+  referralCode: string;
+  lang: Locale;
+};
+
+export type RallyQrRegenerateButtonProps = {
+  registrationId: string;
+};

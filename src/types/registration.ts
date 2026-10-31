@@ -41,6 +41,7 @@ export type Team = Pick<
   | "school"
   | "line_id"
   | "referral_code"
+  | "rally_qr_token"
   | "status"
   | "leader_id"
   | "payment_proof_public_id"

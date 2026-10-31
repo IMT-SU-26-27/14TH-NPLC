@@ -13,6 +13,7 @@ import { TeamMembers } from "@/features/dashboard/components/team-members";
 import { PaymentPanel } from "@/features/dashboard/components/payment-panel";
 import { ReferralCode } from "@/features/dashboard/components/referral-code";
 import { DeleteTeamButton } from "@/features/dashboard/components/delete-team-button";
+import { RallyTeamQr } from "@/features/rally/components/rally-team-qr";
 import type { TeamCardProps } from "@/types/registration";
 
 export function TeamCard({ team, userId, qrisUrl, lang }: TeamCardProps) {
@@ -72,6 +73,10 @@ export function TeamCard({ team, userId, qrisUrl, lang }: TeamCardProps) {
               </Link>
             </AlertAction>
           </Alert>
+        )}
+
+        {team.status === "accepted" && team.competition.type === "logic" && (
+          <RallyTeamQr token={team.rally_qr_token} referralCode={team.referral_code} lang={lang} />
         )}
 
         <div className="grid gap-6 lg:grid-cols-2">

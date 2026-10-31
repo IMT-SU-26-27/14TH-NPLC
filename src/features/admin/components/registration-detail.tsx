@@ -17,6 +17,7 @@ import { RegistrationStatusBadge } from "@/features/registration/components/regi
 import { TeamTimeline } from "@/features/dashboard/components/team-timeline";
 import { AdminMembersTable } from "@/features/admin/components/admin-members-table";
 import { AdminTwibbonProofs } from "@/features/admin/components/admin-twibbon-proofs";
+import { RallyQrRegenerateButton } from "@/features/rally/components/rally-qr-regenerate-button";
 import { AdminDeleteButton } from "@/features/admin/components/admin-delete-button";
 import { PaymentProofButton } from "@/features/admin/components/payment-proof-button";
 import { ReviewForm } from "@/features/admin/components/review-form";
@@ -144,6 +145,18 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
               <ReviewForm registrationId={team.id} status={team.status} rejectionReason={team.rejection_reason} />
             </CardContent>
           </Card>
+
+          {team.competition.type === "logic" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("rally.team.qrTitle")}</CardTitle>
+                <CardDescription>{t("rally.team.regenerateLead")}</CardDescription>
+              </CardHeader>
+              <CardFooter>
+                <RallyQrRegenerateButton registrationId={team.id} />
+              </CardFooter>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>

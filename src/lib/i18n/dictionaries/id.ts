@@ -158,6 +158,16 @@ export const id = {
     adminNone: "Belum ada bukti",
   },
   rally: {
+    team: {
+      qrTitle: "QR Rally Games",
+      qrLead: "Tunjukkan QR ini ke LO setelah selesai bermain di pos. Naikkan kecerahan layar supaya mudah terbaca.",
+      backupCode: "Kode cadangan:",
+      regenerate: "Buat ulang QR",
+      regenerateLead: "Buat QR baru kalau QR tim ini bocor. QR lama langsung tidak berlaku.",
+      regenerateTitle: "Buat ulang QR tim ini?",
+      regenerateDescription: "QR lama langsung tidak berlaku. Tim harus membuka dasbor lagi untuk melihat QR baru.",
+      regenerated: "QR tim diperbarui",
+    },
     errors: {
       notAssigned: "Kamu tidak ditugaskan di pos ini",
       postInactive: "Pos ini sedang nonaktif",
