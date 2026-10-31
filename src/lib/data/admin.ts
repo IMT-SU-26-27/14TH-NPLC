@@ -72,7 +72,7 @@ export async function getRegistrationDetail(id: string): Promise<AdminTeam | nul
   const { data } = await supabase
     .from("registrations")
     .select(
-      `id, team_name, school, line_id, referral_code, status, leader_id, payment_proof_public_id, payment_proof_format, payment_submitted_at,
+      `id, team_name, school, line_id, referral_code, rally_qr_token, status, leader_id, payment_proof_public_id, payment_proof_format, payment_submitted_at,
        rejection_reason, reviewed_at, created_at,
        competition:competitions ( id, slug, name, type, min_members, max_members, fee, qris_public_id, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at ),
        members:registration_members ( id, user_id, full_name, email, phone, nisn, is_leader, created_at, twibbon_proof_public_id, twibbon_proof_format ),

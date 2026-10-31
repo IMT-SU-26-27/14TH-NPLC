@@ -86,6 +86,20 @@ export async function deleteRallyPost(postId: string): Promise<ActionResult> {
   redirect(localePath(await getRequestLocale(), "/admin/rally"));
 }
 
+// Replaces a leaked QR. The old one stops working at once; the team's dashboard shows the new one.
+export async function regenerateRallyQr(registrationId: string): Promise<ActionResult> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  const id = uuidSchema.safeParse(registrationId);
+  if (!id.success) return { ok: false, message: "errors.invalidRequest" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("registrations").update({ rally_qr_token: crypto.randomUUID() }).eq("id", id.data);
+  if (error) return { ok: false, message: databaseErrorMessage(error) };
+
+  refresh();
+  return { ok: true, data: undefined };
+}
+
 export async function createLoAccount(_prev: FormState, formData: FormData): Promise<FormState> {
   if (!(await isAdmin())) return errorState(NOT_ADMIN);
   const parsed = loAccountSchema.safeParse({

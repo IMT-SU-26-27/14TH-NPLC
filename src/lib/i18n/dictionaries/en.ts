@@ -159,6 +159,16 @@ export const en: Dictionary = {
     adminNone: "No proof yet",
   },
   rally: {
+    team: {
+      qrTitle: "Rally Games QR",
+      qrLead: "Show this QR to the LO after playing at a post. Turn up the screen brightness so it's easy to read.",
+      backupCode: "Backup code:",
+      regenerate: "Regenerate QR",
+      regenerateLead: "Create a new QR if this team's QR leaks. The old one stops working at once.",
+      regenerateTitle: "Regenerate this team's QR?",
+      regenerateDescription: "The old QR stops working at once. The team must reopen the dashboard to see the new one.",
+      regenerated: "Team QR updated",
+    },
     errors: {
       notAssigned: "You aren't assigned to this post",
       postInactive: "This post is inactive",
