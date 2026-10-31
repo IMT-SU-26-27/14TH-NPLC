@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-space-grotesk);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -27,10 +27,16 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-sky: var(--brand-sky);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -53,45 +59,58 @@
 }
 
 :root {
-  /* Canon dashboard: faint zinc page ground, white cards, zinc neutrals, one blue primary. */
-  --background: oklch(0.985 0.002 286);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.546 0.245 262.881);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.003 264.542);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.517 0.014 285.938);
-  --accent: oklch(0.955 0.02 260);
-  --accent-foreground: oklch(0.379 0.146 265.522);
-  --destructive: oklch(0.577 0.245 27.325);
+  /* NPLC XIV "Decode the Unknown": cool blue-white ground, white cards, navy text, one blue primary. */
+  --background: #F4F7FD;
+  --foreground: #1D3451;
+  --card: #FFFFFF;
+  --card-foreground: #1D3451;
+  --popover: #FFFFFF;
+  --popover-foreground: #1D3451;
+  --primary: #315BF0;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EAF0FD;
+  --secondary-foreground: #1D3451;
+  --muted: #EDF1FA;
+  --muted-foreground: #56657D;
+  --accent: #E6EDFE;
+  --accent-foreground: #2443BF;
+  --destructive: #C8000A;
+  --destructive-soft: #FDE7E9;
   /* Accepted / passed states, so they never read as a primary action. */
-  --success: oklch(0.527 0.154 150.069);
-  --success-foreground: oklch(0.985 0 0);
-  --warning: oklch(0.53 0.15 65);
-  --warning-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
+  --success: #008236;
+  --success-foreground: #FFFFFF;
+  --success-soft: #DCFCE7;
+  --warning: #B45309;
+  --warning-foreground: #FFFFFF;
+  --border: #D9E1F0;
+  --input: #CFD8EA;
+  --ring: #315BF0;
+  /* Lime highlight: always with --highlight-foreground text. */
+  --highlight: #D8F939;
+  --highlight-foreground: #1D3451;
+  /* Decoration only: white text on purple is just 3.36:1. */
+  --brand-purple: #9C74F7;
+  --brand-sky: #78D9FF;
   /* Series: 1 = Competitive Programming, 2 = Category 2. */
-  --chart-1: oklch(0.546 0.245 262.881);
-  --chart-2: oklch(0.646 0.222 41.116);
-  --chart-3: oklch(0.6 0.118 184.704);
-  --chart-4: oklch(0.552 0.016 285.938);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-1: #315BF0;
+  --chart-2: #9C74F7;
+  --chart-3: #78D9FF;
+  --chart-4: #D8F939;
+  --chart-5: #1D3451;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.546 0.245 262.881);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1D3451;
+  --sidebar-primary: #315BF0;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E6EDFE;
+  --sidebar-accent-foreground: #2443BF;
+  --sidebar-border: #D9E1F0;
+  --sidebar-ring: #315BF0;
+  /* Home hero: fades the wave behind the text. The colour is --background. */
+  --hero-fade: linear-gradient(90deg, rgba(244, 247, 253, 0.94) 0%, rgba(244, 247, 253, 0.94) 48%, rgba(244, 247, 253, 0) 66%);
+  --hero-fade-v: linear-gradient(180deg, rgba(244, 247, 253, 0) 0px, rgba(244, 247, 253, 0) 230px, rgba(244, 247, 253, 0.94) 360px, rgba(244, 247, 253, 0.94) 100%);
+  --hero-fade-bottom: linear-gradient(180deg, rgba(244, 247, 253, 0) calc(100% - 160px), rgba(244, 247, 253, 1) 100%);
+  --tagline-gradient: linear-gradient(90deg, var(--primary) 0%, var(--brand-purple) 100%);
 }
 
 .dark {
@@ -138,6 +157,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
   }
   html {
     @apply font-sans;
