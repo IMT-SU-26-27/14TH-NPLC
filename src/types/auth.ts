@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { z } from "zod";
 import type { Tables } from "@/types/database";
 import type { forgotPasswordSchema, newPasswordSchema, signInSchema, signUpSchema } from "@/lib/validations/auth";
@@ -27,6 +28,13 @@ export type AuthFormLoaderProps = {
   mode: "login" | "signup" | "forgot";
   lang: Locale;
   searchParams: AuthSearchParams;
+};
+
+export type AuthMascot = "login" | "signup";
+
+export type AuthBackdropProps = {
+  mascot: AuthMascot;
+  children: ReactNode;
 };
 
 export type UserMenuProps = {

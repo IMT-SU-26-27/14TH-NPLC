@@ -4,6 +4,7 @@ import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AuthBackdrop } from "@/features/auth/components/auth-backdrop";
 import { AuthFormLoader } from "@/features/auth/components/auth-form-loader";
 import type { AuthPageProps } from "@/types/auth";
 
@@ -17,8 +18,8 @@ export default async function LoginPage({ params, searchParams }: AuthPageProps)
   const t = getT(lang);
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-16">
-      <Card className="w-full max-w-md">
+    <AuthBackdrop mascot="login">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-xl">{t("auth.signInTitle")}</CardTitle>
           <CardDescription>{t("auth.signInSubtitle")}</CardDescription>
@@ -29,6 +30,6 @@ export default async function LoginPage({ params, searchParams }: AuthPageProps)
           </Suspense>
         </CardContent>
       </Card>
-    </main>
+    </AuthBackdrop>
   );
 }
