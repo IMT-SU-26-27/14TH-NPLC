@@ -14,7 +14,7 @@ export function NotFoundView() {
     <main className="mx-auto flex w-full max-w-6xl flex-1 items-center px-4 py-16">
       <Empty>
         <EmptyHeader>
-          <EmptyMedia variant="icon">
+          <EmptyMedia variant="icon" className="bg-accent text-primary">
             <FileQuestionIcon />
           </EmptyMedia>
           <EmptyTitle>
@@ -26,7 +26,7 @@ export function NotFoundView() {
           <Link href={href("/")} className={buttonVariants()}>
             {t("system.backHome")}
           </Link>
-          <Link href={href("/dashboard")} className={buttonVariants({ variant: "outline" })}>
+          <Link href={href("/dashboard")} className={buttonVariants({ variant: "ghost" })}>
             {t("nav.dashboard")}
           </Link>
         </EmptyContent>
