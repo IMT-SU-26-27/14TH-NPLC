@@ -42,7 +42,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
     return (
       <Empty className="border">
         <EmptyHeader>
-          <EmptyMedia variant="icon">
+          <EmptyMedia variant="icon" className="bg-accent text-accent-foreground">
             <PauseIcon />
           </EmptyMedia>
           <EmptyTitle>{t("cp.waiting.pausedTitle")}</EmptyTitle>
@@ -62,7 +62,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
     return (
       <Empty className="border">
         <EmptyHeader>
-          <EmptyMedia variant="icon">
+          <EmptyMedia variant="icon" className="bg-accent text-accent-foreground">
             <TrophyIcon />
           </EmptyMedia>
           <EmptyTitle>{t("cp.waiting.endedTitle")}</EmptyTitle>
@@ -80,7 +80,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
   return (
     <Empty className="border">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
+        <EmptyMedia variant="icon" className="bg-accent text-accent-foreground">
           <HourglassIcon />
         </EmptyMedia>
         <EmptyTitle>{t("cp.waiting.scheduledTitle")}</EmptyTitle>
