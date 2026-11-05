@@ -4,6 +4,7 @@ import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContestProblem } from "@/features/cp/components/cp-sections";
+import { VerdictGuide } from "@/features/cp/components/verdict-guide";
 import type { CpProblemPageProps } from "@/types/cp";
 
 export async function generateMetadata({ params }: CpProblemPageProps): Promise<Metadata> {
@@ -17,6 +18,7 @@ export default function ProblemPage({ params }: CpProblemPageProps) {
       <Suspense fallback={<Skeleton className="h-[40rem]" />}>
         <ContestProblem params={params} />
       </Suspense>
+      <VerdictGuide className="fixed right-4 bottom-4 sm:right-6 sm:bottom-6" />
     </main>
   );
 }

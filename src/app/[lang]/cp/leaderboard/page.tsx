@@ -8,6 +8,7 @@ import { resolveLang } from "@/lib/i18n/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContestLeaderboard } from "@/features/cp/components/cp-sections";
+import { VerdictGuide } from "@/features/cp/components/verdict-guide";
 import type { LangPageProps } from "@/types/i18n";
 
 export async function generateMetadata({ params }: LangPageProps): Promise<Metadata> {
@@ -34,6 +35,7 @@ export default async function Page({ params }: LangPageProps) {
       <Suspense fallback={<Skeleton className="h-96" />}>
         <ContestLeaderboard lang={lang} />
       </Suspense>
+      <VerdictGuide className="fixed right-4 bottom-4 sm:right-6 sm:bottom-6" />
     </main>
   );
 }
