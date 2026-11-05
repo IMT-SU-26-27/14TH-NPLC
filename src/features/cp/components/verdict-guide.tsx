@@ -13,7 +13,7 @@ import type { VerdictGuideEntry, VerdictGuideProps } from "@/types/cp";
 
 // Floating (?) button on every contest page. Opens a reference of every judging result:
 // what it means, common causes and what to try. Error toasts open it at their verdict.
-// Each page positions the button through `className` (its own .css file).
+// cp/layout.tsx positions the button through `className` (features/cp/styles/layout.css).
 export function VerdictGuide({ className }: VerdictGuideProps) {
   const { t, dict } = useI18n();
   const guide = useVerdictGuide();

@@ -4,7 +4,6 @@ import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContestProblem } from "@/features/cp/components/cp-sections";
-import { VerdictGuide } from "@/features/cp/components/verdict-guide";
 import type { CpProblemPageProps } from "@/types/cp";
 import "@/features/cp/styles/problem.css";
 
@@ -19,7 +18,6 @@ export default function ProblemPage({ params }: CpProblemPageProps) {
       <Suspense fallback={<Skeleton className="h-[40rem]" />}>
         <ContestProblem params={params} />
       </Suspense>
-      <VerdictGuide className="cp-problem__guide" />
     </main>
   );
 }

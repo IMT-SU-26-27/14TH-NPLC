@@ -4,9 +4,7 @@ import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContestHome } from "@/features/cp/components/cp-sections";
-import { VerdictGuide } from "@/features/cp/components/verdict-guide";
 import type { LangPageProps } from "@/types/i18n";
-import "@/features/cp/styles/problems.css";
 
 export async function generateMetadata({ params }: LangPageProps): Promise<Metadata> {
   const t = getT(await resolveLang(params));
@@ -21,7 +19,6 @@ export default async function Page({ params }: LangPageProps) {
       <Suspense fallback={<Skeleton className="h-96" />}>
         <ContestHome lang={lang} />
       </Suspense>
-      <VerdictGuide className="cp-problems__guide" />
     </main>
   );
 }

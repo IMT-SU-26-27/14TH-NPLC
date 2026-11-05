@@ -1,4 +1,13 @@
-// Room at the bottom of every contest page so the floating guide button never covers the last content.
+import { VerdictGuide } from "@/features/cp/components/verdict-guide";
+import "@/features/cp/styles/layout.css";
+
+// Every contest page (waiting room, problems, leaderboard) gets the floating judging-results guide.
 export default function CpLayout({ children }: LayoutProps<"/[lang]/cp">) {
-  return <div className="flex flex-1 flex-col pb-20 sm:pb-24">{children}</div>;
+  return (
+    <>
+      {/* Room at the bottom so the floating button never covers the last content. */}
+      <div className="flex flex-1 flex-col pb-20 sm:pb-24">{children}</div>
+      <VerdictGuide className="cp__guide" />
+    </>
+  );
 }
