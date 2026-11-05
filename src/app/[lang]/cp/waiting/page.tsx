@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ContestWaiting } from "@/features/cp/components/cp-sections";
 import { VerdictGuide } from "@/features/cp/components/verdict-guide";
 import type { LangPageProps } from "@/types/i18n";
+import "@/features/cp/styles/waiting.css";
 
 export async function generateMetadata({ params }: LangPageProps): Promise<Metadata> {
   const t = getT(await resolveLang(params));
@@ -22,7 +23,7 @@ export default async function Page({ params }: LangPageProps) {
       <Suspense fallback={<Skeleton className="h-96" />}>
         <ContestWaiting lang={lang} />
       </Suspense>
-      <VerdictGuide className="fixed right-4 bottom-4 sm:right-6 sm:bottom-6" />
+      <VerdictGuide className="cp-waiting__guide" />
     </main>
   );
 }
