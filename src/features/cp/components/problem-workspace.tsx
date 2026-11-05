@@ -12,6 +12,7 @@ import { ResultsPanel } from "@/features/cp/components/results-panel";
 import type { ProblemWorkspaceProps, SubmissionOutcome } from "@/types/cp";
 
 // Left column: the statement (server-rendered) above the editor. Right column: results and history.
+// The right column's sticky position lives in features/cp/styles/problem.css.
 export function ProblemWorkspace({ problemId, statement, recent, cooldownSeconds }: ProblemWorkspaceProps) {
   const { t } = useI18n();
   const editor = useCodeEditor(problemId);
@@ -72,7 +73,7 @@ export function ProblemWorkspace({ problemId, statement, recent, cooldownSeconds
           cooldownLeft={cooldown.left}
         />
       </div>
-      <div className="lg:sticky lg:top-20 lg:self-start">
+      <div className="cp-problem__aside lg:self-start">
         <ResultsPanel result={result} recent={recent} pending={running || submitting} />
       </div>
     </div>
