@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ContestLeaderboard } from "@/features/cp/components/cp-sections";
 import { VerdictGuide } from "@/features/cp/components/verdict-guide";
 import type { LangPageProps } from "@/types/i18n";
+import "@/features/cp/styles/leaderboard.css";
 
 export async function generateMetadata({ params }: LangPageProps): Promise<Metadata> {
   const t = getT(await resolveLang(params));
@@ -25,9 +26,9 @@ export default async function Page({ params }: LangPageProps) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-1">
           <h1 className="font-heading text-2xl font-semibold tracking-tight">{t("cp.leaderboard")}</h1>
-          <p className="text-muted-foreground">{t("cp.leaderboardLead")}</p>
+          <p className="text-muted-foreground text-sm">{t("cp.leaderboardLead")}</p>
         </div>
-        <Link href={localePath(lang, "/cp")} className={buttonVariants({ variant: "outline" })}>
+        <Link href={localePath(lang, "/cp")} className={buttonVariants({ variant: "ghost" })}>
           <ArrowLeftIcon />
           {t("cp.backToProblems")}
         </Link>
@@ -35,7 +36,7 @@ export default async function Page({ params }: LangPageProps) {
       <Suspense fallback={<Skeleton className="h-96" />}>
         <ContestLeaderboard lang={lang} />
       </Suspense>
-      <VerdictGuide className="fixed right-4 bottom-4 sm:right-6 sm:bottom-6" />
+      <VerdictGuide className="cp-leaderboard__guide" />
     </main>
   );
 }
