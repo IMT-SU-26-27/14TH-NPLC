@@ -126,6 +126,15 @@ export type TeamCardProps = {
   lang: Locale;
 };
 
+export type StepState = "done" | "current" | "upcoming" | "failed";
+
+export type TimelineStep = {
+  key: string;
+  title: string;
+  description: string;
+  state: StepState;
+};
+
 export type TeamTimelineProps = {
   team: Team;
   lang: Locale;

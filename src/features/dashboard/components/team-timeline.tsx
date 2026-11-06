@@ -6,9 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
-import type { TeamTimelineProps } from "@/types/registration";
-
-type StepState = "done" | "current" | "upcoming" | "failed";
+import type { TeamTimelineProps, TimelineStep } from "@/types/registration";
 
 const ICON = {
   done: CircleCheckIcon,
@@ -35,7 +33,7 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
   const paymentPending = status === "pending_payment" || status === "rejected";
 
   // Registering means paying: the team exists once its payment proof is sent.
-  const steps: { key: string; title: string; description: string; state: StepState }[] = [
+  const steps: TimelineStep[] = [
     {
       key: "registered",
       title: t("timeline.registered"),
