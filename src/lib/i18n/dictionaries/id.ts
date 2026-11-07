@@ -443,6 +443,7 @@ export const id = {
     copy: "Salin",
     copyNote: "Salin berita transfer",
     noteCopied: "Berita transfer tersalin",
+    pickFile: "Pilih file",
     proofPick: "JPG, PNG, WEBP atau PDF, maksimal 5 MB.",
     qrisAlt: "Kode QRIS untuk membayar {competition}",
     qrisMissing: "Kode QRIS belum diunggah. Cek lagi nanti.",

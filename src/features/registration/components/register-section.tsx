@@ -57,7 +57,7 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
         lead={`${size} · ${formatRupiah(competition.fee, lang)}`}
       />
       <div className="mx-auto grid w-full max-w-6xl items-start gap-8 px-4 py-12 lg:grid-cols-[11rem_minmax(0,1fr)_17rem]">
-        <RegisterSteps lang={lang} />
+        <RegisterSteps />
         <Card className="ring-border rounded-xl py-6 sm:py-8">
           <CardContent className="px-5 sm:px-8">
             <RegisterTeamForm

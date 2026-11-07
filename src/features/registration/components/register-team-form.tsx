@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useState } from "react";
-import { OctagonXIcon, TriangleAlertIcon } from "lucide-react";
+import { ArrowRightIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature, getTwibbonUploadSignature } from "@/lib/actions/registration";
 import { fieldErrorState, initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
@@ -14,6 +14,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSepar
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { FilePicker } from "@/features/registration/components/file-picker";
 import { FormStepHeading } from "@/features/registration/components/form-step-heading";
 import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
 import { TwibbonProofField } from "@/features/registration/components/twibbon-proof-field";
@@ -215,15 +216,13 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
           <FieldLabel htmlFor="paymentProof" className={label}>
             {t("payment.proof")} {requiredMark}
           </FieldLabel>
-          <Input
+          <FilePicker
             id="paymentProof"
-            type="file"
             accept={ACCEPT.join(",")}
             disabled={busy}
-            aria-invalid={!!proofError}
-            className="h-auto border-dashed py-2.5"
-            onChange={(e) => {
-              setFile(e.target.files?.[0] ?? null);
+            invalid={!!proofError}
+            onFileChange={(next) => {
+              setFile(next);
               setMissingProof(false);
             }}
           />
@@ -254,9 +253,15 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
           </Alert>
         )}
 
-        <Button type="submit" size="lg" className="h-11 w-full" disabled={busy || !isPaymentReady(competition, qrisUrl)}>
+        <Button
+          type="submit"
+          size="lg"
+          className="bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 w-full"
+          disabled={busy || !isPaymentReady(competition, qrisUrl)}
+        >
           {busy && <Spinner />}
           {uploading ? t("payment.uploading", { progress }) : t("register.submit")}
+          {!busy && <ArrowRightIcon data-icon="inline-end" />}
         </Button>
       </FieldGroup>
     </form>

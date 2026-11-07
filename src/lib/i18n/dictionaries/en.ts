@@ -444,6 +444,7 @@ export const en: Dictionary = {
     copy: "Copy",
     copyNote: "Copy the transfer note",
     noteCopied: "Transfer note copied",
+    pickFile: "Choose a file",
     proofPick: "JPG, PNG, WEBP or PDF, up to 5 MB.",
     qrisAlt: "QRIS code to pay for {competition}",
     qrisMissing: "The QRIS code hasn't been uploaded yet. Check back soon.",

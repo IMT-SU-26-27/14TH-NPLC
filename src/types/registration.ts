@@ -175,13 +175,17 @@ export type RegisterBannerProps = {
   lead: string;
 };
 
-export type RegisterStepsProps = {
-  lang: Locale;
-};
-
 export type RegisterSummaryProps = {
   competition: PublicCompetition;
   lang: Locale;
+};
+
+export type FilePickerProps = {
+  id: string;
+  accept: string;
+  disabled: boolean;
+  invalid: boolean;
+  onFileChange: (file: File | null) => void;
 };
 
 export type FormStepHeadingProps = {
