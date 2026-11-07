@@ -5,6 +5,7 @@ import { resolveLang } from "@/lib/i18n/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AuthFormLoader } from "@/features/auth/components/auth-form-loader";
+import { ResetHelpContacts } from "@/features/auth/components/reset-help-contacts";
 import type { AuthPageProps } from "@/types/auth";
 
 export async function generateMetadata({ params }: AuthPageProps): Promise<Metadata> {
@@ -23,10 +24,11 @@ export default async function ForgotPasswordPage({ params, searchParams }: AuthP
           <CardTitle className="text-xl">{t("auth.forgotTitle")}</CardTitle>
           <CardDescription>{t("auth.forgotSubtitle")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
           <Suspense fallback={<Skeleton className="h-36 w-full" />}>
             <AuthFormLoader mode="forgot" lang={lang} searchParams={searchParams} />
           </Suspense>
+          <ResetHelpContacts lang={lang} />
         </CardContent>
       </Card>
     </main>
