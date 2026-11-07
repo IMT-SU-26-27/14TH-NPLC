@@ -1,9 +1,10 @@
 import Image from "next/image";
 import { BoxIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { RegisterBannerProps } from "@/types/registration";
 
 // Navy page header from the Figma registration frames ("08 // Daftar tim", "09 // Form daftar", "10 // Gabung tim").
-// The optional mascot sits on the right from lg up, where it clears the lead text.
+// The optional mascot shows from lg up, where it clears the lead text. Its position comes from the page's CSS file.
 export function RegisterBanner({ index, label, title, lead, mascot }: RegisterBannerProps) {
   return (
     <section className="bg-foreground relative isolate pt-12 pb-20 [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:pt-16 sm:pb-24">
@@ -22,13 +23,13 @@ export function RegisterBanner({ index, label, title, lead, mascot }: RegisterBa
         </div>
         {mascot && (
           <Image
-            src={mascot}
+            src={mascot.src}
             alt=""
             width={446}
             height={446}
             priority
             sizes="160px"
-            className="absolute right-4 -top-2 h-auto w-40 max-lg:hidden"
+            className={cn("h-auto w-40 max-lg:hidden", mascot.className)}
           />
         )}
       </div>

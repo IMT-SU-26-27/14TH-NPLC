@@ -32,7 +32,7 @@ export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
         label={t("join.title")}
         title={t("join.title")}
         lead={t(found ? "join.foundLead" : "join.lead")}
-        mascot="/shared/maskot-4.webp"
+        mascot={{ src: "/shared/maskot-4.webp", className: "join__mascot" }}
       />
       <div className={cn("mx-auto w-full space-y-6 px-4 py-12", found ? "max-w-2xl" : "max-w-xl")}>{children}</div>
     </>

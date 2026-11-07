@@ -188,8 +188,9 @@ export type RegisterBannerProps = {
   label: string;
   title: string;
   lead: string;
-  // Path of a 446x446 mascot in public/, shown on the right from lg up.
-  mascot?: string;
+  // A 446x446 mascot in public/, shown on the right from lg up. The page positions it
+  // through className (a class from its features/registration/styles/*.css file).
+  mascot?: { src: string; className: string };
 };
 
 export type RegisterSummaryProps = {
