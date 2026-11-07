@@ -23,7 +23,7 @@ export default async function JoinPage({ params, searchParams }: JoinPageProps) 
           <>
             <PageBand index="10" label={t("join.title")} title={t("join.title")} lead={t("join.lead")} mascot={{ src: "/shared/maskot-4.webp" }} />
             <div className="mx-auto w-full max-w-xl px-4 py-12">
-              <Skeleton className="h-80 rounded-xl" />
+              <Skeleton className="h-80 rounded-[12px]" />
             </div>
           </>
         }

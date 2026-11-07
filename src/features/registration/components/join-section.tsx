@@ -15,7 +15,7 @@ import { JoinCodeForm } from "@/features/registration/components/join-code-form"
 import { JoinTeamForm } from "@/features/registration/components/join-team-form";
 import type { JoinSectionProps } from "@/types/registration";
 
-const card = "ring-border rounded-xl py-6 sm:py-8";
+const card = "ring-border rounded-[12px] py-6 sm:py-8";
 const cardPadding = "px-5 sm:px-8";
 const sectionLabel = "text-primary font-mono text-xs tracking-[0.2em] uppercase";
 
