@@ -1,4 +1,4 @@
-import { ChevronsUpDownIcon, CircleCheckIcon, CircleDashedIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
+import { CheckIcon, HistoryIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -6,14 +6,27 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
-import type { TeamTimelineProps, TimelineStep } from "@/types/registration";
+import type { StepState, TeamTimelineProps, TimelineStep } from "@/types/registration";
 
-const ICON = {
-  done: CircleCheckIcon,
-  current: CircleDotIcon,
-  upcoming: CircleDashedIcon,
-  failed: CircleXIcon,
-} as const;
+// 24px marker: filled when done, ringed while current, hollow while upcoming.
+function StepMarker({ state }: { state: StepState }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "relative flex size-6 shrink-0 items-center justify-center rounded-full",
+        state === "done" && "bg-primary text-primary-foreground",
+        state === "current" && "border-primary bg-card border-2",
+        state === "upcoming" && "border-border bg-card border-2",
+        state === "failed" && "bg-destructive text-primary-foreground",
+      )}
+    >
+      {state === "done" && <CheckIcon className="size-3.5" strokeWidth={3} />}
+      {state === "failed" && <XIcon className="size-3.5" strokeWidth={3} />}
+      {state === "current" && <span className="bg-primary size-2 rounded-full" />}
+    </span>
+  );
+}
 
 // Event notes written by the database in English; shown translated when we know them.
 const EVENT_NOTE: Record<string, string> = {
@@ -67,44 +80,37 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
 
   return (
     <div className="space-y-4">
-      <ol className="space-y-4">
-        {steps.map((step, i) => {
-          const Icon = ICON[step.state];
-          return (
-            <li key={step.key} className="relative flex gap-3" aria-current={step.state === "current" ? "step" : undefined}>
-              {i < steps.length - 1 && (
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute top-6 left-2.5 h-[calc(100%-0.5rem)] w-px",
-                    step.state === "done" ? "bg-primary" : "bg-border",
-                  )}
-                />
-              )}
-              <Icon
-                className={cn(
-                  "relative size-5 shrink-0",
-                  step.state === "done" && "text-primary",
-                  step.state === "current" && "text-primary",
-                  step.state === "upcoming" && "text-muted-foreground",
-                  step.state === "failed" && "text-destructive",
-                )}
+      <ol>
+        {steps.map((step, i) => (
+          <li key={step.key} className="relative flex gap-3 pb-4 last:pb-0" aria-current={step.state === "current" ? "step" : undefined}>
+            {i < steps.length - 1 && (
+              <span
+                aria-hidden
+                className={cn("absolute top-6 bottom-0 left-[11px] w-0.5", step.state === "done" ? "bg-(image:--tagline-gradient)" : "bg-border")}
               />
-              <div className="space-y-0.5">
-                <p className={cn("font-medium", step.state === "upcoming" && "text-muted-foreground")}>{step.title}</p>
-                {step.description && (
-                  <p className={cn("text-muted-foreground text-sm", step.state === "failed" && "text-destructive")}>{step.description}</p>
-                )}
-              </div>
-            </li>
-          );
-        })}
+            )}
+            <StepMarker state={step.state} />
+            <div className="min-w-0 text-sm">
+              <p className={cn("font-medium", step.state === "upcoming" && "text-muted-foreground")}>{step.title}</p>
+              {step.description && (
+                <p className={cn("text-muted-foreground", step.state === "failed" && "text-destructive")}>{step.description}</p>
+              )}
+            </div>
+          </li>
+        ))}
       </ol>
+
+      {/* One segment per step: filled once the step is done. */}
+      <div aria-hidden className="flex gap-1">
+        {steps.map((step) => (
+          <span key={step.key} className={cn("h-2 flex-1 rounded-full", step.state === "done" ? "bg-(image:--tagline-gradient)" : "bg-primary/15")} />
+        ))}
+      </div>
 
       {team.events.length > 0 && (
         <Collapsible>
           <CollapsibleTrigger render={<Button variant="ghost" size="sm" />}>
-            <ChevronsUpDownIcon />
+            <HistoryIcon />
             {t("timeline.history", { count: team.events.length })}
           </CollapsibleTrigger>
           <CollapsibleContent>

@@ -15,9 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { Spinner } from "@/components/ui/spinner";
 import type { MemberActionProps, TeamMembersProps } from "@/types/registration";
 
@@ -54,36 +52,34 @@ function MemberAction({ member, isSelf }: MemberActionProps) {
   );
 }
 
+const chip = "bg-secondary text-secondary-foreground inline-flex h-5 items-center rounded-md px-1.5 font-mono text-[11px] font-medium tracking-[0.1em] uppercase";
+
 export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
   const { t } = useI18n();
   const isLeader = team.leader_id === userId;
 
   return (
-    <ItemGroup className="gap-2">
+    <ul className="space-y-2.5">
       {team.members.map((member) => {
         const isSelf = member.user_id === userId;
         const canAct = canEdit && !member.is_leader && (isLeader || isSelf);
         return (
-          <Item key={member.id} variant="outline" size="sm">
-            <ItemContent>
-              <ItemTitle>
+          <li key={member.id} className="bg-card ring-border flex items-start justify-between gap-3 rounded-[12px] px-3.5 py-3 ring-1">
+            <div className="min-w-0 space-y-1 text-sm">
+              <p className="flex flex-wrap items-center gap-2 font-medium">
                 {member.full_name}
-                {member.is_leader && <Badge variant="secondary">{t("common.leader")}</Badge>}
-                {isSelf && <Badge variant="outline">{t("common.you")}</Badge>}
-              </ItemTitle>
-              <ItemDescription>
-                {member.email} · NISN <span className="font-mono">{member.nisn}</span>
-                {member.phone && <> · <span className="font-mono">{member.phone}</span></>}
-              </ItemDescription>
-            </ItemContent>
-            {canAct && (
-              <ItemActions>
-                <MemberAction member={member} isSelf={isSelf} />
-              </ItemActions>
-            )}
-          </Item>
+                {member.is_leader && <span className={chip}>{t("common.leader")}</span>}
+                {isSelf && <span className={chip}>{t("common.you")}</span>}
+              </p>
+              <p className="text-muted-foreground break-words">
+                {member.email} · NISN {member.nisn}
+                {member.phone && <> · WA {member.phone}</>}
+              </p>
+            </div>
+            {canAct && <MemberAction member={member} isSelf={isSelf} />}
+          </li>
         );
       })}
-    </ItemGroup>
+    </ul>
   );
 }

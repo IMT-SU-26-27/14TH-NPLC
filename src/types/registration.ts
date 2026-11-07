@@ -175,6 +175,16 @@ export type AccountCardProps = {
   lang: Locale;
 };
 
+export type AccountNoteProps = {
+  teamName: string;
+  lang: Locale;
+};
+
+export type TeamStatusPillProps = {
+  status: RegistrationStatus;
+  lang: Locale;
+};
+
 export type DeleteTeamButtonProps = {
   registrationId: string;
 };
