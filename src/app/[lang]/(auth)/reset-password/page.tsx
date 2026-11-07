@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AuthHero } from "@/features/auth/components/auth-hero";
-import "@/features/auth/styles/reset-password.css";
+import { PageBand } from "@/components/shared/page-band";
 import { NewPasswordForm } from "@/features/auth/components/new-password-form";
 import type { LangPageProps } from "@/types/i18n";
 
@@ -18,14 +17,8 @@ export default async function ResetPasswordPage({ params }: LangPageProps) {
   const t = getT(await resolveLang(params));
 
   return (
-    <main className="reset-password-page flex-1">
-      <AuthHero
-        step="06"
-        eyebrow={t("auth.password")}
-        title={t("auth.resetTitle")}
-        subtitle={t("auth.resetSubtitle")}
-        mascot="/auth/maskot-1.webp"
-      />
+    <main className="flex-1">
+      <PageBand index="06" label={t("auth.password")} title={t("auth.resetTitle")} lead={t("auth.resetSubtitle")} mascot={{ src: "/auth/maskot-1.webp" }} />
       <div className="flex justify-center px-4 pt-6 pb-16 sm:pt-10 sm:pb-24">
         <Card className="w-full max-w-xl px-2 py-8 sm:px-8 sm:py-10">
           <CardHeader>

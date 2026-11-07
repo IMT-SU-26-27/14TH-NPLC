@@ -33,11 +33,3 @@ export type UserMenuProps = {
   user: CurrentUser;
 };
 
-export type AuthHeroProps = {
-  step: string;
-  /** Small label above the title; defaults to the title. */
-  eyebrow?: string;
-  title: string;
-  subtitle: string;
-  mascot?: string;
-};

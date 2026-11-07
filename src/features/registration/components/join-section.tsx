@@ -10,9 +10,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageBand } from "@/components/shared/page-band";
 import { JoinCodeForm } from "@/features/registration/components/join-code-form";
 import { JoinTeamForm } from "@/features/registration/components/join-team-form";
-import { RegisterBanner } from "@/features/registration/components/register-banner";
 import type { JoinSectionProps } from "@/types/registration";
 
 const card = "ring-border rounded-xl py-6 sm:py-8";
@@ -27,12 +27,12 @@ export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
 
   const page = (found: boolean, children: React.ReactNode) => (
     <>
-      <RegisterBanner
+      <PageBand
         index={found ? "11" : "10"}
         label={t("join.title")}
         title={t("join.title")}
         lead={t(found ? "join.foundLead" : "join.lead")}
-        mascot={{ src: "/shared/maskot-4.webp", className: "join__mascot" }}
+        mascot={{ src: "/shared/maskot-4.webp" }}
       />
       <div className={cn("mx-auto w-full space-y-6 px-4 py-12", found ? "max-w-2xl" : "max-w-xl")}>{children}</div>
     </>

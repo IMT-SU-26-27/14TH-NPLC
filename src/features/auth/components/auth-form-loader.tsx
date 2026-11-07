@@ -13,12 +13,6 @@ export async function AuthFormLoader({ mode, lang, searchParams }: AuthFormLoade
 
   return (
     <div className="space-y-4">
-      {error === "confirm" && (
-        <Alert variant="destructive">
-          <OctagonXIcon />
-          <AlertDescription>{t("auth.confirmLinkInvalid")}</AlertDescription>
-        </Alert>
-      )}
       {error === "recovery" && (
         <Alert variant="destructive">
           <OctagonXIcon />

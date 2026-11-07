@@ -183,16 +183,6 @@ export type RegistrationRealtimeProps = {
   registrationIds: string[];
 };
 
-export type RegisterBannerProps = {
-  index: string;
-  label: string;
-  title: string;
-  lead: string;
-  // A 446x446 mascot in public/, shown on the right from lg up. The page positions it
-  // through className (a class from its features/registration/styles/*.css file).
-  mascot?: { src: string; className: string };
-};
-
 export type RegisterSummaryProps = {
   competition: PublicCompetition;
   lang: Locale;
