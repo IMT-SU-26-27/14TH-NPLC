@@ -181,13 +181,6 @@ export type RegistrationRealtimeProps = {
   registrationIds: string[];
 };
 
-export type RegisterBannerProps = {
-  index: string;
-  label: string;
-  title: string;
-  lead: string;
-};
-
 export type RegisterSummaryProps = {
   competition: PublicCompetition;
   lang: Locale;
