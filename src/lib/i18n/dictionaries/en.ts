@@ -1175,6 +1175,9 @@ export const en: Dictionary = {
   system: {
     notFoundTitle: "Page not found",
     notFoundDescription: "This address is wrong or the page has moved. Check the link, or go back to the home page.",
+    notFoundLabel: "Not found",
+    notFoundLead: "Signal lost along the way.",
+    notFoundCode: "Error // 404",
     backHome: "Go to home",
     errorTitle: "Something went wrong",
     errorDescription: "This page failed to load. Try again; if it keeps failing, contact the committee and include the code below.",
