@@ -9,8 +9,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
+
+const labelClass = "text-primary font-mono text-xs font-medium tracking-[0.2em] uppercase";
+const requiredMark = (
+  <span aria-hidden className="text-destructive">
+    *
+  </span>
+);
 
 export function ChangePasswordForm() {
   const [state, action, pending] = useActionState(changePassword, initialFormState);
@@ -33,34 +40,40 @@ export function ChangePasswordForm() {
         <CardContent className="px-5 sm:px-10">
           <FieldGroup>
             <Field data-invalid={!!errors.currentPassword}>
-              <FieldLabel htmlFor="currentPassword" className="text-primary font-mono text-xs tracking-[0.12em] uppercase">
-                {t("profile.currentPassword")} <span aria-hidden className="text-destructive">*</span>
+              <FieldLabel htmlFor="currentPassword" className={labelClass}>
+                {t("profile.currentPassword")} {requiredMark}
               </FieldLabel>
-              <div className="relative">
-                <LockIcon aria-hidden className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2" />
-                <Input id="currentPassword" name="currentPassword" type="password" autoComplete="current-password" aria-invalid={!!errors.currentPassword} required className="h-12 rounded-[8px] pl-10" />
-              </div>
+              <InputGroup className="h-12">
+                <InputGroupAddon>
+                  <LockIcon />
+                </InputGroupAddon>
+                <InputGroupInput id="currentPassword" name="currentPassword" type="password" autoComplete="current-password" aria-invalid={!!errors.currentPassword} required />
+              </InputGroup>
               <FieldError errors={fieldErrors(errors.currentPassword)} />
             </Field>
             <Field data-invalid={!!errors.password}>
-              <FieldLabel htmlFor="password" className="text-primary font-mono text-xs tracking-[0.12em] uppercase">
-                {t("auth.newPassword")} <span aria-hidden className="text-destructive">*</span>
+              <FieldLabel htmlFor="password" className={labelClass}>
+                {t("auth.newPassword")} {requiredMark}
               </FieldLabel>
-              <div className="relative">
-                <LockIcon aria-hidden className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2" />
-                <Input id="password" name="password" type="password" autoComplete="new-password" aria-invalid={!!errors.password} required className="h-12 rounded-[8px] pl-10" />
-              </div>
+              <InputGroup className="h-12">
+                <InputGroupAddon>
+                  <LockIcon />
+                </InputGroupAddon>
+                <InputGroupInput id="password" name="password" type="password" autoComplete="new-password" aria-invalid={!!errors.password} required />
+              </InputGroup>
               <FieldDescription>{t("auth.passwordHint")}</FieldDescription>
               <FieldError errors={fieldErrors(errors.password)} />
             </Field>
             <Field data-invalid={!!errors.confirmPassword}>
-              <FieldLabel htmlFor="confirmPassword" className="text-primary font-mono text-xs tracking-[0.12em] uppercase">
-                {t("auth.confirmPassword")} <span aria-hidden className="text-destructive">*</span>
+              <FieldLabel htmlFor="confirmPassword" className={labelClass}>
+                {t("auth.confirmPassword")} {requiredMark}
               </FieldLabel>
-              <div className="relative">
-                <LockIcon aria-hidden className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2" />
-                <Input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" aria-invalid={!!errors.confirmPassword} required className="h-12 rounded-[8px] pl-10" />
-              </div>
+              <InputGroup className="h-12">
+                <InputGroupAddon>
+                  <LockIcon />
+                </InputGroupAddon>
+                <InputGroupInput id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" aria-invalid={!!errors.confirmPassword} required />
+              </InputGroup>
               <FieldError errors={fieldErrors(errors.confirmPassword)} />
             </Field>
             {state.status === "error" && state.message && (
@@ -77,7 +90,7 @@ export function ChangePasswordForm() {
             )}
           </FieldGroup>
         </CardContent>
-        <CardFooter className="flex-wrap items-center justify-between gap-3 px-5 sm:px-10">
+        <CardFooter className="flex-col items-start gap-3 border-t-0 bg-transparent px-5 pt-0 pb-6 sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:pb-9">
           <p className="text-muted-foreground text-[0.8125rem]">{t("profile.passwordNoDraft")}</p>
           <Button type="submit" size="lg" className="rounded-[8px] px-4" disabled={pending}>
             {pending && <Spinner />}
