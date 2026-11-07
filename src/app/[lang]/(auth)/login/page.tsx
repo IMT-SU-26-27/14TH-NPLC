@@ -25,7 +25,7 @@ export default async function LoginPage({ params, searchParams }: AuthPageProps)
         </CardHeader>
         <CardContent>
           <Suspense fallback={<Skeleton className="h-72 w-full" />}>
-            <AuthFormLoader mode="login" lang={lang} searchParams={searchParams} />
+            <AuthFormLoader mode="login" searchParams={searchParams} />
           </Suspense>
         </CardContent>
       </Card>

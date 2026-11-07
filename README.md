@@ -80,10 +80,19 @@ pnpm db:types
 
 ## 4. Configure Supabase Auth
 
-- **Email confirmation** must be on, and SMTP must be configured so confirmation emails are delivered (self-hosted: the `SMTP_*` settings in Supabase's `.env`).
-- **Site URL / redirect URLs:** add your app URL (e.g. `http://localhost:3000`) and `http://localhost:3000/auth/confirm` to the allowed redirect URLs.
-- **Password reset:** `/forgot-password` sends Supabase's *Reset Password* email, whose link goes through `/auth/confirm` to `/reset-password`. With the default template the link only works in the browser that asked for it (PKCE). To make it work on any device, set the template's link to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`.
-- **Google sign-in (optional, later):** enable the Google provider (self-hosted: `GOTRUE_EXTERNAL_GOOGLE_*`). Accounts with the same verified email are linked automatically.
+The site sends no email, so SMTP is not needed.
+
+- **Confirm email: off** (self-hosted: `ENABLE_EMAIL_AUTOCONFIRM=true` in Supabase's `.env`). After sign-up the user is signed in straight away and lands on the dashboard (or back on the join link they came from).
+- **Forgot password:** handled by hand, no email. `/forgot-password` tells the user to message the committee's contact person on LINE; set their name and LINE ID in [`src/lib/password-reset-contact.ts`](src/lib/password-reset-contact.ts). The committee sets a temporary password in the SQL editor (Studio's *Send password recovery* sends an email, so don't use it):
+
+  ```sql
+  update auth.users
+  set encrypted_password = extensions.crypt('<temporary password>', extensions.gen_salt('bf')), updated_at = now()
+  where email = '<user email>';
+  ```
+
+  The user signs in with it and changes it on their Profile page.
+- **Accounts made while confirmation was on:** they can't sign in until confirmed. Confirm them in the SQL editor: `update auth.users set email_confirmed_at = now() where email_confirmed_at is null;`.
 
 ## 5. Run it
 
@@ -107,7 +116,7 @@ pnpm lint
 
 ## 6. Create the first admin
 
-1. Sign up on the site and confirm your email.
+1. Sign up on the site.
 2. In the Supabase SQL editor run:
 
    ```sql
@@ -147,7 +156,6 @@ Verdicts, languages and scoring are documented in [`docs/judge0-errors.md`](docs
 ```
 src/
   app/[lang]/          routes (id / en); pages are thin Server Components
-  app/auth/confirm/    email confirmation callback
   features/<feature>/  feature components (auth, registration, dashboard, admin, cp, content, landing, competitions)
   components/ui/       shadcn/ui components (generated, don't edit)
   components/shared/   header, footer, menus, markdown, i18n provider
@@ -166,7 +174,7 @@ More detail: [`docs/database.md`](docs/database.md) (tables, flows, security), [
 
 | Problem | Fix |
 |---|---|
-| Sign-up says to check email but nothing arrives | Configure SMTP in Supabase Auth. |
+| Sign-up or sign-in says the account isn't active yet | "Confirm email" is still on in Supabase Auth. Turn it off and confirm existing accounts (see [step 4](#4-configure-supabase-auth)). |
 | "Permission denied for table …" | A migration wasn't applied, or a table is missing grants. Re-run the migrations in order. |
 | Register button stays disabled | The competition has no payment method set up. Set QRIS or BCA in Admin → Registrations → Payment. |
 | Waiting room doesn't move into the contest | Check that Realtime is running and the migrations (which add `cp_sessions`, `cp_scores` and `registration_events` to the `supabase_realtime` publication) were applied. |

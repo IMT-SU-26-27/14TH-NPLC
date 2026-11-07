@@ -149,7 +149,7 @@ Submissions can't be written from the browser at all. The server judges the code
 
 Every team member signs in before creating or joining a team, so each member row belongs to a real account and the email comes from that account. Participants can only create teams through `create_registration()` and join through `join_team()`; direct inserts are blocked.
 
-Supabase links a Google sign-in to an existing email/password account with the same verified email automatically. This needs email confirmation turned on in your self-hosted Auth settings.
+"Confirm email" is off and the site sends no email. A forgotten password is reset by hand by the committee's contact person; see README step 4.
 
 ## Scoring
 
