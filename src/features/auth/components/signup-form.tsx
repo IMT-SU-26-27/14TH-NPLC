@@ -2,12 +2,12 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { MailCheckIcon, OctagonXIcon } from "lucide-react";
+import { OctagonXIcon } from "lucide-react";
 import { signUp } from "@/lib/actions/auth";
 import { initialFormState } from "@/lib/form";
 import { useFormDraft } from "@/hooks/use-form-draft";
 import { useI18n } from "@/hooks/use-i18n";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -22,20 +22,6 @@ export function SignupForm({ next }: AuthFormProps) {
   const [state, action, pending] = useActionState(clearOnSuccess(signUp), initialFormState);
   const { t, href, fieldErrors } = useI18n();
   const errors = state.fieldErrors ?? {};
-
-  if (state.status === "success") {
-    return (
-      <Alert>
-        <MailCheckIcon />
-        <AlertTitle>{t("auth.checkEmailTitle")}</AlertTitle>
-        <AlertDescription>
-          <p>
-            {t("auth.checkEmail", state.params)} <Link href={href("/login")}>{t("auth.signInAfter")}</Link>.
-          </p>
-        </AlertDescription>
-      </Alert>
-    );
-  }
 
   return (
     <form ref={formRef} action={action}>
