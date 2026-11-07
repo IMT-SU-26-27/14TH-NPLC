@@ -70,6 +70,8 @@ export type RegisterTeamFormProps = {
   competition: PublicCompetition;
   user: CurrentUser;
   qrisUrl: string | null;
+  // What the team pays now, from currentFee().
+  fee: number;
 };
 
 export type RegisterPageProps = {
@@ -109,6 +111,8 @@ export type TwibbonProofFieldProps = {
 
 export type JoinCodeFormProps = {
   defaultCode?: string;
+  // False under a team preview, where joining is the main action and searching again is secondary.
+  primary?: boolean;
 };
 
 export type DashboardPageProps = {
@@ -177,4 +181,36 @@ export type DeleteTeamButtonProps = {
 
 export type RegistrationRealtimeProps = {
   registrationIds: string[];
+};
+
+export type RegisterBannerProps = {
+  index: string;
+  label: string;
+  title: string;
+  lead: string;
+  // A 446x446 mascot in public/, shown on the right from lg up. The page positions it
+  // through className (a class from its features/registration/styles/*.css file).
+  mascot?: { src: string; className: string };
+};
+
+export type RegisterSummaryProps = {
+  competition: PublicCompetition;
+  lang: Locale;
+  // What the team pays now, from currentFee().
+  fee: number;
+};
+
+export type FilePickerProps = {
+  id: string;
+  accept: string;
+  disabled: boolean;
+  invalid: boolean;
+  onFileChange: (file: File | null) => void;
+};
+
+export type FormStepHeadingProps = {
+  id: string;
+  step: number;
+  title: string;
+  description?: string;
 };
