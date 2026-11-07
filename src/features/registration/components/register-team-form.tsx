@@ -49,7 +49,7 @@ const requiredMark = (
 );
 
 // Registering = creating the team AND paying: the proof is uploaded first, then the team is created with it.
-export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFormProps) {
+export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTeamFormProps) {
   const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: `register-team-${competition.slug}`, userId: user.id });
   const [state, action, pending] = useActionState(clearOnSuccess(createRegistration), initialFormState);
   const { t, fieldErrors } = useI18n();
@@ -219,6 +219,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
         <FormStepHeading id="step-payment" step={3} title={t("register.stepPayment")} description={t("register.paymentStepLead")} />
         <PaymentInstructions
           details={competition}
+          fee={fee}
           qrisUrl={qrisUrl}
           transferNote={`${teamName.trim() || t("register.teamName")} - ${competition.name}`}
         />

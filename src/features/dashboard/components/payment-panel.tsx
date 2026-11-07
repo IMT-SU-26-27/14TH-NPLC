@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { InfoIcon, OctagonXIcon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 import { getPaymentUploadSignature, submitPayment } from "@/lib/actions/registration";
+import { currentFee } from "@/lib/pricing";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -51,7 +52,8 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
 
   return (
     <div className="grid gap-6 md:grid-cols-[minmax(0,16rem)_1fr]">
-      <PaymentInstructions details={team.competition} qrisUrl={qrisUrl} />
+      {/* The price when the team registered, so a team that signed up in the early bird keeps it. */}
+      <PaymentInstructions details={team.competition} fee={currentFee(team.competition.fee, new Date(team.created_at))} qrisUrl={qrisUrl} />
 
       <form onSubmit={handleSubmit}>
         <FieldGroup>

@@ -120,10 +120,16 @@ export const en: Dictionary = {
   competition: {
     members: "Members",
     fee: "Fee",
+    normalPrice: "Normal price",
+    earlyPrice: "Early bird price",
     leaderOnly: "Leader only",
     leaderPlus: "Leader + {range} members",
     type: {
       competitive_programming: "Competitive programming",
+      logic: "Logic",
+    },
+    category: {
+      competitive_programming: "Programming",
       logic: "Logic",
     },
     open: "Open",

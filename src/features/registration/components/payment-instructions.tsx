@@ -2,19 +2,19 @@
 
 import Image from "next/image";
 import { CheckIcon, CopyIcon, InfoIcon } from "lucide-react";
-import { formatRupiah } from "@/lib/format";
 import { isPaymentReady } from "@/lib/payment";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FeeAmount } from "@/components/shared/fee-amount";
 import type { PaymentInstructionsProps } from "@/types/competition";
 
 const rowLabel = "text-muted-foreground font-mono text-xs tracking-[0.15em] uppercase";
 
 // Where to pay: the competition's QRIS image, or its bank account. The amount is shown either way.
-export function PaymentInstructions({ details, qrisUrl, transferNote }: PaymentInstructionsProps) {
+export function PaymentInstructions({ details, fee, qrisUrl, transferNote }: PaymentInstructionsProps) {
   const { t, lang } = useI18n();
   const account = useCopyToClipboard();
   const note = useCopyToClipboard();
@@ -25,7 +25,15 @@ export function PaymentInstructions({ details, qrisUrl, transferNote }: PaymentI
   const amount = (
     <div className="bg-card space-y-0.5 rounded-b-lg px-4 py-3">
       <dt className={rowLabel}>{t("payment.amount")}</dt>
-      <dd className="font-heading text-2xl font-bold">{formatRupiah(details.fee, lang)}</dd>
+      <dd>
+        <FeeAmount
+          fee={fee}
+          normalFee={details.fee}
+          lang={lang}
+          labels={{ normal: t("competition.normalPrice"), early: t("competition.earlyPrice") }}
+          className="font-heading text-2xl font-bold"
+        />
+      </dd>
     </div>
   );
 

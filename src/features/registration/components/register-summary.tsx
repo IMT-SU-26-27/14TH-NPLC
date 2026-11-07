@@ -1,12 +1,13 @@
 import { CodeXmlIcon, NetworkIcon } from "lucide-react";
-import { formatDateTime, formatRupiah, formatTeamSize } from "@/lib/format";
+import { formatDateTime, formatTeamSize } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { FeeAmount } from "@/components/shared/fee-amount";
 import type { RegisterSummaryProps } from "@/types/registration";
 
 // "// Ringkasan" card beside the form: what this competition costs and its rules in three lines.
-export function RegisterSummary({ competition, lang }: RegisterSummaryProps) {
+export function RegisterSummary({ competition, lang, fee }: RegisterSummaryProps) {
   const t = getT(lang);
   const Icon = competition.type === "competitive_programming" ? CodeXmlIcon : NetworkIcon;
   const size = formatTeamSize(competition.min_members, competition.max_members, lang);
@@ -38,7 +39,15 @@ export function RegisterSummary({ competition, lang }: RegisterSummaryProps) {
       <CardContent className="space-y-4">
         <div>
           <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{t("competition.fee")}</p>
-          <p className="font-heading text-3xl font-bold">{formatRupiah(competition.fee, lang)}</p>
+          <p>
+            <FeeAmount
+              fee={fee}
+              normalFee={competition.fee}
+              lang={lang}
+              labels={{ normal: t("competition.normalPrice"), early: t("competition.earlyPrice") }}
+              className="font-heading text-3xl font-bold"
+            />
+          </p>
         </div>
         <ul className="space-y-2 border-t pt-4 text-sm">
           {notes.map((note) => (

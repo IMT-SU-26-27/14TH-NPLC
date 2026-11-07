@@ -27,8 +27,19 @@ export type PaymentMethod = Competition["payment_method"];
 
 export type PaymentDetails = Pick<Competition, "name" | "fee" | "payment_method" | "bank_account_number" | "bank_account_holder">;
 
+export type FeeAmountProps = {
+  // What the team pays now, from currentFee().
+  fee: number;
+  normalFee: number;
+  lang: Locale;
+  labels: { normal: string; early: string };
+  className?: string;
+};
+
 export type PaymentInstructionsProps = {
   details: PaymentDetails;
+  // What the team pays now, from currentFee(). details.fee is the normal price.
+  fee: number;
   qrisUrl: string | null;
   // "Team Name - Competition", shown with a copy button while registering.
   transferNote?: string;

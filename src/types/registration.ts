@@ -70,6 +70,8 @@ export type RegisterTeamFormProps = {
   competition: PublicCompetition;
   user: CurrentUser;
   qrisUrl: string | null;
+  // What the team pays now, from currentFee().
+  fee: number;
 };
 
 export type RegisterPageProps = {
@@ -189,6 +191,8 @@ export type RegisterBannerProps = {
 export type RegisterSummaryProps = {
   competition: PublicCompetition;
   lang: Locale;
+  // What the team pays now, from currentFee().
+  fee: number;
 };
 
 export type FilePickerProps = {

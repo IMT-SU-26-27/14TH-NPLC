@@ -119,10 +119,16 @@ export const id = {
   competition: {
     members: "Anggota",
     fee: "Biaya",
+    normalPrice: "Harga normal",
+    earlyPrice: "Harga early bird",
     leaderOnly: "Ketua saja",
     leaderPlus: "Ketua + {range} anggota",
     type: {
       competitive_programming: "Competitive programming",
+      logic: "Logika",
+    },
+    category: {
+      competitive_programming: "Pemrograman",
       logic: "Logika",
     },
     open: "Dibuka",

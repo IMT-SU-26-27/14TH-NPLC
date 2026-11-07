@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/data/auth";
 import { getActiveCompetitionBySlug, isRegistrationOpen } from "@/lib/data/competitions";
 import { hasRegistration } from "@/lib/data/registrations";
 import { formatRupiah, formatTeamSize } from "@/lib/format";
+import { currentFee } from "@/lib/pricing";
 import { localePath } from "@/lib/i18n/config";
 import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -47,6 +48,7 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
   }
 
   const size = formatTeamSize(competition.min_members, competition.max_members, lang);
+  const fee = currentFee(competition.fee);
 
   return (
     <>
@@ -54,7 +56,7 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
         index="09"
         label={t("register.formLabel")}
         title={t("register.title", { competition: competition.name })}
-        lead={`${size} · ${formatRupiah(competition.fee, lang)}`}
+        lead={`${size} · ${formatRupiah(fee, lang)}`}
       />
       <div className="mx-auto grid w-full max-w-6xl items-start gap-8 px-4 py-12 lg:grid-cols-[11rem_minmax(0,1fr)_17rem]">
         <RegisterSteps />
@@ -63,12 +65,13 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
             <RegisterTeamForm
               competition={competition}
               user={user}
+              fee={fee}
               qrisUrl={competition.qris_public_id ? publicImageUrl(competition.qris_public_id) : null}
             />
           </CardContent>
         </Card>
         <div className="max-lg:hidden lg:sticky lg:top-20">
-          <RegisterSummary competition={competition} lang={lang} />
+          <RegisterSummary competition={competition} lang={lang} fee={fee} />
         </div>
       </div>
     </>
