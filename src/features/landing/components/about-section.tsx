@@ -12,7 +12,7 @@ import { GridBackdrop } from "@/features/landing/components/grid-backdrop";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import type { LangProps } from "@/types/i18n";
 
-const darkCard = "bg-background/5 text-background ring-background/15 relative rounded-[12px]";
+const darkCard = "bg-band-card text-band-foreground ring-band-line relative rounded-[12px]";
 
 // "01 // Tentang": the admin's About text (Admin > Content) with the built-in summary as fallback.
 export async function AboutSection({ lang }: LangProps) {
@@ -38,7 +38,7 @@ export async function AboutSection({ lang }: LangProps) {
   return (
     <section
       id="about"
-      className="bg-foreground relative isolate scroll-mt-14 py-24 [clip-path:polygon(0_3rem,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:py-32"
+      className="bg-band relative isolate scroll-mt-14 py-24 [clip-path:polygon(0_3rem,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:py-32"
     >
       <GridBackdrop />
       <div className="mx-auto max-w-6xl space-y-10 px-4">
@@ -49,20 +49,20 @@ export async function AboutSection({ lang }: LangProps) {
             <CardContent className="space-y-4 px-6">
               <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{`// ${t("landing.about.summary")}`}</p>
               {paragraphs.map((paragraph) => (
-                <p key={paragraph} className="text-background/90 text-base leading-relaxed text-pretty sm:text-lg">
+                <p key={paragraph} className="text-band-foreground/90 text-base leading-relaxed text-pretty sm:text-lg">
                   {paragraph}
                 </p>
               ))}
             </CardContent>
             <CardContent className="mt-auto grid gap-x-6 px-6 sm:grid-cols-2">
               {facts.map((fact) => (
-                <div key={fact.label} className="border-background/15 flex items-center gap-3 border-t py-4">
+                <div key={fact.label} className="border-band-line flex items-center gap-3 border-t py-4">
                   <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-full", fact.tint)}>
                     <fact.icon aria-hidden className="size-4" />
                   </span>
                   <div>
                     <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{fact.label}</p>
-                    <p className="text-background text-sm font-medium">{fact.value}</p>
+                    <p className="text-band-foreground text-sm font-medium">{fact.value}</p>
                   </div>
                 </div>
               ))}
@@ -73,8 +73,8 @@ export async function AboutSection({ lang }: LangProps) {
             <Card className={darkCard}>
               <CardHeader className="px-6">
                 <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{`A // ${t("landing.about.guidebookLabel")}`}</p>
-                <CardTitle className="text-background text-2xl font-bold">{t("landing.about.guidebookTitle")}</CardTitle>
-                <CardDescription className="text-background/70">{t("landing.about.guidebookBody")}</CardDescription>
+                <CardTitle className="text-band-foreground text-2xl font-bold">{t("landing.about.guidebookTitle")}</CardTitle>
+                <CardDescription className="text-band-muted">{t("landing.about.guidebookBody")}</CardDescription>
                 <BookOpenIcon aria-hidden className="text-brand-sky absolute top-5 right-5 size-6" />
               </CardHeader>
               <CardContent className="px-6">
@@ -89,7 +89,7 @@ export async function AboutSection({ lang }: LangProps) {
                     <ArrowRightIcon />
                   </a>
                 ) : (
-                  <p className="text-background/75 font-mono text-xs tracking-[0.15em] uppercase">{t("landing.about.guidebookSoon")}</p>
+                  <p className="text-band-muted font-mono text-xs tracking-[0.15em] uppercase">{t("landing.about.guidebookSoon")}</p>
                 )}
               </CardContent>
             </Card>
@@ -97,8 +97,8 @@ export async function AboutSection({ lang }: LangProps) {
             <Card className={darkCard}>
               <CardHeader className="px-6">
                 <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{`B // ${t("landing.about.registerLabel")}`}</p>
-                <CardTitle className="text-background text-2xl font-bold">{t("landing.about.registerTitle")}</CardTitle>
-                <CardDescription className="text-background/70">{t("landing.about.registerBody")}</CardDescription>
+                <CardTitle className="text-band-foreground text-2xl font-bold">{t("landing.about.registerTitle")}</CardTitle>
+                <CardDescription className="text-band-muted">{t("landing.about.registerBody")}</CardDescription>
                 <UserPlusIcon aria-hidden className="text-brand-sky absolute top-5 right-5 size-6" />
               </CardHeader>
               <CardContent className="px-6">

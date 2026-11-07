@@ -40,6 +40,10 @@
   --color-band: var(--band);
   --color-band-foreground: var(--band-foreground);
   --color-band-muted: var(--band-muted);
+  --color-band-card: var(--band-card);
+  --color-band-line: var(--band-line);
+  --color-band-raised: var(--band-raised);
+  --shadow-band-glow-lime: var(--band-glow-lime);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -114,13 +118,20 @@
   --hero-fade-v: linear-gradient(180deg, rgba(244, 247, 253, 0) 0px, rgba(244, 247, 253, 0) 230px, rgba(244, 247, 253, 0.94) 360px, rgba(244, 247, 253, 0.94) 100%);
   --hero-fade-bottom: linear-gradient(180deg, rgba(244, 247, 253, 0) calc(100% - 160px), rgba(244, 247, 253, 1) 100%);
   --tagline-gradient: linear-gradient(90deg, var(--primary) 0%, var(--brand-purple) 100%);
-  /* Dark page-header band (PageBand): deep navy with a faint grid. */
-  --band: #0F1B33;
+  /* Every navy band (PageBand, Home "Tentang" and "Timeline"): the design's navy with its 48px grid. */
+  --band: #0E1A30;
   --band-foreground: #FFFFFF;
   --band-muted: #C3CEE3;
+  /* Cards on a band (the design's hframe in scene-navy): translucent navy-2, 1px sky line, 12px radius. */
+  --band-card: rgba(29, 52, 81, 0.62);
+  --band-line: rgba(120, 217, 255, 0.42);
+  /* Solid navy-2 for small raised marks on a band, e.g. the timeline step numbers. */
+  --band-raised: #1D3451;
+  /* The active timeline card and step (hframe-lime): lime halo around a 2px lime ring. */
+  --band-glow-lime: 0 0 0 4px rgba(216, 249, 57, 0.22), 0 0 24px rgba(216, 249, 57, 0.6);
   --band-grid:
-    linear-gradient(rgba(120, 217, 255, 0.07) 1px, transparent 1px) 0 0 / 66px 66px,
-    linear-gradient(90deg, rgba(120, 217, 255, 0.07) 1px, transparent 1px) 0 0 / 66px 66px;
+    linear-gradient(rgba(120, 217, 255, 0.08) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, rgba(120, 217, 255, 0.08) 1px, transparent 1px) 0 0 / 48px 48px;
 }
 
 .dark {

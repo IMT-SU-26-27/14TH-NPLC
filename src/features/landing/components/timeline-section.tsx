@@ -29,7 +29,7 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
   return (
     <section
       id="timeline"
-      className="bg-foreground relative isolate scroll-mt-14 py-24 [clip-path:polygon(0_3rem,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:py-32"
+      className="bg-band relative isolate scroll-mt-14 py-24 [clip-path:polygon(0_3rem,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:py-32"
     >
       <GridBackdrop />
       <div className="mx-auto max-w-6xl space-y-10 px-4">
@@ -42,7 +42,7 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
         />
 
         {events.length === 0 ? (
-          <Empty className="border-background/15 text-background border">
+          <Empty className="border-band-line text-band-foreground border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <CalendarIcon />
@@ -64,7 +64,7 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
                   <span
                     className={cn(
                       "relative flex size-8 items-center justify-center rounded-full border font-mono text-xs",
-                      active ? "bg-highlight text-highlight-foreground border-highlight" : "border-brand-sky text-brand-sky",
+                      active ? "bg-highlight text-highlight-foreground border-highlight shadow-band-glow-lime" : "bg-band-raised border-brand-sky text-brand-sky",
                     )}
                   >
                     {n}
@@ -72,22 +72,22 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
                   <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{t("landing.timeline.phase", { n })}</p>
                   <Card
                     className={cn(
-                      "bg-background/5 text-background rounded-[12px]",
-                      active ? "ring-highlight shadow-[0_0_24px_color-mix(in_oklch,var(--highlight)_45%,transparent)] ring-2" : "ring-brand-sky/30",
+                      "bg-band-card text-band-foreground rounded-[12px]",
+                      active ? "ring-highlight shadow-band-glow-lime ring-2" : "ring-band-line",
                     )}
                   >
                     <CardHeader className="gap-1.5">
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-brand-sky font-mono text-xs tracking-wider">{formatDateRange(event.starts_on, event.ends_on, lang)}</p>
                         {active && (
-                          <Badge variant="outline" className="border-background/30 text-background font-mono text-xs tracking-[0.15em] uppercase">
+                          <Badge variant="outline" className="border-band-line bg-band-card text-band-foreground font-mono text-xs tracking-[0.15em] uppercase">
                             <span aria-hidden className="bg-highlight size-1.5 rounded-full" />
                             {t("landing.timeline.active")}
                           </Badge>
                         )}
                       </div>
-                      <CardTitle className="text-background text-lg font-bold">{lang === "id" ? event.title_id : event.title_en}</CardTitle>
-                      {description && <CardDescription className="text-background/70">{description}</CardDescription>}
+                      <CardTitle className="text-band-foreground text-lg font-bold">{lang === "id" ? event.title_id : event.title_en}</CardTitle>
+                      {description && <CardDescription className="text-band-muted">{description}</CardDescription>}
                     </CardHeader>
                   </Card>
                 </li>
