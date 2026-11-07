@@ -19,7 +19,7 @@ export default async function SignupPage({ params, searchParams }: AuthPageProps
 
   return (
     <main className="flex-1">
-      <AuthHero step="03" title={t("auth.signupTitle")} subtitle={t("auth.signupSubtitle")} mascot="/auth/maskot-1.webp" />
+      <AuthHero step="03" eyebrow={t("auth.signupTitle")} title={t("auth.signupTitle")} subtitle={t("auth.signupSubtitle")} mascot="/auth/maskot-1.webp" />
       <div className="flex justify-center px-4 pt-6 pb-16 sm:pt-10 sm:pb-24">
         <Card className="w-full max-w-xl px-2 py-8 sm:px-8 sm:py-10">
           <CardHeader>
