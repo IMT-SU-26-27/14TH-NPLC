@@ -20,10 +20,11 @@ export async function SiteFooter({ lang }: LangProps) {
 
   return (
     <footer className="bg-background mt-auto border-t">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-[1.2fr_1fr_auto] md:gap-12">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-[minmax(0,21rem)_auto_auto] md:justify-between md:gap-12">
         <div className="space-y-3">
-          <Link href={localePath(lang, "/")} className="inline-block">
-            <Image src="/shared/logo-nplc-xiv.webp" alt={t("meta.siteName")} width={138} height={28} />
+          <Link href={localePath(lang, "/")} className="inline-flex items-center gap-2">
+            <Image src="/shared/logo-star.webp" alt="" width={21} height={26} />
+            <Image src="/shared/logo-nplc-xiv.webp" alt={t("meta.siteName")} width={128} height={26} className="h-[26px] w-auto" />
           </Link>
           <p className="text-muted-foreground max-w-sm text-sm">{t("footer.tagline")}</p>
         </div>
@@ -55,9 +56,11 @@ export async function SiteFooter({ lang }: LangProps) {
         </div>
       </div>
       <Separator />
-      <p className="text-muted-foreground mx-auto max-w-6xl px-4 py-6 font-mono text-xs tracking-[0.2em] uppercase">
-        {t("footer.rights", { year: new Date().getFullYear() })}
-      </p>
+      <div className="mx-auto flex max-w-6xl items-center gap-8 px-4 py-5">
+        <p className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">{t("footer.rights", { year: new Date().getFullYear() })}</p>
+        <Separator className="flex-1 max-sm:hidden" />
+        <Image src="/shared/hud-barcode.webp" alt="" width={80} height={12} className="ml-auto opacity-60 sm:ml-0" />
+      </div>
     </footer>
   );
 }
