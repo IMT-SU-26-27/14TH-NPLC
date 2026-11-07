@@ -93,11 +93,11 @@ export function Hero({ status }: HeroProps) {
           )}
         </div>
 
-        <div aria-hidden className="relative hidden min-h-80 sm:block lg:min-h-105">
+        <div aria-hidden className="relative order-first min-h-48 sm:min-h-80 lg:order-none lg:min-h-105">
           <p className="text-muted-foreground absolute top-0 right-0 max-w-28 text-right font-mono text-xs tracking-[0.2em] uppercase">
             {t("landing.hero.host")}
           </p>
-          <div className="text-primary/25 absolute inset-x-0 top-1/3 space-y-3 overflow-hidden font-mono text-xs whitespace-nowrap">
+          <div className="text-primary/25 absolute inset-x-0 top-1/3 space-y-3 overflow-hidden font-mono text-xs whitespace-nowrap max-sm:hidden">
             <p>{BINARY_TOP}</p>
             <p>{CODE_LINE}</p>
             <p>{BINARY_BOTTOM}</p>
@@ -107,8 +107,8 @@ export function Hero({ status }: HeroProps) {
             alt=""
             width={587}
             height={577}
-            sizes="(min-width: 1024px) 420px, 320px"
-            className="relative mx-auto mt-10 w-72 drop-shadow-xl lg:w-96"
+            sizes="(min-width: 1024px) 384px, (min-width: 640px) 288px, 176px"
+            className="relative mx-auto mt-6 w-44 drop-shadow-xl sm:mt-10 sm:w-72 lg:w-96"
           />
         </div>
       </div>

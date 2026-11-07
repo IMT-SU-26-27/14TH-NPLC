@@ -22,7 +22,6 @@ export async function SiteFooter({ lang }: LangProps) {
     { href: `${home}#competitions`, label: t("nav.competitions") },
     { href: `${home}#timeline`, label: t("nav.timeline") },
     { href: `${home}#faq`, label: t("nav.faq") },
-    { href: localePath(lang, "/join"), label: t("nav.joinTeam") },
     { href: localePath(lang, "/dashboard"), label: t("nav.dashboard") },
   ];
   const { name, whatsapp } = COMMITTEE_CONTACT;
@@ -46,9 +45,9 @@ export async function SiteFooter({ lang }: LangProps) {
             ))}
           </div>
         </nav>
-        {whatsapp && (
-          <div className="space-y-2">
-            <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{`// ${t("footer.contact")}`}</p>
+        <div className="space-y-2">
+          <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{`// ${t("footer.contact")}`}</p>
+          {whatsapp ? (
             <a
               href={whatsappUrl(whatsapp)}
               target="_blank"
@@ -58,11 +57,13 @@ export async function SiteFooter({ lang }: LangProps) {
               <MessageCircleIcon data-icon="inline-start" />
               {[t("footer.whatsapp"), name, `+${whatsapp}`].filter(Boolean).join(" · ")}
             </a>
-          </div>
-        )}
+          ) : (
+            <p className="text-muted-foreground text-sm">{t("landing.contact.soon")}</p>
+          )}
+        </div>
       </div>
       <Separator />
-      <p className="text-muted-foreground mx-auto max-w-6xl px-4 py-6 text-xs">
+      <p className="text-muted-foreground mx-auto max-w-6xl px-4 py-6 font-mono text-xs tracking-[0.2em] uppercase">
         {t("footer.rights", { year: new Date().getFullYear() })}
       </p>
     </footer>

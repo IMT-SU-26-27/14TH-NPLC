@@ -11,7 +11,7 @@ export function FaqSection({ lang }: LangProps) {
   const t = getT(lang);
 
   return (
-    <section id="faq" className="bg-secondary scroll-mt-14 py-20 sm:py-28">
+    <section id="faq" className="bg-brand-purple/10 scroll-mt-14 pt-28 pb-20 [clip-path:polygon(0_3rem,100%_0,100%_100%,0_100%)] sm:pt-36 sm:pb-28">
       <div className="mx-auto max-w-6xl space-y-10 px-4">
         <SectionHeading index="06" label={t("landing.faq.label")} title={t("landing.faq.title")} />
         <div className="space-y-3">
