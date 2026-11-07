@@ -5,16 +5,21 @@ import Link from "next/link";
 import { MailCheckIcon, OctagonXIcon } from "lucide-react";
 import { signUp } from "@/lib/actions/auth";
 import { initialFormState } from "@/lib/form";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { FormDraftBanner } from "@/components/shared/form-draft-banner";
+import { FormDraftStatus } from "@/components/shared/form-draft-status";
 import type { AuthFormProps } from "@/types/auth";
 
 export function SignupForm({ next }: AuthFormProps) {
-  const [state, action, pending] = useActionState(signUp, initialFormState);
+  // No account yet, so the draft belongs to this device. Passwords are never saved.
+  const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: "signup", userId: "guest" });
+  const [state, action, pending] = useActionState(clearOnSuccess(signUp), initialFormState);
   const { t, href, fieldErrors } = useI18n();
   const errors = state.fieldErrors ?? {};
 
@@ -33,9 +38,10 @@ export function SignupForm({ next }: AuthFormProps) {
   }
 
   return (
-    <form action={action}>
+    <form ref={formRef} action={action}>
       <input type="hidden" name="next" value={next ?? "/dashboard"} />
       <FieldGroup>
+        {draftRestored && <FormDraftBanner onDiscard={discardDraft} />}
         <Field data-invalid={!!errors.fullName}>
           <FieldLabel htmlFor="fullName">{t("common.fullName")}</FieldLabel>
           <Input id="fullName" name="fullName" autoComplete="name" aria-invalid={!!errors.fullName} required />
@@ -68,6 +74,7 @@ export function SignupForm({ next }: AuthFormProps) {
             {pending && <Spinner />}
             {t("auth.createAccount")}
           </Button>
+          <FormDraftStatus savedAt={draftSavedAt} className="justify-center" />
           <FieldDescription className="text-center">
             {t("auth.haveAccount")}{" "}
             <Link href={next ? `${href("/login")}?next=${encodeURIComponent(next)}` : href("/login")}>{t("auth.signIn")}</Link>

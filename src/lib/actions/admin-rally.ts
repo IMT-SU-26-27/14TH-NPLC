@@ -10,7 +10,14 @@ import { databaseErrorMessage, errorState, fieldErrorState, successState } from 
 import { localePath } from "@/lib/i18n/config";
 import { getRequestLocale } from "@/lib/i18n/server";
 import { uuidSchema } from "@/lib/validations/admin";
-import { loAccountSchema, rallyCorrectionSchema, rallyDeleteResultSchema, rallyPostSchema } from "@/lib/validations/rally";
+import {
+  loAccountSchema,
+  rallyCorrectionSchema,
+  rallyDeleteResultSchema,
+  rallyFreezeSchema,
+  rallyPostSchema,
+  rallySessionStatusSchema,
+} from "@/lib/validations/rally";
 import type { ActionResult, FormState } from "@/types";
 
 async function isAdmin() {
@@ -135,6 +142,36 @@ export async function deleteRallyResult(_prev: FormState, formData: FormData): P
 
   refresh();
   return successState("rally.results.deleted");
+}
+
+export async function setRallySessionStatus(competitionId: string, status: string): Promise<ActionResult> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  const parsed = rallySessionStatusSchema.safeParse({ competitionId, status });
+  if (!parsed.success) return { ok: false, message: "errors.invalidRequest" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("rally_sessions").update({ status: parsed.data.status }).eq("competition_id", parsed.data.competitionId);
+  if (error) return { ok: false, message: databaseErrorMessage(error) };
+
+  refresh();
+  return { ok: true, data: undefined, message: `rally.session.changed.${parsed.data.status}` };
+}
+
+// Freeze: participants keep seeing the standings from this moment while results keep counting. Admins always see live scores.
+export async function setRallyLeaderboardFrozen(competitionId: string, frozen: boolean): Promise<ActionResult> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  const parsed = rallyFreezeSchema.safeParse({ competitionId, frozen });
+  if (!parsed.success) return { ok: false, message: "errors.invalidRequest" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("rally_sessions")
+    .update({ leaderboard_frozen_at: parsed.data.frozen ? new Date().toISOString() : null })
+    .eq("competition_id", parsed.data.competitionId);
+  if (error) return { ok: false, message: databaseErrorMessage(error) };
+
+  refresh();
+  return { ok: true, data: undefined, message: parsed.data.frozen ? "rally.leaderboard.frozenDone" : "rally.leaderboard.unfrozenDone" };
 }
 
 export async function createLoAccount(_prev: FormState, formData: FormData): Promise<FormState> {

@@ -38,6 +38,7 @@ const RAISED: [string, string][] = [
   ["Upload the twibbon proof before submitting", "errors.twibbonRequired"],
   ["LO accounts cannot join a team", "errors.loCannotJoin"],
   ["You are not assigned to this post", "rally.errors.notAssigned"],
+  ["The Rally session is not open", "rally.errors.sessionNotOpen"],
   ["This post is not active", "rally.errors.postInactive"],
   ["No team matches this code", "rally.errors.teamNotFound"],
   ["This team is not in this competition", "rally.errors.wrongCompetition"],
