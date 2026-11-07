@@ -1182,6 +1182,7 @@ export const id = {
     errorReference: "Kode kesalahan:",
   },
   profile: {
+    label: "Profil",
     title: "Profil",
     lead: "Nama akun, kata sandi, dan notifikasi.",
     detailsTitle: "Data akun",
@@ -1193,6 +1194,7 @@ export const id = {
     passwordLead: "Masukkan kata sandi sekarang untuk memastikan ini memang kamu.",
     currentPassword: "Kata sandi sekarang",
     changePassword: "Ganti kata sandi",
+    passwordNoDraft: "Kata sandi tidak disimpan sebagai draf.",
     passwordChanged: "Kata sandi diganti. Gunakan kata sandi baru saat masuk berikutnya.",
     wrongCurrentPassword: "Kata sandi sekarang salah",
   },

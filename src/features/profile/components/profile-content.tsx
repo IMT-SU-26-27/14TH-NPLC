@@ -8,7 +8,7 @@ export async function ProfileContent() {
   const user = await requireUser("/profile");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <ProfileForm user={user} />
       <NotificationSettings />
       <ChangePasswordForm />
