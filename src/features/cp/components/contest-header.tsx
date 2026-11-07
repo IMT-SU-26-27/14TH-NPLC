@@ -12,7 +12,7 @@ export function ContestHeader({ lang, context, showBackToProblems }: ContestHead
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="space-y-1">
         <h1 className="font-heading text-2xl font-semibold tracking-tight">{t("cp.title")}</h1>
-        {context.teamName && <p className="text-muted-foreground">{t("cp.waiting.team", { team: context.teamName })}</p>}
+        {context.teamName && <p className="text-muted-foreground text-sm">{t("cp.waiting.team", { team: context.teamName })}</p>}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <ContestClock
@@ -22,12 +22,12 @@ export function ContestHeader({ lang, context, showBackToProblems }: ContestHead
           pausedAt={context.session.paused_at}
         />
         {showBackToProblems && (
-          <Link href={localePath(lang, "/cp")} className={buttonVariants({ variant: "outline" })}>
+          <Link href={localePath(lang, "/cp")} className={buttonVariants({ variant: "ghost" })}>
             <ArrowLeftIcon />
             {t("cp.backToProblems")}
           </Link>
         )}
-        <Link href={localePath(lang, "/cp/leaderboard")} className={buttonVariants({ variant: "outline" })}>
+        <Link href={localePath(lang, "/cp/leaderboard")} className={buttonVariants({ variant: "ghost" })}>
           <ListOrderedIcon />
           {t("cp.leaderboard")}
         </Link>

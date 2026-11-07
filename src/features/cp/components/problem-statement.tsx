@@ -13,7 +13,7 @@ export function ProblemStatement({ problem, lang }: ProblemStatementProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">
+        <CardTitle className="text-lg">
           {t("cp.level", { level: problem.level })} · {problem.title}
         </CardTitle>
         <CardAction className="flex items-center gap-2">
@@ -22,7 +22,7 @@ export function ProblemStatement({ problem, lang }: ProblemStatementProps) {
         </CardAction>
       </CardHeader>
       <CardContent className="space-y-5">
-        <p className="text-muted-foreground text-xs">{t("cp.limits", { time: `${problem.time_limit_ms} ms`, memory })}</p>
+        <p className="text-muted-foreground text-sm">{t("cp.limits", { time: `${problem.time_limit_ms} ms`, memory })}</p>
         <Markdown>{problem.statement}</Markdown>
         {[
           { title: t("cp.inputFormat"), body: problem.input_format },

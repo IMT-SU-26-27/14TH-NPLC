@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { VerdictBadge } from "@/features/cp/components/verdict-badge";
-import type { VerdictGuideEntry } from "@/types/cp";
+import type { VerdictGuideEntry, VerdictGuideProps } from "@/types/cp";
 
 // Floating (?) button on every contest page. Opens a reference of every judging result:
 // what it means, common causes and what to try. Error toasts open it at their verdict.
-export function VerdictGuide() {
+// cp/layout.tsx positions the button through `className` (features/cp/styles/layout.css).
+export function VerdictGuide({ className }: VerdictGuideProps) {
   const { t, dict } = useI18n();
   const guide = useVerdictGuide();
   const entries = dict.cp.verdict as Record<string, VerdictGuideEntry>;
@@ -23,7 +24,7 @@ export function VerdictGuide() {
       <Button
         variant="outline"
         size="icon-lg"
-        className="fixed right-4 bottom-4 z-40 size-11 rounded-full sm:right-6 sm:bottom-6"
+        className={cn("z-40 size-11 rounded-full", className)}
         aria-label={t("cp.guideButton")}
         title={t("cp.guideButton")}
         onClick={() => guide.onOpenChange(true)}

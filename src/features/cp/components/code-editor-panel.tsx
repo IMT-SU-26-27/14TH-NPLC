@@ -73,7 +73,7 @@ export function CodeEditorPanel({
         />
       </CardContent>
       <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t py-3">
-        <p className="text-muted-foreground text-xs">{language === "java" ? t("cp.javaHint") : " "}</p>
+        <p className="text-muted-foreground text-sm">{language === "java" ? t("cp.javaHint") : " "}</p>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onRun} disabled={busy}>
             {running ? <Spinner /> : <PlayIcon />}
