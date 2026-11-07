@@ -1174,6 +1174,9 @@ export const id = {
   system: {
     notFoundTitle: "Halaman tidak ditemukan",
     notFoundDescription: "Alamat ini salah atau halamannya sudah dipindahkan. Periksa lagi tautannya, atau kembali ke beranda.",
+    notFoundLabel: "Tidak ditemukan",
+    notFoundLead: "Sinyal hilang di tengah jalan.",
+    notFoundCode: "Error // 404",
     backHome: "Ke beranda",
     errorTitle: "Terjadi kesalahan",
     errorDescription: "Halaman ini gagal dimuat. Coba lagi; jika masih gagal, hubungi panitia dan sertakan kode di bawah.",
