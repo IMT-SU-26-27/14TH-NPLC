@@ -142,7 +142,7 @@ export const id = {
     stepTwibbonHint: "Bukti post twibbon",
     schoolHint: "Tulis nama lengkap sekolah.",
     paymentStepLead: "Transfer sesuai rincian, lalu unggah buktinya. Tim dibuat setelah bukti terkirim.",
-    twibbonLead: "Pasang twibbon, unggah ke Instagram, lalu unggah screenshot postingannya.",
+    twibbonLead: "Pasang twibbon di fotomu, posting di Instagram, lalu unggah screenshot postingannya.",
     summary: "Ringkasan",
     payBank: "Bayar hanya lewat blu by BCA",
     payQris: "Bayar lewat QRIS",

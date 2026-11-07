@@ -37,7 +37,7 @@ export function RegisterSummary({ competition, lang }: RegisterSummaryProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <p className="text-primary font-mono text-[0.65rem] tracking-[0.2em] uppercase">{t("competition.fee")}</p>
+          <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{t("competition.fee")}</p>
           <p className="font-heading text-3xl font-bold">{formatRupiah(competition.fee, lang)}</p>
         </div>
         <ul className="space-y-2 border-t pt-4 text-sm">

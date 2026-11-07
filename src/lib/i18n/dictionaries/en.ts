@@ -143,7 +143,7 @@ export const en: Dictionary = {
     stepTwibbonHint: "Twibbon post proof",
     schoolHint: "Write the school's full name.",
     paymentStepLead: "Transfer using the details below, then upload the proof. The team is created once the proof is sent.",
-    twibbonLead: "Put on the twibbon, post it on Instagram, then upload a screenshot of the post.",
+    twibbonLead: "Add the twibbon to your photo, post it on Instagram, then upload a screenshot of the post.",
     summary: "Summary",
     payBank: "Pay through blu by BCA only",
     payQris: "Pay with QRIS",

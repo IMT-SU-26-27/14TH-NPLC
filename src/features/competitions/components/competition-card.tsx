@@ -10,7 +10,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import type { CompetitionCardProps } from "@/types/competition";
 
-const microLabel = "text-primary flex items-center gap-1.5 font-mono text-[0.65rem] tracking-[0.2em] uppercase";
+const microLabel = "text-primary flex items-center gap-1.5 font-mono text-xs tracking-[0.2em] uppercase";
 
 // Figma "08 // Daftar tim" card: numbered name, open badge, members and fee side by side, deadline and CTA.
 export function CompetitionCard({ competition, lang, index }: CompetitionCardProps) {
@@ -28,7 +28,7 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
       <CardHeader className="gap-3 px-6 sm:px-8">
         <div className="flex items-start justify-between gap-3">
           <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{`${String(index + 1).padStart(2, "0")} // ${competition.name}`}</p>
-          <Badge variant="outline" className="shrink-0 font-mono text-[0.6rem] tracking-[0.15em] uppercase">
+          <Badge variant="outline" className="shrink-0 font-mono text-xs tracking-[0.15em] uppercase">
             <span aria-hidden className={cn("size-2 rounded-full", open ? "bg-highlight ring-highlight-foreground/40 ring-1" : "bg-muted-foreground")} />
             {open ? t("competition.open") : t("competition.closed")}
           </Badge>

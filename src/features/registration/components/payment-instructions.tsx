@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { PaymentInstructionsProps } from "@/types/competition";
 
-const rowLabel = "text-muted-foreground font-mono text-[0.65rem] tracking-[0.15em] uppercase";
+const rowLabel = "text-muted-foreground font-mono text-xs tracking-[0.15em] uppercase";
 
 // Where to pay: the competition's QRIS image, or its bank account. The amount is shown either way.
 export function PaymentInstructions({ details, qrisUrl, transferNote }: PaymentInstructionsProps) {
@@ -49,7 +49,7 @@ export function PaymentInstructions({ details, qrisUrl, transferNote }: PaymentI
             <dt className={rowLabel}>{t("payment.bankName")}</dt>
             <dd className="font-medium">{t("payment.bankValue")}</dd>
           </div>
-          <Badge variant="outline" className="bg-card font-mono text-[0.6rem] tracking-[0.15em] uppercase">
+          <Badge variant="outline" className="bg-card font-mono text-xs tracking-[0.15em] uppercase">
             {t("payment.bankOnly")}
           </Badge>
         </div>
