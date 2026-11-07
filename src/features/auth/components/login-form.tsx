@@ -2,16 +2,23 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { OctagonXIcon } from "lucide-react";
+import { ArrowRightIcon, LockIcon, MailIcon, OctagonXIcon } from "lucide-react";
 import { signIn } from "@/lib/actions/auth";
 import { initialFormState } from "@/lib/form";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
 import type { AuthFormProps } from "@/types/auth";
+
+const labelClass = "text-primary font-mono text-xs font-medium tracking-[0.2em] uppercase";
+const requiredMark = (
+  <span aria-hidden className="text-destructive">
+    *
+  </span>
+);
 
 export function LoginForm({ next }: AuthFormProps) {
   const [state, action, pending] = useActionState(signIn, initialFormState);
@@ -23,18 +30,47 @@ export function LoginForm({ next }: AuthFormProps) {
       <input type="hidden" name="next" value={next ?? "/dashboard"} />
       <FieldGroup>
         <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="email">{t("common.email")}</FieldLabel>
-          <Input id="email" name="email" type="email" autoComplete="email" aria-invalid={!!errors.email} required />
+          <FieldLabel htmlFor="email" className={labelClass}>
+            {t("common.email")} {requiredMark}
+          </FieldLabel>
+          <InputGroup className="h-12">
+            <InputGroupAddon>
+              <MailIcon />
+            </InputGroupAddon>
+            <InputGroupInput
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder={t("auth.emailPlaceholder")}
+              aria-invalid={!!errors.email}
+              required
+            />
+          </InputGroup>
           <FieldError errors={fieldErrors(errors.email)} />
         </Field>
         <Field data-invalid={!!errors.password}>
           <div className="flex items-center justify-between gap-2">
-            <FieldLabel htmlFor="password">{t("auth.password")}</FieldLabel>
-            <Link href={href("/forgot-password")} className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline">
+            <FieldLabel htmlFor="password" className={labelClass}>
+              {t("auth.password")} {requiredMark}
+            </FieldLabel>
+            <Link href={href("/forgot-password")} className="text-foreground hover:text-primary text-sm underline underline-offset-4">
               {t("auth.forgotPassword")}
             </Link>
           </div>
-          <Input id="password" name="password" type="password" autoComplete="current-password" aria-invalid={!!errors.password} required />
+          <InputGroup className="h-12">
+            <InputGroupAddon>
+              <LockIcon />
+            </InputGroupAddon>
+            <InputGroupInput
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              aria-invalid={!!errors.password}
+              required
+            />
+          </InputGroup>
           <FieldError errors={fieldErrors(errors.password)} />
         </Field>
         {state.status === "error" && state.message && (
@@ -44,9 +80,10 @@ export function LoginForm({ next }: AuthFormProps) {
           </Alert>
         )}
         <Field>
-          <Button type="submit" size="lg" disabled={pending}>
+          <Button type="submit" size="lg" className="h-12 text-base" disabled={pending}>
             {pending && <Spinner />}
             {t("auth.signIn")}
+            {!pending && <ArrowRightIcon />}
           </Button>
           <FieldDescription className="text-center">
             {t("auth.noAccount")}{" "}

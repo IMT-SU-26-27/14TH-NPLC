@@ -32,3 +32,4 @@ export type AuthFormLoaderProps = {
 export type UserMenuProps = {
   user: CurrentUser;
 };
+

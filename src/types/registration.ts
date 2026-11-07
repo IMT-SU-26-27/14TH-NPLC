@@ -111,6 +111,8 @@ export type TwibbonProofFieldProps = {
 
 export type JoinCodeFormProps = {
   defaultCode?: string;
+  // False under a team preview, where joining is the main action and searching again is secondary.
+  primary?: boolean;
 };
 
 export type DashboardPageProps = {
