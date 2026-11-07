@@ -115,6 +115,7 @@ export const en: Dictionary = {
   landing: {
     hero: {
       eyebrow: "14th // National Programming & Logic Competition",
+      eyebrowShort: "14th // NPLC 2026/2027",
       host: "Universitas Ciputra",
       title: "Decode the Unknown",
       analyze: "Analyze",
