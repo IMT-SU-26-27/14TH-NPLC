@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { ArrowRightIcon, ClockIcon, CodeXmlIcon, NetworkIcon, UsersIcon, WalletIcon } from "lucide-react";
-import { formatDateTime, formatRupiah, formatTeamSize } from "@/lib/format";
+import { formatDateTime, formatTeamSize } from "@/lib/format";
 import { isRegistrationOpen } from "@/lib/data/competitions";
 import { localePath } from "@/lib/i18n/config";
+import { currentFee } from "@/lib/pricing";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { FeeAmount } from "@/components/shared/fee-amount";
 import type { CompetitionCardProps } from "@/types/competition";
 
 const microLabel = "text-primary flex items-center gap-1.5 font-mono text-xs tracking-[0.2em] uppercase";
@@ -16,7 +18,7 @@ const microLabel = "text-primary flex items-center gap-1.5 font-mono text-xs tra
 export function CompetitionCard({ competition, lang, index }: CompetitionCardProps) {
   const t = getT(lang);
   const open = isRegistrationOpen(competition);
-  const typeLabel = t(`competition.type.${competition.type}`);
+  const category = t(`competition.category.${competition.type}`);
   const isCp = competition.type === "competitive_programming";
   const Icon = isCp ? CodeXmlIcon : NetworkIcon;
   const extraMin = Math.max(competition.min_members - 1, 0);
@@ -24,7 +26,7 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
   const range = extraMin === extraMax ? `${extraMax}` : `${extraMin}–${extraMax}`;
 
   return (
-    <Card className="ring-border gap-6 rounded-xl py-6 sm:py-8">
+    <Card className="ring-border h-full gap-6 rounded-xl py-6 sm:py-8">
       <CardHeader className="gap-3 px-6 sm:px-8">
         <div className="flex items-start justify-between gap-3">
           <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{`${String(index + 1).padStart(2, "0")} // ${competition.name}`}</p>
@@ -36,7 +38,7 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <h2 className="text-2xl font-bold sm:text-3xl">{competition.name}</h2>
-            {typeLabel.toLowerCase() !== competition.name.toLowerCase() && <p className="text-muted-foreground text-sm">{typeLabel}</p>}
+            <p className="text-muted-foreground text-sm">{category}</p>
           </div>
           <span
             className={cn(
@@ -47,7 +49,8 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
             <Icon aria-hidden className="size-5" />
           </span>
         </div>
-        {competition.description && <p className="text-muted-foreground">{competition.description}</p>}
+        {/* Three lines tall on desktop, so the members/fee rows of both cards line up. */}
+        <p className="text-muted-foreground md:min-h-[3lh]">{competition.description}</p>
       </CardHeader>
 
       <CardContent className="mx-6 grid grid-cols-2 border-y px-0 sm:mx-8">
@@ -66,7 +69,15 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
             <WalletIcon aria-hidden className="size-3.5" />
             {t("competition.fee")}
           </p>
-          <p className="font-heading text-xl font-bold sm:text-2xl">{formatRupiah(competition.fee, lang)}</p>
+          <p>
+            <FeeAmount
+              fee={currentFee(competition.fee)}
+              normalFee={competition.fee}
+              lang={lang}
+              labels={{ normal: t("competition.normalPrice"), early: t("competition.earlyPrice") }}
+              className="font-heading text-xl font-bold sm:text-2xl"
+            />
+          </p>
         </div>
       </CardContent>
 
