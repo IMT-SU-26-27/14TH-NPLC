@@ -1183,6 +1183,7 @@ export const en: Dictionary = {
     errorReference: "Error code:",
   },
   profile: {
+    label: "Profile",
     title: "Profile",
     lead: "Your account name, password and notifications.",
     detailsTitle: "Account details",
@@ -1194,6 +1195,7 @@ export const en: Dictionary = {
     passwordLead: "Enter your current password to confirm it's you.",
     currentPassword: "Current password",
     changePassword: "Change password",
+    passwordNoDraft: "Passwords are never saved as a draft.",
     passwordChanged: "Password changed. Use the new one the next time you sign in.",
     wrongCurrentPassword: "Your current password is wrong",
   },
