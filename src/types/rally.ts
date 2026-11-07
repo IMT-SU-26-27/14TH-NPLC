@@ -20,7 +20,7 @@ export type RallyPostWithLos = Pick<
 
 export type LoPost = Pick<
   RallyPost,
-  "id" | "name" | "kind" | "location" | "allow_draw" | "is_active" | "points_win" | "points_lose" | "points_draw"
+  "id" | "competition_id" | "name" | "kind" | "location" | "allow_draw" | "is_active" | "points_win" | "points_lose" | "points_draw"
 >;
 
 export type RallyPostsTableProps = {
@@ -86,6 +86,7 @@ export type RallyStationView =
 export type LoStationProps = {
   post: LoPost;
   recent: RallyRecentResult[];
+  sessionStatus: RallySessionStatus;
 };
 
 export type LoPostPageProps = {
@@ -187,4 +188,34 @@ export type RallyLogTableProps = {
 
 export type RallyResultActionsProps = {
   result: RallyResultRow;
+};
+
+export type RallySessionStatus = Enums<"rally_session_status">;
+export type RallySession = Pick<Tables<"rally_sessions">, "competition_id" | "status" | "leaderboard_frozen_at">;
+export type RallyScore = Pick<Tables<"rally_scores">, "registration_id" | "team_name" | "school" | "total_points" | "posts_finished" | "last_result_at">;
+
+export type RallySessionStatusButtonProps = {
+  competitionId: string;
+  to: RallySessionStatus;
+};
+
+export type RallySessionControlProps = {
+  session: RallySession;
+};
+
+export type RallyLeaderboardTableProps = {
+  competitionId: string;
+  initialRows: RallyScore[];
+  viewer: "admin" | "participant";
+  frozenAt: string | null;
+  highlightRegistrationId?: string;
+};
+
+export type RallyFreezeButtonProps = {
+  competitionId: string;
+  frozen: boolean;
+};
+
+export type RallyLeaderboardPageProps = {
+  params: LangParams;
 };
