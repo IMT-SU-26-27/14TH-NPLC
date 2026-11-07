@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AuthFormLoader } from "@/features/auth/components/auth-form-loader";
 import { AuthHero } from "@/features/auth/components/auth-hero";
+import "@/features/auth/styles/signup.css";
 import type { AuthPageProps } from "@/types/auth";
 
 export async function generateMetadata({ params }: AuthPageProps): Promise<Metadata> {
@@ -18,7 +19,7 @@ export default async function SignupPage({ params, searchParams }: AuthPageProps
   const t = getT(lang);
 
   return (
-    <main className="flex-1">
+    <main className="signup-page flex-1">
       <AuthHero step="03" eyebrow={t("auth.signupTitle")} title={t("auth.signupTitle")} subtitle={t("auth.signupSubtitle")} mascot="/auth/maskot-1.webp" />
       <div className="flex justify-center px-4 pt-6 pb-16 sm:pt-10 sm:pb-24">
         <Card className="w-full max-w-xl px-2 py-8 sm:px-8 sm:py-10">

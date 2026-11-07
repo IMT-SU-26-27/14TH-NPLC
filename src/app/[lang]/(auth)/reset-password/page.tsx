@@ -3,6 +3,7 @@ import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AuthHero } from "@/features/auth/components/auth-hero";
+import "@/features/auth/styles/reset-password.css";
 import { NewPasswordForm } from "@/features/auth/components/new-password-form";
 import type { LangPageProps } from "@/types/i18n";
 
@@ -17,7 +18,7 @@ export default async function ResetPasswordPage({ params }: LangPageProps) {
   const t = getT(await resolveLang(params));
 
   return (
-    <main className="flex-1">
+    <main className="reset-password-page flex-1">
       <AuthHero
         step="06"
         eyebrow={t("auth.password")}

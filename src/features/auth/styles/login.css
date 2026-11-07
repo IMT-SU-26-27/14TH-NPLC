@@ -1,0 +1,1068 @@
+/* Login page: one block per screen in media-query-template.css. Colours and type styles stay in Tailwind;
+   these set the header band's spacing, title size and mascot, so the submit button stays on screen on short
+   laptop and landscape-phone viewports. */
+.login-page .auth-hero-inner {
+  padding-top: 56px;
+  padding-bottom: 96px;
+}
+.login-page .auth-hero-title {
+  font-size: 60px;
+  line-height: 1;
+}
+.login-page .auth-hero-subtitle {
+  font-size: 20px;
+}
+.login-page .auth-hero-mascot {
+  position: relative;
+  top: 0px;
+  right: 32px;
+  width: 208px;
+  height: 208px;
+}
+.login-page .auth-card-area {
+  padding-top: 40px;
+}
+.login-page .auth-card {
+  padding-block: 40px;
+}
+
+@media (max-width: 3840px) and (max-height: 2160px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 2850px) and (max-height: 1800px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 2560px) and (max-height: 1600px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 2560px) and (max-height: 1352px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 2560px) and (max-height: 1140px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1920px) and (max-height: 1080px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1900px) and (max-height: 1920px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1900px) and (max-height: 1200px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1728px) and (max-height: 1117px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1538px) and (max-height: 2048px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1528px) and (max-height: 732px) {
+  .login-page .auth-hero-inner {
+    padding-top: 32px;
+    padding-bottom: 64px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 52px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 18px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 1512px) and (max-height: 982px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1440px) and (max-height: 641px) {
+  .login-page .auth-hero-inner {
+    padding-top: 24px;
+    padding-bottom: 56px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 48px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 18px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 144px;
+    height: 144px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 16px;
+  }
+  .login-page .auth-card {
+    padding-block: 28px;
+  }
+}
+@media (max-width: 1366px) and (max-height: 1024px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1366px) and (max-height: 768px) {
+  .login-page .auth-hero-inner {
+    padding-top: 32px;
+    padding-bottom: 64px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 52px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 18px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 1333px) and (max-height: 632px) {
+  .login-page .auth-hero-inner {
+    padding-top: 24px;
+    padding-bottom: 56px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 48px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 18px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 144px;
+    height: 144px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 16px;
+  }
+  .login-page .auth-card {
+    padding-block: 28px;
+  }
+}
+@media (max-width: 1280px) and (max-height: 853px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1180px) and (max-height: 820px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1024px) and (max-height: 1366px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 1024px) and (max-height: 768px) and (orientation: landscape) {
+  .login-page .auth-hero-inner {
+    padding-top: 32px;
+    padding-bottom: 64px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 52px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 18px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 1024px) and (max-height: 600px) {
+  .login-page .auth-hero-inner {
+    padding-top: 20px;
+    padding-bottom: 48px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 44px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 17px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 24px;
+    width: 128px;
+    height: 128px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 16px;
+  }
+  .login-page .auth-card {
+    padding-block: 24px;
+  }
+}
+@media (max-width: 956px) and (max-height: 440px) and (orientation: landscape) {
+  .login-page .auth-hero-inner {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 15px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 96px;
+    height: 96px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 16px;
+  }
+  .login-page .auth-card {
+    padding-block: 24px;
+  }
+}
+@media (max-width: 932px) and (max-height: 430px) {
+  .login-page .auth-hero-inner {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 15px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 96px;
+    height: 96px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 16px;
+  }
+  .login-page .auth-card {
+    padding-block: 24px;
+  }
+}
+@media (max-width: 912px) and (max-height: 1368px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 853px) and (max-height: 1280px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 844px) and (max-height: 390px) {
+  .login-page .auth-hero-inner {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 15px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 96px;
+    height: 96px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 16px;
+  }
+  .login-page .auth-card {
+    padding-block: 24px;
+  }
+}
+@media (max-width: 820px) and (max-height: 1180px) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 768px) and (max-height: 1024px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 60px;
+    line-height: 1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 20px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 32px;
+    width: 208px;
+    height: 208px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 40px;
+  }
+  .login-page .auth-card {
+    padding-block: 40px;
+  }
+}
+@media (max-width: 740px) and (max-height: 360px) and (orientation: landscape) {
+  .login-page .auth-hero-inner {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 15px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 96px;
+    height: 96px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 16px;
+  }
+  .login-page .auth-card {
+    padding-block: 24px;
+  }
+}
+@media (max-width: 720px) and (max-height: 540px) and (orientation: landscape) {
+  .login-page .auth-hero-inner {
+    padding-top: 16px;
+    padding-bottom: 36px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 112px;
+    height: 112px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 12px;
+  }
+  .login-page .auth-card {
+    padding-block: 24px;
+  }
+}
+@media (max-width: 540px) and (max-height: 720px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 459px) and (max-height: 841px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 440px) and (max-height: 956px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 430px) and (max-height: 932px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 414px) and (max-height: 896px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 393px) and (max-height: 873px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 390px) and (max-height: 844px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 375px) and (max-height: 667px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 360px) and (max-height: 740px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
+@media (max-width: 344px) and (max-height: 882px) and (orientation: portrait) {
+  .login-page .auth-hero-inner {
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .login-page .auth-hero-title {
+    font-size: 36px;
+    line-height: 1.111;
+  }
+  .login-page .auth-hero-subtitle {
+    font-size: 16px;
+  }
+  .login-page .auth-hero-mascot {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 160px;
+    height: 160px;
+  }
+  .login-page .auth-card-area {
+    padding-top: 24px;
+  }
+  .login-page .auth-card {
+    padding-block: 32px;
+  }
+}
