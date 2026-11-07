@@ -153,7 +153,6 @@ export const id = {
       fee: "Biaya",
       normalPrice: "Harga normal",
       earlyPrice: "Harga early bird",
-      save: "Hemat {amount}",
       earlyBirdRange: "Early bird {range}",
       closes: "Tutup {date}",
       registerCta: "Daftarkan tim {short}",

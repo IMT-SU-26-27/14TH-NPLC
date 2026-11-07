@@ -7,7 +7,6 @@ import { formatDateRange, formatRupiah } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EarlyBirdRing } from "@/features/landing/components/early-bird-ring";
@@ -49,14 +48,9 @@ export async function FeeSection({ lang }: LangProps) {
                   <span className="sr-only">{`${t("landing.competitions.normalPrice")} `}</span>
                   {formatRupiah(normalFee, lang)}
                 </p>
-                <p className="flex flex-wrap items-center gap-3">
+                <p className="font-heading text-5xl leading-none font-bold tracking-tight sm:text-6xl">
                   <span className="sr-only">{`${t("landing.competitions.earlyPrice")} `}</span>
-                  <span className="font-heading text-5xl leading-none font-bold tracking-tight sm:text-6xl">
-                    {formatRupiah(EARLY_BIRD.fee, lang)}
-                  </span>
-                  <Badge className="bg-highlight text-highlight-foreground font-mono text-[0.6rem] tracking-[0.15em] uppercase">
-                    {t("landing.competitions.save", { amount: formatRupiah(normalFee - EARLY_BIRD.fee, lang) })}
-                  </Badge>
+                  {formatRupiah(EARLY_BIRD.fee, lang)}
                 </p>
               </>
             ) : (
@@ -66,7 +60,7 @@ export async function FeeSection({ lang }: LangProps) {
           </div>
 
           <div className="space-y-4 lg:w-72 lg:border-l lg:pl-8">
-            <p className="text-primary font-mono text-[0.65rem] tracking-[0.2em] uppercase">{`// ${t("landing.fees.paymentLabel")}`}</p>
+            <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{`// ${t("landing.fees.paymentLabel")}`}</p>
             <p className="text-sm">{t("landing.fees.payment")}</p>
             <Link
               href={localePath(lang, "/register")}

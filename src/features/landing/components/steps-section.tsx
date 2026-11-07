@@ -27,7 +27,7 @@ export function StepsSection({ lang }: LangProps) {
                 {n}
               </span>
               <div className="space-y-1.5 md:mt-6">
-                <p className="text-primary font-mono text-[0.65rem] tracking-[0.2em] uppercase">{t("landing.steps.step", { n })}</p>
+                <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{t("landing.steps.step", { n })}</p>
                 <h3 className="text-lg font-bold">{t(`landing.steps.${step}Title`)}</h3>
                 <p className="text-muted-foreground text-sm">{t(`landing.steps.${step}Body`)}</p>
               </div>

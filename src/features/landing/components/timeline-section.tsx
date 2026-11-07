@@ -69,7 +69,7 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
                   >
                     {n}
                   </span>
-                  <p className="text-brand-sky font-mono text-[0.65rem] tracking-[0.2em] uppercase">{t("landing.timeline.phase", { n })}</p>
+                  <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{t("landing.timeline.phase", { n })}</p>
                   <Card
                     className={cn(
                       "bg-background/5 text-background rounded-xl",
@@ -80,7 +80,7 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-brand-sky font-mono text-xs tracking-wider">{formatDateRange(event.starts_on, event.ends_on, lang)}</p>
                         {active && (
-                          <Badge variant="outline" className="border-background/30 text-background font-mono text-[0.6rem] tracking-[0.15em] uppercase">
+                          <Badge variant="outline" className="border-background/30 text-background font-mono text-xs tracking-[0.15em] uppercase">
                             <span aria-hidden className="bg-highlight size-1.5 rounded-full" />
                             {t("landing.timeline.active")}
                           </Badge>

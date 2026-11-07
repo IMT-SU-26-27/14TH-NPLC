@@ -26,7 +26,6 @@ export type CompetitionPickerItem = {
   membersHint: string;
   normalFee: string;
   earlyFee: string | null;
-  saveLabel: string | null;
   earlyRange: string | null;
   open: boolean;
   closesLabel: string | null;

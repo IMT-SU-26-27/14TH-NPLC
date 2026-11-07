@@ -15,7 +15,7 @@ const TYPE_ICON = {
   logic: { icon: NetworkIcon, tint: "bg-highlight text-highlight-foreground" },
 } as const;
 
-const microLabel = "text-primary flex items-center gap-1.5 font-mono text-[0.65rem] tracking-[0.2em] uppercase";
+const microLabel = "text-primary flex items-center gap-1.5 font-mono text-xs tracking-[0.2em] uppercase";
 
 // Two selectable competition cards with the chosen one's members, fee and deadline underneath.
 export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
@@ -34,10 +34,10 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
               className="group/pick text-foreground hover:border-primary/60 data-active:border-primary data-active:ring-primary/15 border-border h-auto flex-col items-stretch gap-2 rounded-xl p-5 text-left whitespace-normal group-data-[variant=line]/tabs-list:bg-card group-data-[variant=line]/tabs-list:data-active:bg-card after:hidden data-active:ring-4 sm:p-6"
             >
               <span className="flex items-start justify-between gap-3">
-                <span className="text-primary font-mono text-[0.65rem] tracking-[0.2em] uppercase">
+                <span className="text-primary font-mono text-xs tracking-[0.2em] uppercase">
                   {`${String(i + 1).padStart(2, "0")} // ${item.name}`}
                 </span>
-                <Badge className="bg-highlight text-highlight-foreground hidden font-mono text-[0.6rem] tracking-[0.15em] uppercase group-data-active/pick:inline-flex">
+                <Badge className="bg-highlight text-highlight-foreground hidden font-mono text-xs tracking-[0.15em] uppercase group-data-active/pick:inline-flex">
                   <CheckIcon />
                   {labels.selected}
                 </Badge>
@@ -79,12 +79,9 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
                       <span className="sr-only">{`${labels.normalPrice} `}</span>
                       {item.normalFee}
                     </p>
-                    <p className="flex flex-wrap items-center gap-2">
+                    <p className="font-heading text-2xl font-bold sm:text-3xl">
                       <span className="sr-only">{`${labels.earlyPrice} `}</span>
-                      <span className="font-heading text-2xl font-bold sm:text-3xl">{item.earlyFee}</span>
-                      <Badge className="bg-highlight text-highlight-foreground font-mono text-[0.6rem] tracking-[0.15em] uppercase">
-                        {item.saveLabel}
-                      </Badge>
+                      {item.earlyFee}
                     </p>
                     <p className="text-muted-foreground text-sm">{item.earlyRange}</p>
                   </>
@@ -98,7 +95,7 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
             </div>
             <CardFooter className="flex-wrap justify-between gap-4 border-t-0 bg-transparent p-5 sm:p-6">
               <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="outline" className="font-mono text-[0.6rem] tracking-[0.15em] uppercase">
+                <Badge variant="outline" className="font-mono text-xs tracking-[0.15em] uppercase">
                   <span aria-hidden className={cn("size-2 rounded-full", item.open ? "bg-highlight ring-highlight-foreground/40 ring-1" : "bg-muted-foreground")} />
                   {item.open ? labels.open : labels.closed}
                 </Badge>

@@ -61,7 +61,7 @@ export async function AboutSection({ lang }: LangProps) {
                     <fact.icon aria-hidden className="size-4" />
                   </span>
                   <div>
-                    <p className="text-brand-sky font-mono text-[0.65rem] tracking-[0.2em] uppercase">{fact.label}</p>
+                    <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{fact.label}</p>
                     <p className="text-background text-sm font-medium">{fact.value}</p>
                   </div>
                 </div>
@@ -72,7 +72,7 @@ export async function AboutSection({ lang }: LangProps) {
           <div className="grid gap-4">
             <Card className={darkCard}>
               <CardHeader className="px-6">
-                <p className="text-brand-sky font-mono text-[0.65rem] tracking-[0.2em] uppercase">{`A // ${t("landing.about.guidebookLabel")}`}</p>
+                <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{`A // ${t("landing.about.guidebookLabel")}`}</p>
                 <CardTitle className="text-background text-2xl font-bold">{t("landing.about.guidebookTitle")}</CardTitle>
                 <CardDescription className="text-background/70">{t("landing.about.guidebookBody")}</CardDescription>
                 <BookOpenIcon aria-hidden className="text-brand-sky absolute top-5 right-5 size-6" />
@@ -89,14 +89,14 @@ export async function AboutSection({ lang }: LangProps) {
                     <ArrowRightIcon />
                   </a>
                 ) : (
-                  <p className="text-background/50 font-mono text-xs tracking-[0.15em] uppercase">{t("landing.about.guidebookSoon")}</p>
+                  <p className="text-background/75 font-mono text-xs tracking-[0.15em] uppercase">{t("landing.about.guidebookSoon")}</p>
                 )}
               </CardContent>
             </Card>
 
             <Card className={darkCard}>
               <CardHeader className="px-6">
-                <p className="text-brand-sky font-mono text-[0.65rem] tracking-[0.2em] uppercase">{`B // ${t("landing.about.registerLabel")}`}</p>
+                <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{`B // ${t("landing.about.registerLabel")}`}</p>
                 <CardTitle className="text-background text-2xl font-bold">{t("landing.about.registerTitle")}</CardTitle>
                 <CardDescription className="text-background/70">{t("landing.about.registerBody")}</CardDescription>
                 <UserPlusIcon aria-hidden className="text-brand-sky absolute top-5 right-5 size-6" />

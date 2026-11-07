@@ -154,7 +154,6 @@ export const en: Dictionary = {
       fee: "Fee",
       normalPrice: "Normal price",
       earlyPrice: "Early bird price",
-      save: "Save {amount}",
       earlyBirdRange: "Early bird {range}",
       closes: "Closes {date}",
       registerCta: "Register a {short} team",

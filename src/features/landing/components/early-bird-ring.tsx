@@ -35,9 +35,9 @@ export function EarlyBirdRing({ totalDays, endsAt }: EarlyBirdRingProps) {
         <circle cx="100" cy="100" r="66" fill="none" strokeWidth="1" strokeDasharray="2 4" className="stroke-border" />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <p className="text-primary font-mono text-[0.6rem] tracking-[0.2em] uppercase">{t("landing.fees.earlyBird")}</p>
+        <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{t("landing.fees.earlyBird")}</p>
         <p className="font-heading text-5xl leading-none font-bold tabular-nums">{days ?? "–"}</p>
-        <p className="text-muted-foreground font-mono text-[0.6rem] tracking-[0.2em] uppercase">
+        <p className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
           {days === 1 ? t("landing.fees.lastDay") : t("landing.fees.daysLeft")}
         </p>
       </div>

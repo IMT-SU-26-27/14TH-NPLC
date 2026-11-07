@@ -53,7 +53,6 @@ export async function CompetitionSection({ lang }: LangProps) {
       membersHint: extraMax === 0 ? t("landing.competitions.leaderOnly") : t("landing.competitions.leaderPlus", { range }),
       normalFee: formatRupiah(c.fee, lang),
       earlyFee: discounted ? formatRupiah(EARLY_BIRD.fee, lang) : null,
-      saveLabel: discounted ? t("landing.competitions.save", { amount: formatRupiah(c.fee - EARLY_BIRD.fee, lang) }) : null,
       earlyRange: discounted ? t("landing.competitions.earlyBirdRange", { range: earlyRange }) : null,
       open: isRegistrationOpen(c, now),
       closesLabel: c.registration_closes_at ? t("landing.competitions.closes", { date: formatDateTime(c.registration_closes_at, lang) }) : null,
