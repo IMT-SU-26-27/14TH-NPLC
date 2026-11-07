@@ -16,8 +16,8 @@ export function FaqSection({ lang }: LangProps) {
         <SectionHeading index="06" label={t("landing.faq.label")} title={t("landing.faq.title")} />
         <div className="space-y-3">
           {QUESTIONS.map((key, i) => (
-            <Collapsible key={key} defaultOpen={i === 0} className="bg-card ring-border rounded-xl ring-1">
-              <CollapsibleTrigger className="group/faq focus-visible:ring-ring/50 flex w-full items-center gap-4 rounded-xl px-5 py-4 text-left outline-none focus-visible:ring-3">
+            <Collapsible key={key} defaultOpen={i === 0} className="bg-card ring-border rounded-[12px] ring-1">
+              <CollapsibleTrigger className="group/faq focus-visible:ring-ring/50 flex w-full items-center gap-4 rounded-[12px] px-5 py-4 text-left outline-none focus-visible:ring-3">
                 <span className="text-primary w-10 shrink-0 font-mono text-xs">{`Q.${String(i + 1).padStart(2, "0")}`}</span>
                 <span className="flex-1 font-semibold">{t(`landing.faq.${key}Q`)}</span>
                 <PlusIcon aria-hidden className="text-primary size-4 shrink-0 transition-transform group-data-panel-open/faq:rotate-45" />

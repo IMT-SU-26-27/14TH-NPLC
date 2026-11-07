@@ -31,7 +31,7 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
             <TabsTrigger
               key={item.id}
               value={item.id}
-              className="group/pick text-foreground hover:border-primary/60 data-active:border-primary data-active:ring-primary/15 border-border h-auto flex-col items-stretch gap-2 rounded-xl p-5 text-left whitespace-normal group-data-[variant=line]/tabs-list:bg-card group-data-[variant=line]/tabs-list:data-active:bg-card after:hidden data-active:ring-4 sm:p-6"
+              className="group/pick text-foreground hover:border-primary/60 data-active:border-primary data-active:ring-primary/15 border-border h-auto flex-col items-stretch gap-2 rounded-[12px] p-5 text-left whitespace-normal group-data-[variant=line]/tabs-list:bg-card group-data-[variant=line]/tabs-list:data-active:bg-card after:hidden data-active:ring-4 sm:p-6"
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-primary font-mono text-xs tracking-[0.2em] uppercase">
@@ -58,7 +58,7 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
 
       {items.map((item) => (
         <TabsContent key={item.id} value={item.id}>
-          <Card className="ring-border gap-0 rounded-xl py-0">
+          <Card className="ring-border gap-0 rounded-[12px] py-0">
             <CardContent className="grid gap-6 p-5 sm:grid-cols-2 sm:p-6">
               <div className="space-y-1">
                 <p className={microLabel}>

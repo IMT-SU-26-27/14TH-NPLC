@@ -12,7 +12,7 @@ import { GridBackdrop } from "@/features/landing/components/grid-backdrop";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import type { LangProps } from "@/types/i18n";
 
-const darkCard = "bg-background/5 text-background ring-background/15 relative rounded-xl";
+const darkCard = "bg-background/5 text-background ring-background/15 relative rounded-[12px]";
 
 // "01 // Tentang": the admin's About text (Admin > Content) with the built-in summary as fallback.
 export async function AboutSection({ lang }: LangProps) {

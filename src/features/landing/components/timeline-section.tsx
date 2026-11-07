@@ -72,7 +72,7 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
                   <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{t("landing.timeline.phase", { n })}</p>
                   <Card
                     className={cn(
-                      "bg-background/5 text-background rounded-xl",
+                      "bg-background/5 text-background rounded-[12px]",
                       active ? "ring-highlight shadow-[0_0_24px_color-mix(in_oklch,var(--highlight)_45%,transparent)] ring-2" : "ring-brand-sky/30",
                     )}
                   >
