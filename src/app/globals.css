@@ -114,7 +114,7 @@
   --hero-fade-v: linear-gradient(180deg, rgba(244, 247, 253, 0) 0px, rgba(244, 247, 253, 0) 230px, rgba(244, 247, 253, 0.94) 360px, rgba(244, 247, 253, 0.94) 100%);
   --hero-fade-bottom: linear-gradient(180deg, rgba(244, 247, 253, 0) calc(100% - 160px), rgba(244, 247, 253, 1) 100%);
   --tagline-gradient: linear-gradient(90deg, var(--primary) 0%, var(--brand-purple) 100%);
-  /* Dark page-header band (auth pages): deep navy with a faint grid. */
+  /* Dark page-header band (PageBand): deep navy with a faint grid. */
   --band: #0F1B33;
   --band-foreground: #FFFFFF;
   --band-muted: #C3CEE3;
