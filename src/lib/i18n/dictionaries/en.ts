@@ -168,6 +168,7 @@ export const en: Dictionary = {
   },
   rally: {
     results: {
+      correctedBy: "corrected by {name}",
       title: "Post results",
       lead: "Each team's active results. Changing or deleting a result requires a reason.",
       allPosts: "All posts",
@@ -286,6 +287,7 @@ export const en: Dictionary = {
       deletePostDescription: "The post and its LO assignments are permanently deleted.",
     },
     lo: {
+      feedbackTip: "Turn on touch vibration/haptics and allow the camera. Touch the screen once to turn on sound.",
       stationTitle: "Record results",
       points: "{points} points",
       reading: "QR read, finding the team...",

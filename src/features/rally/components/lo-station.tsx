@@ -1,5 +1,6 @@
 "use client";
 
+import { useFeedbackAudioUnlock } from "@/hooks/use-feedback-audio-unlock";
 import { useRallyStation } from "@/hooks/use-rally-station";
 import { LoRecentResults } from "@/features/rally/components/lo-recent-results";
 import { LoSavedStep } from "@/features/rally/components/lo-saved-step";
@@ -9,6 +10,7 @@ import type { LoStationProps } from "@/types/rally";
 
 export function LoStation({ post, recent }: LoStationProps) {
   const { view, error, lookUp, record, undoSaved, undoExisting, reset } = useRallyStation(post.id);
+  useFeedbackAudioUnlock();
 
   return (
     <div className="space-y-8">

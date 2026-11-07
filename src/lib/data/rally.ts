@@ -90,7 +90,8 @@ export async function listRallyResults(filters: RallyFilters): Promise<RallyResu
       `id, outcome, points, recorded_at,
        post:rally_posts ( id, name, allow_draw ),
        registration:registrations!inner ( id, team_name, school ),
-       recorder:profiles!rally_results_recorded_by_fkey ( full_name )`,
+       recorder:profiles!rally_results_recorded_by_fkey ( full_name ),
+       corrector:profiles!rally_results_corrected_by_fkey ( full_name )`,
       { count: "exact" },
     )
     .is("voided_at", null)
