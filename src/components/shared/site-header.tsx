@@ -14,7 +14,8 @@ export function SiteHeader({ lang }: LangProps) {
   return (
     <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 min-[360px]:gap-4">
-        <Link href={localePath(lang, "/")} className="shrink-0">
+        <Link href={localePath(lang, "/")} className="inline-flex shrink-0 items-center gap-2">
+          <Image src="/shared/logo-star.webp" alt="" aria-hidden width={21} height={26} preload className="h-[22px] w-auto sm:h-[26px]" />
           <Image
             src="/shared/logo-nplc-xiv.webp"
             alt={t("meta.siteName")}
