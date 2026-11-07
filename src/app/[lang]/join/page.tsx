@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RegisterBanner } from "@/features/registration/components/register-banner";
 import { JoinSection } from "@/features/registration/components/join-section";
 import type { JoinPageProps } from "@/types/registration";
 
@@ -13,12 +14,16 @@ export async function generateMetadata({ params }: JoinPageProps): Promise<Metad
 
 export default async function JoinPage({ params, searchParams }: JoinPageProps) {
   const lang = await resolveLang(params);
+  const t = getT(lang);
 
   return (
-    <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12">
-      <Suspense fallback={<Skeleton className="h-96" />}>
-        <JoinSection lang={lang} searchParams={searchParams} />
-      </Suspense>
+    <main className="flex-1">
+      <RegisterBanner index="10" label={t("join.title")} title={t("join.title")} lead={t("join.lead")} mascot="/shared/maskot-4.webp" />
+      <div className="mx-auto w-full max-w-xl px-4 py-12">
+        <Suspense fallback={<Skeleton className="h-80 rounded-xl" />}>
+          <JoinSection lang={lang} searchParams={searchParams} />
+        </Suspense>
+      </div>
     </main>
   );
 }

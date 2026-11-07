@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/data/auth";
 import { getMyTeams, previewTeam } from "@/lib/data/registrations";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { cn } from "@/lib/utils";
 import { referralCodeSchema } from "@/lib/validations/registration";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,10 @@ import { JoinCodeForm } from "@/features/registration/components/join-code-form"
 import { JoinTeamForm } from "@/features/registration/components/join-team-form";
 import type { JoinSectionProps } from "@/types/registration";
 
+const card = "ring-border rounded-xl py-6 sm:py-8";
+const cardPadding = "px-5 sm:px-8";
+const sectionLabel = "text-primary font-mono text-xs tracking-[0.2em] uppercase";
+
 export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
   const t = getT(lang);
   const { code } = await searchParams;
@@ -21,11 +26,11 @@ export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
 
   if (myTeam) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">{t("join.title")}</CardTitle>
+      <Card className={card}>
+        <CardHeader className={cardPadding}>
+          <p className={sectionLabel}>{`// ${t("join.title")}`}</p>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className={cn("space-y-6", cardPadding)}>
           <Alert variant="destructive">
             <OctagonXIcon />
             <AlertTitle>{t("join.alreadyTitle")}</AlertTitle>
@@ -40,12 +45,11 @@ export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
   }
 
   const codeCard = (message?: string) => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">{t("join.title")}</CardTitle>
-        <CardDescription>{t("join.lead")}</CardDescription>
+    <Card className={card}>
+      <CardHeader className={cardPadding}>
+        <p className={sectionLabel}>{`// ${t("join.code")}`}</p>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className={cn("space-y-6", cardPadding)}>
         {message && (
           <Alert variant="destructive">
             <OctagonXIcon />
@@ -68,8 +72,9 @@ export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
   const full = preview.member_count >= preview.max_members;
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className={card}>
+      <CardHeader className={cn("gap-2", cardPadding)}>
+        <p className={sectionLabel}>{`// ${t("join.found")}`}</p>
         <CardTitle className="text-xl">{preview.team_name}</CardTitle>
         <CardDescription>{t("join.ledBy", { competition: preview.competition_name, leader: preview.leader_name })}</CardDescription>
         <CardAction>
@@ -79,7 +84,7 @@ export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
           </Badge>
         </CardAction>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className={cn("space-y-6", cardPadding)}>
         {!preview.is_joinable || full ? (
           <Alert variant="destructive">
             <OctagonXIcon />
@@ -90,7 +95,7 @@ export async function JoinSection({ lang, searchParams }: JoinSectionProps) {
           <JoinTeamForm referralCode={parsed.data} preview={preview} user={user} />
         )}
         <Separator />
-        <JoinCodeForm />
+        <JoinCodeForm primary={false} />
       </CardContent>
     </Card>
   );

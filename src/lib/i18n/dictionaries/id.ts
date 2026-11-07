@@ -423,6 +423,7 @@ export const id = {
     codePlaceholder: "mis. GDYFUVQM",
     codeHint: "Minta kode 8 karakter dari dasbor ketua tim.",
     find: "Cari tim",
+    found: "Tim ditemukan",
     ledBy: "{competition} · ketua {leader}",
     submit: "Gabung {team}",
     notFound: "Tidak ada tim dengan kode ini. Cek lagi ke ketua tim.",

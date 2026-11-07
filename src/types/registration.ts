@@ -111,6 +111,8 @@ export type TwibbonProofFieldProps = {
 
 export type JoinCodeFormProps = {
   defaultCode?: string;
+  // False under a team preview, where joining is the main action and searching again is secondary.
+  primary?: boolean;
 };
 
 export type DashboardPageProps = {
@@ -186,6 +188,8 @@ export type RegisterBannerProps = {
   label: string;
   title: string;
   lead: string;
+  // Path of a 446x446 mascot in public/, shown on the right from lg up.
+  mascot?: string;
 };
 
 export type RegisterSummaryProps = {

@@ -424,6 +424,7 @@ export const en: Dictionary = {
     codePlaceholder: "e.g. GDYFUVQM",
     codeHint: "Ask your team leader for the 8-character code on their dashboard.",
     find: "Find team",
+    found: "Team found",
     ledBy: "{competition} · led by {leader}",
     submit: "Join {team}",
     notFound: "No team has this code. Check it with your team leader.",
