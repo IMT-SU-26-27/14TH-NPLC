@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { CircleCheckIcon, OctagonXIcon } from "lucide-react";
 import { updateProfile } from "@/lib/actions/profile";
 import { initialFormState } from "@/lib/form";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -11,22 +12,26 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { FormDraftBanner } from "@/components/shared/form-draft-banner";
+import { FormDraftStatus } from "@/components/shared/form-draft-status";
 import type { ProfileFormProps } from "@/types/profile";
 
 export function ProfileForm({ user }: ProfileFormProps) {
-  const [state, action, pending] = useActionState(updateProfile, initialFormState);
+  const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: "profile", userId: user.id });
+  const [state, action, pending] = useActionState(clearOnSuccess(updateProfile), initialFormState);
   const { t, fieldErrors } = useI18n();
   const errors = state.fieldErrors ?? {};
 
   return (
     <Card>
-      <form action={action} className="contents">
+      <form ref={formRef} action={action} className="contents">
         <CardHeader>
           <CardTitle>{t("profile.detailsTitle")}</CardTitle>
           <CardDescription>{t("profile.detailsLead")}</CardDescription>
         </CardHeader>
         <CardContent>
           <FieldGroup>
+            {draftRestored && <FormDraftBanner onDiscard={discardDraft} />}
             <Field data-invalid={!!errors.fullName}>
               <FieldLabel htmlFor="fullName">{t("common.fullName")}</FieldLabel>
               <Input id="fullName" name="fullName" autoComplete="name" defaultValue={user.full_name} aria-invalid={!!errors.fullName} required />
@@ -52,7 +57,8 @@ export function ProfileForm({ user }: ProfileFormProps) {
             )}
           </FieldGroup>
         </CardContent>
-        <CardFooter className="justify-end">
+        <CardFooter className="justify-end gap-3">
+          <FormDraftStatus savedAt={draftSavedAt} className="mr-auto" />
           <Button type="submit" disabled={pending}>
             {pending && <Spinner />}
             {t("common.save")}

@@ -102,6 +102,8 @@ export type TwibbonProofFieldProps = {
   error: string | null;
   uploading: boolean;
   progress: number;
+  // A restored draft filled the form, but files are never saved.
+  reselectHint?: boolean;
   onFileChange: (file: File | null) => void;
 };
 
