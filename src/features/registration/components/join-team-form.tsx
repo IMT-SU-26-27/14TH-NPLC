@@ -5,12 +5,15 @@ import { OctagonXIcon } from "lucide-react";
 import { getTwibbonUploadSignature, joinTeam } from "@/lib/actions/registration";
 import { initialFormState } from "@/lib/form";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { FormDraftBanner } from "@/components/shared/form-draft-banner";
+import { FormDraftStatus } from "@/components/shared/form-draft-status";
 import { TwibbonProofField } from "@/features/registration/components/twibbon-proof-field";
 import type { JoinTeamFormProps } from "@/types/registration";
 
@@ -18,7 +21,8 @@ const TWIBBON_ACCEPT = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
 
 export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps) {
-  const [state, action, pending] = useActionState(joinTeam, initialFormState);
+  const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: "join-team", userId: user.id });
+  const [state, action, pending] = useActionState(clearOnSuccess(joinTeam), initialFormState);
   const { t, fieldErrors } = useI18n();
   const [twibbonFile, setTwibbonFile] = useState<File | null>(null);
   const [missingTwibbon, setMissingTwibbon] = useState(false);
@@ -46,9 +50,10 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form ref={formRef} onSubmit={handleSubmit}>
       <input type="hidden" name="referralCode" value={referralCode} />
       <FieldGroup>
+        {draftRestored && <FormDraftBanner hasFiles onDiscard={discardDraft} />}
         <Field data-invalid={!!errors.fullName}>
           <FieldLabel htmlFor="fullName">{t("common.fullName")}</FieldLabel>
           <Input id="fullName" name="fullName" defaultValue={user.full_name} autoComplete="name" aria-invalid={!!errors.fullName} required />
@@ -78,6 +83,7 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
           error={twibbonError}
           uploading={twibbon.uploading}
           progress={twibbon.progress}
+          reselectHint={draftRestored && !twibbonFile}
           onFileChange={(next) => {
             setTwibbonFile(next);
             setMissingTwibbon(false);
@@ -95,6 +101,7 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
           {busy && <Spinner />}
           {t("join.submit", { team: preview.team_name })}
         </Button>
+        <FormDraftStatus savedAt={draftSavedAt} className="-mt-3 justify-center" />
       </FieldGroup>
     </form>
   );

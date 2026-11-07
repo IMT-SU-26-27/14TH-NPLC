@@ -6,5 +6,5 @@ export type ProfileInput = z.infer<typeof profileSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
 export type ProfileFormProps = {
-  user: Pick<CurrentUser, "full_name" | "email">;
+  user: Pick<CurrentUser, "id" | "full_name" | "email">;
 };

@@ -55,6 +55,14 @@ export const id = {
     profile: "Profil",
     contest: "Kontes CP",
   },
+  draft: {
+    restoredTitle: "Draf sebelumnya dipulihkan",
+    restored: "Isian yang belum terkirim sudah diisi lagi. Periksa sebelum mengirim.",
+    restoredWithFiles: "Isian yang belum terkirim sudah diisi lagi. File tidak ikut tersimpan, jadi pilih ulang filenya.",
+    discard: "Hapus draf",
+    saved: "Draf tersimpan · {time}",
+    reselectFile: "Pilih ulang file. File tidak ikut tersimpan di draf.",
+  },
   auth: {
     signInTitle: "Masuk",
     signInSubtitle: "Gunakan email yang kamu daftarkan.",

@@ -6,6 +6,7 @@ import { createRegistration, getNewRegistrationUploadSignature, getTwibbonUpload
 import { initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,8 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegen
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { FormDraftBanner } from "@/components/shared/form-draft-banner";
+import { FormDraftStatus } from "@/components/shared/form-draft-status";
 import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
 import { TwibbonProofField } from "@/features/registration/components/twibbon-proof-field";
 import type { RegisterTeamFormProps } from "@/types/registration";
@@ -23,7 +26,8 @@ const MAX_BYTES = 5 * 1024 * 1024;
 
 // Registering = creating the team AND paying: the proof is uploaded first, then the team is created with it.
 export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFormProps) {
-  const [state, action, pending] = useActionState(createRegistration, initialFormState);
+  const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: `register-team-${competition.slug}`, userId: user.id });
+  const [state, action, pending] = useActionState(clearOnSuccess(createRegistration), initialFormState);
   const { t, fieldErrors } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [missingProof, setMissingProof] = useState(false);
@@ -75,9 +79,10 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
   const twibbonError = missingTwibbon ? t("errors.twibbonRequired") : twibbon.error ? t(twibbon.error, twibbon.errorParams) : null;
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form ref={formRef} onSubmit={handleSubmit}>
       <input type="hidden" name="competitionId" value={competition.id} />
       <FieldGroup>
+        {draftRestored && <FormDraftBanner hasFiles onDiscard={discardDraft} />}
         <Alert>
           <TriangleAlertIcon />
           <AlertDescription>{t("register.oneCompetitionWarning")}</AlertDescription>
@@ -136,6 +141,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
               error={twibbonError}
               uploading={twibbon.uploading}
               progress={twibbon.progress}
+              reselectHint={draftRestored && !twibbonFile}
               onFileChange={(next) => {
                 setTwibbonFile(next);
                 setMissingTwibbon(false);
@@ -163,6 +169,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
                 }}
               />
               <FieldDescription>{t("payment.proofHint")}</FieldDescription>
+              {draftRestored && !file && <FieldDescription className="text-warning">{t("draft.reselectFile")}</FieldDescription>}
               <FieldError errors={proofError ? [{ message: proofError }] : undefined} />
               {uploading && <Progress value={progress} />}
             </Field>
@@ -180,6 +187,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
           {busy && <Spinner />}
           {uploading ? t("payment.uploading", { progress }) : t("register.submit")}
         </Button>
+        <FormDraftStatus savedAt={draftSavedAt} className="-mt-3 justify-center" />
       </FieldGroup>
     </form>
   );

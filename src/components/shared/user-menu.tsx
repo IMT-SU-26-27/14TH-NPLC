@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { LayoutDashboardIcon, LogOutIcon, MapPinIcon, ShieldIcon, UserRoundIcon, UsersIcon } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
+import { removeAllDrafts } from "@/lib/form-draft";
 import { useI18n } from "@/hooks/use-i18n";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,7 +60,12 @@ export function UserMenu({ user }: UserMenuProps) {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
+        <DropdownMenuItem variant="destructive" onClick={() => {
+            // Form drafts hold personal data (name, NISN, phone), so a shared device keeps none after sign-out.
+            removeAllDrafts();
+            signOut();
+          }}
+        >
           <LogOutIcon />
           {t("nav.signOut")}
         </DropdownMenuItem>

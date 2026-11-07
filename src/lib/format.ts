@@ -18,6 +18,11 @@ export function formatDateTime(value: string | null, lang: Locale): string {
   return `${formatted} WIB`;
 }
 
+// Hours and minutes on the device clock, e.g. "14.32" in Indonesian.
+export function formatTimeOfDay(ms: number, lang: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[lang], { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(ms));
+}
+
 // With seconds, for judging records where the order of submissions matters.
 export function formatTimestamp(value: string, lang: Locale): string {
   const formatted = new Intl.DateTimeFormat(INTL_LOCALE[lang], {
