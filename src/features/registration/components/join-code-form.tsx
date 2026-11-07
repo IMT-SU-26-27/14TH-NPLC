@@ -38,7 +38,7 @@ export function JoinCodeForm({ defaultCode, primary = true }: JoinCodeFormProps)
           </InputGroup>
           <FieldDescription>{t("join.codeHint")}</FieldDescription>
         </Field>
-        <Button type="submit" size="lg" variant={primary ? "default" : "outline"} className="h-11 w-full">
+        <Button type="submit" size="lg" variant={primary ? "default" : "outline"} className={primary ? "h-11 w-full" : "border-primary bg-background h-11 w-full"}>
           {t("join.find")}
           <SearchIcon data-icon="inline-end" />
         </Button>

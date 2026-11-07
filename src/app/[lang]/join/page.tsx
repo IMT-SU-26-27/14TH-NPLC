@@ -18,12 +18,18 @@ export default async function JoinPage({ params, searchParams }: JoinPageProps) 
 
   return (
     <main className="flex-1">
-      <RegisterBanner index="10" label={t("join.title")} title={t("join.title")} lead={t("join.lead")} mascot="/shared/maskot-4.webp" />
-      <div className="mx-auto w-full max-w-xl px-4 py-12">
-        <Suspense fallback={<Skeleton className="h-80 rounded-xl" />}>
-          <JoinSection lang={lang} searchParams={searchParams} />
-        </Suspense>
-      </div>
+      <Suspense
+        fallback={
+          <>
+            <RegisterBanner index="10" label={t("join.title")} title={t("join.title")} lead={t("join.lead")} mascot="/shared/maskot-4.webp" />
+            <div className="mx-auto w-full max-w-xl px-4 py-12">
+              <Skeleton className="h-80 rounded-xl" />
+            </div>
+          </>
+        }
+      >
+        <JoinSection lang={lang} searchParams={searchParams} />
+      </Suspense>
     </main>
   );
 }
