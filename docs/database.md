@@ -149,7 +149,7 @@ Submissions can't be written from the browser at all. The server judges the code
 
 Every team member signs in before creating or joining a team, so each member row belongs to a real account and the email comes from that account. Participants can only create teams through `create_registration()` and join through `join_team()`; direct inserts are blocked.
 
-"Confirm email" is off and the site sends no email. A forgotten password is reset by hand by the committee's contact person; see README step 4.
+"Confirm email" is off, so an account is active right after sign-up. The only email the site sends is the password reset link; see README step 4.
 
 ## Scoring
 

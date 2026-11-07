@@ -80,19 +80,23 @@ pnpm db:types
 
 ## 4. Configure Supabase Auth
 
-The site sends no email, so SMTP is not needed.
+- **Confirm email: off** (self-hosted: `ENABLE_EMAIL_AUTOCONFIRM=true` in Supabase's `.env`). After sign-up the user is signed in straight away and lands on `/dashboard`, or back on the join link they came from. Accounts made while confirmation was still on can't sign in; confirm them in the SQL editor with `update auth.users set email_confirmed_at = now() where email_confirmed_at is null;`.
+- **SMTP: required, for password resets only.** The reset link is the only email the site sends. Set it in **Authentication → SMTP Settings** (self-hosted: the `SMTP_*` settings in Supabase's `.env`). Without custom SMTP, hosted Supabase only delivers to the project's team members, at a few emails an hour.
+- **Site URL:** the real domain (e.g. `https://nplc.example.com`), not `localhost`. Add `https://<domain>/auth/confirm` to the allowed redirect URLs too (and `http://localhost:3000/auth/confirm` for development).
+- **Reset Password template:** point the link at `/auth/confirm` with the token hash, so it works on any device and not only in the browser that asked for it:
 
-- **Confirm email: off** (self-hosted: `ENABLE_EMAIL_AUTOCONFIRM=true` in Supabase's `.env`). After sign-up the user is signed in straight away and lands on the dashboard (or back on the join link they came from).
-- **Forgot password:** handled by hand, no email. `/forgot-password` tells the user to message the committee's contact person on LINE; set their name and LINE ID in [`src/lib/password-reset-contact.ts`](src/lib/password-reset-contact.ts). The committee sets a temporary password in the SQL editor (Studio's *Send password recovery* sends an email, so don't use it):
+  ```html
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password">Reset password</a>
+  ```
+
+  Flow: `/forgot-password` sends the email, `/auth/confirm` signs the user in, `/reset-password` saves the new password. Under the form, users who get no email are pointed to their competition's contact person on WhatsApp.
+- **Manual reset (fallback, if the email never arrives):** the committee sets a temporary password in the SQL editor, and the user changes it on their Profile page after signing in:
 
   ```sql
   update auth.users
   set encrypted_password = extensions.crypt('<temporary password>', extensions.gen_salt('bf')), updated_at = now()
-  where email = '<user email>';
+  where email = lower('<user email>');
   ```
-
-  The user signs in with it and changes it on their Profile page.
-- **Accounts made while confirmation was on:** they can't sign in until confirmed. Confirm them in the SQL editor: `update auth.users set email_confirmed_at = now() where email_confirmed_at is null;`.
 
 ## 5. Run it
 
@@ -156,6 +160,7 @@ Verdicts, languages and scoring are documented in [`docs/judge0-errors.md`](docs
 ```
 src/
   app/[lang]/          routes (id / en); pages are thin Server Components
+  app/auth/confirm/    password reset link callback
   features/<feature>/  feature components (auth, registration, dashboard, admin, cp, content, landing, competitions)
   components/ui/       shadcn/ui components (generated, don't edit)
   components/shared/   header, footer, menus, markdown, i18n provider
@@ -175,6 +180,8 @@ More detail: [`docs/database.md`](docs/database.md) (tables, flows, security), [
 | Problem | Fix |
 |---|---|
 | Sign-up or sign-in says the account isn't active yet | "Confirm email" is still on in Supabase Auth. Turn it off and confirm existing accounts (see [step 4](#4-configure-supabase-auth)). |
+| Password reset email doesn't arrive | Check the SMTP settings and the Auth logs. Meanwhile, reset the password by hand (see [step 4](#4-configure-supabase-auth)). |
+| Reset link opens the forgot-password page with "invalid or expired" | The link expired (1 hour) or was already used, or the template still uses `{{ .ConfirmationURL }}` and was opened in another browser. Use the `token_hash` template above. |
 | "Permission denied for table …" | A migration wasn't applied, or a table is missing grants. Re-run the migrations in order. |
 | Register button stays disabled | The competition has no payment method set up. Set QRIS or BCA in Admin → Registrations → Payment. |
 | Waiting room doesn't move into the contest | Check that Realtime is running and the migrations (which add `cp_sessions`, `cp_scores` and `registration_events` to the `supabase_realtime` publication) were applied. |

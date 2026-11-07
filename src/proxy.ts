@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { redirectWithCookies, updateSession } from "@/lib/supabase/proxy";
 import { DEFAULT_LOCALE, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 
-const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/lo", "/rally", "/profile"];
+const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/lo", "/rally", "/reset-password", "/profile"];
 // LO accounts run posts only: they never register, compete or administer.
 const NOT_FOR_LO = ["/dashboard", "/register", "/join", "/admin", "/cp", "/rally"];
 const SIGNED_OUT_ONLY = ["/login", "/signup", "/forgot-password"];
@@ -15,6 +15,11 @@ function matches(path: string, prefixes: string[]) {
 // 2. Optimistic route guards on the path without its locale. Pages and RLS enforce the same rules again.
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+
+  if (pathname.startsWith("/auth/")) {
+    const { response } = await updateSession(request);
+    return response();
+  }
 
   const [, first, ...rest] = pathname.split("/");
   if (!isLocale(first)) {
