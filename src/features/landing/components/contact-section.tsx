@@ -18,7 +18,7 @@ export function ContactSection({ lang }: LangProps) {
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 md:grid-cols-[1.2fr_1fr]">
         <div className="space-y-4">
           <p className="font-mono text-xs tracking-[0.2em] uppercase">{`07 // ${t("landing.contact.label")}`}</p>
-          <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-5xl">{t("landing.contact.title")}</h2>
+          <h2 className="font-display text-[36px] leading-[1.08] font-extrabold tracking-[0.01em] uppercase sm:text-[48px]">{t("landing.contact.title")}</h2>
           <span aria-hidden className="bg-highlight block h-1 w-16 rounded-full" />
           <p>{t("landing.contact.lead")}</p>
           <div className="flex flex-col gap-2.5 pt-2 sm:flex-row sm:flex-wrap sm:gap-3">

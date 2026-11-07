@@ -114,6 +114,7 @@ export type Database = {
           registration_closes_at: string | null
           registration_opens_at: string | null
           slug: string
+          sort_order: number
           twibbon_url: string | null
           type: Database["public"]["Enums"]["competition_type"]
           updated_at: string
@@ -134,6 +135,7 @@ export type Database = {
           registration_closes_at?: string | null
           registration_opens_at?: string | null
           slug: string
+          sort_order?: number
           twibbon_url?: string | null
           type: Database["public"]["Enums"]["competition_type"]
           updated_at?: string
@@ -154,6 +156,7 @@ export type Database = {
           registration_closes_at?: string | null
           registration_opens_at?: string | null
           slug?: string
+          sort_order?: number
           twibbon_url?: string | null
           type?: Database["public"]["Enums"]["competition_type"]
           updated_at?: string

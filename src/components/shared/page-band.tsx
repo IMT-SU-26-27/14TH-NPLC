@@ -15,7 +15,7 @@ export function PageBand({ index, label, title, lead, mascot, children }: PageBa
           <BoxIcon aria-hidden className="text-brand-purple size-3.5 shrink-0" />
           {`${index} // ${label}`}
         </p>
-        <h1 className="text-band-foreground text-3xl font-bold tracking-tight text-balance uppercase sm:text-5xl">{title}</h1>
+        <h1 className="font-display text-band-foreground text-[30px] leading-[1.08] font-extrabold tracking-[0.01em] text-balance uppercase sm:text-[44px]">{title}</h1>
         {lead && <p className="text-band-muted max-w-2xl sm:text-lg">{lead}</p>}
         {children}
       </div>

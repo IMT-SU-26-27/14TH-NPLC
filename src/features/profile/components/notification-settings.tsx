@@ -40,12 +40,12 @@ export function NotificationSettings() {
   if (push.support === "off") return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("push.settingsTitle")}</CardTitle>
-        <CardDescription>{t("push.settingsLead")}</CardDescription>
+    <Card className="ring-border rounded-[12px] py-6 sm:py-9">
+      <CardHeader className="px-5 sm:px-10">
+        <CardTitle className="text-primary font-mono text-xs font-medium tracking-[0.14em] uppercase">{`// ${t("push.settingsTitle")}`}</CardTitle>
+        <CardDescription className="text-sm">{t("push.settingsLead")}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-5 sm:px-10">
         {push.support === "checking" && <Skeleton className="h-12" />}
         {push.support === "unsupported" && (
           <Alert>
@@ -81,7 +81,7 @@ export function NotificationSettings() {
         )}
       </CardContent>
       {push.subscribed && (
-        <CardFooter className="justify-end">
+        <CardFooter className="border-t-0 bg-transparent px-5 pt-0 pb-6 sm:justify-end sm:px-10 sm:pb-9">
           <Button variant="outline" onClick={test} disabled={testing}>
             {testing ? <Spinner /> : <SendIcon />}
             {t("push.sendTest")}

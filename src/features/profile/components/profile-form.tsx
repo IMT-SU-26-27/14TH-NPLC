@@ -10,11 +10,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
 import { FormDraftBanner } from "@/components/shared/form-draft-banner";
 import { FormDraftStatus } from "@/components/shared/form-draft-status";
 import type { ProfileFormProps } from "@/types/profile";
+
+const labelClass = "text-primary font-mono text-xs font-medium tracking-[0.2em] uppercase";
+const requiredMark = (
+  <span aria-hidden className="text-destructive">
+    *
+  </span>
+);
 
 export function ProfileForm({ user }: ProfileFormProps) {
   const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: "profile", userId: user.id });
@@ -33,24 +40,28 @@ export function ProfileForm({ user }: ProfileFormProps) {
           <FieldGroup>
             {draftRestored && <FormDraftBanner onDiscard={discardDraft} />}
             <Field data-invalid={!!errors.fullName}>
-              <FieldLabel htmlFor="fullName" className="text-primary font-mono text-xs tracking-[0.12em] uppercase">
-                {t("common.fullName")} <span aria-hidden className="text-destructive">*</span>
+              <FieldLabel htmlFor="fullName" className={labelClass}>
+                {t("common.fullName")} {requiredMark}
               </FieldLabel>
-              <div className="relative">
-                <UserIcon aria-hidden className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2" />
-                <Input id="fullName" name="fullName" autoComplete="name" defaultValue={user.full_name} aria-invalid={!!errors.fullName} required className="h-12 rounded-[8px] pl-10" />
-              </div>
+              <InputGroup className="h-12">
+                <InputGroupAddon>
+                  <UserIcon />
+                </InputGroupAddon>
+                <InputGroupInput id="fullName" name="fullName" autoComplete="name" defaultValue={user.full_name} aria-invalid={!!errors.fullName} required />
+              </InputGroup>
               <FieldDescription>{t("profile.nameHint")}</FieldDescription>
               <FieldError errors={fieldErrors(errors.fullName)} />
             </Field>
             <Field>
-              <FieldLabel htmlFor="email" className="text-primary font-mono text-xs tracking-[0.12em] uppercase">
+              <FieldLabel htmlFor="email" className={labelClass}>
                 {t("common.email")}
               </FieldLabel>
-              <div className="relative">
-                <MailIcon aria-hidden className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2" />
-                <Input id="email" type="email" value={user.email} readOnly disabled className="h-12 rounded-[8px] pl-10 bg-muted" />
-              </div>
+              <InputGroup className="bg-muted h-12">
+                <InputGroupAddon>
+                  <MailIcon />
+                </InputGroupAddon>
+                <InputGroupInput id="email" type="email" value={user.email} readOnly disabled />
+              </InputGroup>
               <FieldDescription>{t("profile.emailHint")}</FieldDescription>
             </Field>
             {state.status === "error" && state.message && (
@@ -67,9 +78,9 @@ export function ProfileForm({ user }: ProfileFormProps) {
             )}
           </FieldGroup>
         </CardContent>
-        <CardFooter className="flex-wrap justify-end gap-3 px-5 sm:px-10">
-          <FormDraftStatus savedAt={draftSavedAt} className="mr-auto" />
-          <Button type="submit" size="lg" className="rounded-[8px] px-4" disabled={pending}>
+        <CardFooter className="flex-col items-start gap-3 border-t-0 bg-transparent px-5 pt-0 pb-6 sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:pb-9">
+          <FormDraftStatus savedAt={draftSavedAt} />
+          <Button type="submit" size="lg" className="rounded-[8px] px-4 sm:ml-auto" disabled={pending}>
             {pending && <Spinner />}
             {t("common.save")}
           </Button>

@@ -68,7 +68,7 @@ export const en: Dictionary = {
     restored: "Your unsent answers are back in the form. Check them before you submit.",
     restoredWithFiles: "Your unsent answers are back in the form. Files are not saved, so choose them again.",
     discard: "Delete draft",
-    saved: "Draft saved · {time}",
+    saved: "Draft saved automatically · {time}",
     savedNoPassword: "Draft auto-saved · {time} · passwords excluded",
     reselectFile: "Choose the file again. Files are not saved in the draft.",
   },

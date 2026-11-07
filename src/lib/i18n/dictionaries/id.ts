@@ -67,7 +67,7 @@ export const id = {
     restored: "Isian yang belum terkirim sudah diisi lagi. Periksa sebelum mengirim.",
     restoredWithFiles: "Isian yang belum terkirim sudah diisi lagi. File tidak ikut tersimpan, jadi pilih ulang filenya.",
     discard: "Hapus draf",
-    saved: "Draf tersimpan · {time}",
+    saved: "Draf tersimpan otomatis · {time}",
     savedNoPassword: "Draf tersimpan otomatis · {time} · tanpa kata sandi",
     reselectFile: "Pilih ulang file. File tidak ikut tersimpan di draf.",
   },
