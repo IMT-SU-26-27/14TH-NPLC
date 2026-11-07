@@ -81,7 +81,7 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
         </div>
       </CardContent>
 
-      <CardFooter className="mt-auto flex-col items-start gap-4 border-t-0 bg-transparent px-6 py-0 sm:px-8">
+      <CardFooter className="mt-auto flex-col items-start gap-4 border-t-0 bg-transparent px-6 pt-0 pb-6 sm:px-8 sm:pb-8">
         {competition.registration_closes_at && (
           <p className="text-muted-foreground flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase">
             <ClockIcon aria-hidden className="size-3.5" />
