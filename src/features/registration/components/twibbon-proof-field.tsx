@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { FilePicker } from "@/features/registration/components/file-picker";
 import type { TwibbonProofFieldProps } from "@/types/registration";
 
-export function TwibbonProofField({ twibbonUrl, disabled, error, uploading, progress, onFileChange }: TwibbonProofFieldProps) {
+export function TwibbonProofField({ twibbonUrl, disabled, error, uploading, progress, reselectHint = false, onFileChange }: TwibbonProofFieldProps) {
   const { t } = useI18n();
 
   return (
@@ -25,6 +25,7 @@ export function TwibbonProofField({ twibbonUrl, disabled, error, uploading, prog
       )}
       <FilePicker id="twibbonProof" accept="image/jpeg,image/png,image/webp" disabled={disabled} invalid={!!error} onFileChange={onFileChange} />
       <FieldDescription>{t("twibbon.hint")}</FieldDescription>
+      {reselectHint && <FieldDescription className="text-warning">{t("draft.reselectFile")}</FieldDescription>}
       <FieldError errors={error ? [{ message: error }] : undefined} />
       {uploading && <Progress value={progress} />}
     </Field>

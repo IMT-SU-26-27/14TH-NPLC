@@ -1,12 +1,13 @@
 "use client";
 
-import { startTransition, useActionState, useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { ArrowRightIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature, getTwibbonUploadSignature } from "@/lib/actions/registration";
 import { fieldErrorState, initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
 import { createRegistrationSchema } from "@/lib/validations/registration";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,8 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSepar
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { FormDraftBanner } from "@/components/shared/form-draft-banner";
+import { FormDraftStatus } from "@/components/shared/form-draft-status";
 import { FilePicker } from "@/features/registration/components/file-picker";
 import { FormStepHeading } from "@/features/registration/components/form-step-heading";
 import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
@@ -47,7 +50,8 @@ const requiredMark = (
 
 // Registering = creating the team AND paying: the proof is uploaded first, then the team is created with it.
 export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFormProps) {
-  const [state, action, pending] = useActionState(createRegistration, initialFormState);
+  const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: `register-team-${competition.slug}`, userId: user.id });
+  const [state, action, pending] = useActionState(clearOnSuccess(createRegistration), initialFormState);
   const { t, fieldErrors } = useI18n();
   const [teamName, setTeamName] = useState("");
   const [clientErrors, setClientErrors] = useState<FieldErrors>({});
@@ -64,6 +68,12 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
   const errors: FieldErrors = { ...(state.fieldErrors ?? {}), ...clientErrors };
   const busy = uploading || twibbon.uploading || pending;
   const hasClientErrors = Object.values(clientErrors).some(Boolean);
+
+  // The draft hook fills the inputs without firing events, so read the restored team name for the transfer note.
+  useEffect(() => {
+    const input = formRef.current?.elements.namedItem("teamName");
+    if (input instanceof HTMLInputElement) setTeamName(input.value);
+  }, [draftRestored, formRef]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -109,9 +119,10 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
   const formMessage = hasClientErrors || missingProof || missingTwibbon ? "validation.fixFields" : state.status === "error" ? state.message : null;
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} onSubmit={handleSubmit} noValidate>
       <input type="hidden" name="competitionId" value={competition.id} />
       <FieldGroup>
+        {draftRestored && <FormDraftBanner hasFiles onDiscard={discardDraft} />}
         <Alert className="border-l-highlight border-l-4">
           <TriangleAlertIcon />
           <AlertDescription>{t("register.oneCompetitionWarning")}</AlertDescription>
@@ -129,7 +140,6 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
               maxLength={60}
               aria-invalid={!!errors.teamName}
               required
-              value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
             />
             <FieldDescription>{t("register.teamNameHint")}</FieldDescription>
@@ -227,6 +237,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
             }}
           />
           <FieldDescription>{t("payment.proofPick")}</FieldDescription>
+          {draftRestored && !file && <FieldDescription className="text-warning">{t("draft.reselectFile")}</FieldDescription>}
           <FieldError errors={proofError ? [{ message: proofError }] : undefined} />
           {uploading && <Progress value={progress} />}
         </Field>
@@ -240,6 +251,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
           error={twibbonError}
           uploading={twibbon.uploading}
           progress={twibbon.progress}
+          reselectHint={draftRestored && !twibbonFile}
           onFileChange={(next) => {
             setTwibbonFile(next);
             setMissingTwibbon(false);
@@ -263,6 +275,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
           {uploading ? t("payment.uploading", { progress }) : t("register.submit")}
           {!busy && <ArrowRightIcon data-icon="inline-end" />}
         </Button>
+        <FormDraftStatus savedAt={draftSavedAt} className="-mt-3 justify-center" />
       </FieldGroup>
     </form>
   );

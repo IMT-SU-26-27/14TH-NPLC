@@ -7,12 +7,15 @@ Competition registration website. Next.js 16 (App Router, Cache Components) + Su
 - Claude provides coding assistance, debugging, and implementation guidance only.
 
 ## Git workflow
-- After finishing each feature, commit and push to GitHub (`origin`, branch `main`) without waiting to be asked.
+- Start every change on a new branch from `staging`, named by type: `feature/<name>`, `fix/<name>`, `chore/<name>` or `docs/<name>` (e.g. `feature/team-referral-join`).
 - One feature per commit. Use Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:` (e.g. `feat: add team referral code join flow`).
-- Before committing: run `pnpm exec tsc --noEmit` and `pnpm lint`, and fix failures. Never commit or push a broken build.
+- Before committing: run `pnpm exec tsc --noEmit` and `pnpm lint`, and fix every failure. Never commit or push a broken build.
 - Check `git status` and the staged diff before committing. Never commit `.env*` files (except `.env.local.example`), keys, tokens or other secrets.
-- No `Co-Authored-By` lines or any other Claude attribution in commit messages or PR descriptions.
-- Never force-push, rewrite pushed history, or push to another branch or remote without being asked.
+- Push the branch and open a pull request into `staging` (`gh pr create --base staging`).
+- A PR that changes the UI includes screenshots of every changed page at desktop 1440px and mobile 390px wide.
+- Never push directly to `main` or `staging`, never force-push or rewrite pushed history, and never merge your own PR.
+- Only the Koordinator Tech merges into `staging`. Only the Koordinator SU Tech merges `staging` into `main`.
+- No `Co-Authored-By` lines or any other AI attribution in commits, PR titles or PR descriptions.
 
 ## Package manager
 - Use `pnpm` only. Never run `npm`, `npx` or `yarn`. Use `pnpm add`, `pnpm dlx`, `pnpm exec`.
@@ -74,7 +77,7 @@ git status --porcelain --untracked-files=all -- public/
 
 Rules for every image in `public/`:
 
-- **Grouped by feature:** `public/<feature>/`, where `<feature>` matches a folder in `src/features/` (e.g. `public/landing/`, `public/registration/`). Use `public/shared/` for an image used by 2+ features. No images loose in the `public/` root.
+- **Grouped by feature:** `public/<feature>/`, where `<feature>` matches a folder in `src/features/` (e.g. `public/landing/hero-banner.webp`, `public/registration/payment-guide.webp`). Use `public/shared/` for an image used by 2+ features (e.g. `public/shared/logo-nplc-xiv.webp`). No images loose in the `public/` root.
 - **File name:** lowercase kebab-case. Every space becomes `-` and every letter is lowercase, with no underscores or other symbols: `Hero Banner.PNG` becomes `hero-banner.webp`.
 - **Format:** `.webp` only. Convert PNG, JPG, JPEG, GIF and similar files to WebP.
 - The full path must match `^public/[a-z0-9-]+/[a-z0-9]+(-[a-z0-9]+)*\.webp$`.
@@ -116,7 +119,11 @@ Exceptions (not images, or required at the root):
 - Validate env vars with a Zod schema instead of reading `process.env.X!` throughout the code.
 
 ## Conventions
-- TypeScript strict mode. No `any`. Path alias `@/*` maps to `src/*`.
-- File names in kebab-case. Components in PascalCase.
+- TypeScript strict mode. Path alias `@/*` maps to `src/*`.
+- No `any`. When a type is not known yet, use `unknown` and narrow it before use.
+- File names in kebab-case, component names in PascalCase: `team-timeline.tsx` exports `TeamTimeline`, `use-countdown.ts` exports `useCountdown`, `public/landing/hero-banner.webp`.
+- One component per file. The only exception is the generated shadcn/ui files in `components/ui/`.
+- No `console.log`, no commented-out code and no unused imports in committed code.
+- `pnpm lint` must finish with 0 errors and 0 warnings (the script runs `eslint --max-warnings=0`).
 - Read the relevant guide in `node_modules/next/dist/docs/` before writing Next.js code; this version has breaking changes (see AGENTS.md).
 - Check with `pnpm exec tsc --noEmit` and `pnpm lint` before finishing a task.

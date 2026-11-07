@@ -102,6 +102,8 @@ export type TwibbonProofFieldProps = {
   error: string | null;
   uploading: boolean;
   progress: number;
+  // A restored draft filled the form, but files are never saved.
+  reselectHint?: boolean;
   onFileChange: (file: File | null) => void;
 };
 
@@ -124,6 +126,15 @@ export type TeamCardProps = {
   userId: string;
   qrisUrl: string | null;
   lang: Locale;
+};
+
+export type StepState = "done" | "current" | "upcoming" | "failed";
+
+export type TimelineStep = {
+  key: string;
+  title: string;
+  description: string;
+  state: StepState;
 };
 
 export type TeamTimelineProps = {
