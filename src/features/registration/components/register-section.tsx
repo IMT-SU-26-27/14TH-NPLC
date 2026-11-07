@@ -13,7 +13,7 @@ import { resolveLang } from "@/lib/i18n/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { RegisterBanner } from "@/features/registration/components/register-banner";
+import { PageBand } from "@/components/shared/page-band";
 import { RegisterSteps } from "@/features/registration/components/register-steps";
 import { RegisterSummary } from "@/features/registration/components/register-summary";
 import { RegisterTeamForm } from "@/features/registration/components/register-team-form";
@@ -52,7 +52,7 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
 
   return (
     <>
-      <RegisterBanner
+      <PageBand
         index="09"
         label={t("register.formLabel")}
         title={t("register.title", { competition: competition.name })}
