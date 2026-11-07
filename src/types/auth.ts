@@ -32,3 +32,10 @@ export type AuthFormLoaderProps = {
 export type UserMenuProps = {
   user: CurrentUser;
 };
+
+export type AuthHeroProps = {
+  step: string;
+  title: string;
+  subtitle: string;
+  mascot?: string;
+};
