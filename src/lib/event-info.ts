@@ -1,10 +1,8 @@
-import type { CommitteeContact } from "@/types/landing";
-
-// Event facts the homepage shows that the database doesn't store yet.
+// Event facts the website shows that the database doesn't store yet.
 // Fill in the nulls when the committee confirms them; the page hides what is still missing.
 
-// Early bird price from the Figma "05 // Biaya" section. The registration form still charges
-// competitions.fee, so keep this in sync with whatever the committee sets there.
+// Early bird price from the design's "05 // Biaya" section. The amount to pay comes from
+// currentFee() in src/lib/pricing.ts, so the homepage and the registration form always agree.
 export const EARLY_BIRD = {
   fee: 85_000,
   // Date-only, WIB. The price is valid through the whole last day.
@@ -14,11 +12,16 @@ export const EARLY_BIRD = {
 
 export const GUIDEBOOK_URL: string | null = null;
 
-// WhatsApp number in international format without "+" or spaces, e.g. "6281234567890".
-export const COMMITTEE_CONTACT: CommitteeContact = {
-  name: null,
-  whatsapp: null,
-};
+// One contact person per competition. `whatsapp` is the international format without "+" or spaces.
+export const COMMITTEE_CONTACTS = [
+  { competition: "Competitive Programming", name: "Jae", whatsapp: "6281232626369", display: "0812-3262-6369" },
+  { competition: "Logic Rally Games", name: "Caca", whatsapp: "6289506677376", display: "0895-0667-7376" },
+] as const;
+
+export const INSTAGRAM = {
+  handle: "@ucnplc",
+  url: "https://www.instagram.com/ucnplc",
+} as const;
 
 // End of the early bird's last day in WIB, as an instant.
 export function earlyBirdEndsAt(): Date {

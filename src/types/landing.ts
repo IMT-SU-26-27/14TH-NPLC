@@ -1,10 +1,8 @@
+import type { COMMITTEE_CONTACTS } from "@/lib/event-info";
 import type { Competition } from "@/types/competition";
 import type { Locale } from "@/types/i18n";
 
-export type CommitteeContact = {
-  name: string | null;
-  whatsapp: string | null;
-};
+export type CommitteeContact = (typeof COMMITTEE_CONTACTS)[number];
 
 export type SectionTone = "light" | "dark";
 

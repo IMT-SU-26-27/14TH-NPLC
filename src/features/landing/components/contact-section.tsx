@@ -1,15 +1,14 @@
 import Image from "next/image";
 import { MessageCircleIcon } from "lucide-react";
-import { COMMITTEE_CONTACT, whatsappUrl } from "@/lib/event-info";
+import { COMMITTEE_CONTACTS, whatsappUrl } from "@/lib/event-info";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import type { LangProps } from "@/types/i18n";
 
-// "07 // Kontak": blue band with the waving mascot. Until the committee number is set, says it is coming.
+// "07 // Kontak": blue band with the waving mascot and one WhatsApp button per competition's contact person.
 export function ContactSection({ lang }: LangProps) {
   const t = getT(lang);
-  const { name, whatsapp } = COMMITTEE_CONTACT;
 
   return (
     <section
@@ -22,24 +21,21 @@ export function ContactSection({ lang }: LangProps) {
           <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-5xl">{t("landing.contact.title")}</h2>
           <span aria-hidden className="bg-highlight block h-1 w-16 rounded-full" />
           <p>{t("landing.contact.lead")}</p>
-          {whatsapp ? (
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+          <div className="flex flex-col gap-2.5 pt-2 sm:flex-row sm:flex-wrap sm:gap-3">
+            {COMMITTEE_CONTACTS.map((contact) => (
               <a
-                href={whatsappUrl(whatsapp)}
+                key={contact.whatsapp}
+                href={whatsappUrl(contact.whatsapp)}
                 target="_blank"
-                rel="noreferrer"
-                className={cn(buttonVariants({ size: "lg" }), "bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 px-5")}
+                rel="noopener"
+                className={cn(buttonVariants({ size: "lg" }), "bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 w-full px-5 sm:w-auto")}
               >
                 <MessageCircleIcon data-icon="inline-start" />
-                {t("landing.contact.cta")}
+                {`${contact.competition} · ${contact.name}`}
+                <span className="sr-only">{` (${t("landing.contact.opensWhatsapp")})`}</span>
               </a>
-              <p className="font-mono text-xs tracking-[0.15em] uppercase">
-                {[name, `+${whatsapp}`].filter(Boolean).join(" · ")}
-              </p>
-            </div>
-          ) : (
-            <p className="pt-2 font-mono text-xs tracking-[0.15em] uppercase">{t("landing.contact.soon")}</p>
-          )}
+            ))}
+          </div>
         </div>
         <div aria-hidden className="relative mx-auto w-56 sm:w-72">
           <div className="bg-primary-foreground/20 absolute inset-6 -z-10 rounded-full blur-3xl" />
