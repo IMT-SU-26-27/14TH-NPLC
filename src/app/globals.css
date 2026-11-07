@@ -114,13 +114,13 @@
   --hero-fade-v: linear-gradient(180deg, rgba(244, 247, 253, 0) 0px, rgba(244, 247, 253, 0) 230px, rgba(244, 247, 253, 0.94) 360px, rgba(244, 247, 253, 0.94) 100%);
   --hero-fade-bottom: linear-gradient(180deg, rgba(244, 247, 253, 0) calc(100% - 160px), rgba(244, 247, 253, 1) 100%);
   --tagline-gradient: linear-gradient(90deg, var(--primary) 0%, var(--brand-purple) 100%);
-  /* Dark page-header band (PageBand): deep navy with a faint grid. */
-  --band: #0F1B33;
+  /* Every navy band (PageBand, Home "Tentang" and "Timeline"): the design's navy with its 48px grid. */
+  --band: #0E1A30;
   --band-foreground: #FFFFFF;
   --band-muted: #C3CEE3;
   --band-grid:
-    linear-gradient(rgba(120, 217, 255, 0.07) 1px, transparent 1px) 0 0 / 66px 66px,
-    linear-gradient(90deg, rgba(120, 217, 255, 0.07) 1px, transparent 1px) 0 0 / 66px 66px;
+    linear-gradient(rgba(120, 217, 255, 0.08) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, rgba(120, 217, 255, 0.08) 1px, transparent 1px) 0 0 / 48px 48px;
 }
 
 .dark {
