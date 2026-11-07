@@ -18,6 +18,7 @@ export async function getActiveCompetitions(): Promise<PublicCompetition[]> {
     .from("competitions")
     .select(PUBLIC_COLUMNS)
     .eq("is_active", true)
+    .order("sort_order")
     .order("created_at");
   if (error) throw new Error(`Could not load competitions: ${error.message}`);
   return data;
