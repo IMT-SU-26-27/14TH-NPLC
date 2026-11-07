@@ -167,3 +167,26 @@ export type DeleteTeamButtonProps = {
 export type RegistrationRealtimeProps = {
   registrationIds: string[];
 };
+
+export type RegisterBannerProps = {
+  index: string;
+  label: string;
+  title: string;
+  lead: string;
+};
+
+export type RegisterStepsProps = {
+  lang: Locale;
+};
+
+export type RegisterSummaryProps = {
+  competition: PublicCompetition;
+  lang: Locale;
+};
+
+export type FormStepHeadingProps = {
+  id: string;
+  step: number;
+  title: string;
+  description?: string;
+};

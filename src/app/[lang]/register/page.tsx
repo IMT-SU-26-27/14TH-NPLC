@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RegisterBanner } from "@/features/registration/components/register-banner";
 import { RegisterIndexSection } from "@/features/registration/components/register-index-section";
 import type { LangPageProps } from "@/types/i18n";
 
@@ -16,14 +17,13 @@ export default async function RegisterIndexPage({ params }: LangPageProps) {
   const t = getT(lang);
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-12">
-      <div className="space-y-1">
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">{t("register.pageTitle")}</h1>
-        <p className="text-muted-foreground">{t("register.pageLead")}</p>
+    <main className="flex-1">
+      <RegisterBanner index="08" label={t("register.label")} title={t("register.pageTitle")} lead={t("register.pageLead")} />
+      <div className="mx-auto w-full max-w-6xl px-4 py-12">
+        <Suspense fallback={<Skeleton className="h-96" />}>
+          <RegisterIndexSection lang={lang} />
+        </Suspense>
       </div>
-      <Suspense fallback={<Skeleton className="h-72" />}>
-        <RegisterIndexSection lang={lang} />
-      </Suspense>
     </main>
   );
 }

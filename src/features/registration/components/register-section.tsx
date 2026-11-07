@@ -10,8 +10,11 @@ import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { RegisterBanner } from "@/features/registration/components/register-banner";
+import { RegisterSteps } from "@/features/registration/components/register-steps";
+import { RegisterSummary } from "@/features/registration/components/register-summary";
 import { RegisterTeamForm } from "@/features/registration/components/register-team-form";
 import type { RegisterSectionProps } from "@/types/registration";
 
@@ -24,39 +27,50 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
 
   if (!competition || !isRegistrationOpen(competition)) {
     return (
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <CircleOffIcon />
-          </EmptyMedia>
-          <EmptyTitle>{competition ? t("register.closedTitle") : t("register.notFoundTitle")}</EmptyTitle>
-          <EmptyDescription>{competition ? t("register.closedDescription") : t("register.notFoundDescription")}</EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
-          <Link href={`${localePath(lang, "/")}#competitions`} className={buttonVariants({ variant: "outline" })}>
-            {t("register.seeAll")}
-          </Link>
-        </EmptyContent>
-      </Empty>
+      <div className="mx-auto w-full max-w-2xl px-4 py-16">
+        <Empty className="bg-card border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <CircleOffIcon />
+            </EmptyMedia>
+            <EmptyTitle>{competition ? t("register.closedTitle") : t("register.notFoundTitle")}</EmptyTitle>
+            <EmptyDescription>{competition ? t("register.closedDescription") : t("register.notFoundDescription")}</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Link href={`${localePath(lang, "/")}#competitions`} className={buttonVariants({ variant: "outline" })}>
+              {t("register.seeAll")}
+            </Link>
+          </EmptyContent>
+        </Empty>
+      </div>
     );
   }
 
+  const size = formatTeamSize(competition.min_members, competition.max_members, lang);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">{t("register.title", { competition: competition.name })}</CardTitle>
-        <CardDescription>
-          {t("competition.teamOf", { size: formatTeamSize(competition.min_members, competition.max_members, lang) })} ·{" "}
-          {formatRupiah(competition.fee, lang)}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <RegisterTeamForm
-          competition={competition}
-          user={user}
-          qrisUrl={competition.qris_public_id ? publicImageUrl(competition.qris_public_id) : null}
-        />
-      </CardContent>
-    </Card>
+    <>
+      <RegisterBanner
+        index="09"
+        label={t("register.formLabel")}
+        title={t("register.title", { competition: competition.name })}
+        lead={`${size} · ${formatRupiah(competition.fee, lang)}`}
+      />
+      <div className="mx-auto grid w-full max-w-6xl items-start gap-8 px-4 py-12 lg:grid-cols-[11rem_minmax(0,1fr)_17rem]">
+        <RegisterSteps lang={lang} />
+        <Card className="ring-border rounded-xl py-6 sm:py-8">
+          <CardContent className="px-5 sm:px-8">
+            <RegisterTeamForm
+              competition={competition}
+              user={user}
+              qrisUrl={competition.qris_public_id ? publicImageUrl(competition.qris_public_id) : null}
+            />
+          </CardContent>
+        </Card>
+        <div className="max-lg:hidden lg:sticky lg:top-20">
+          <RegisterSummary competition={competition} lang={lang} />
+        </div>
+      </div>
+    </>
   );
 }

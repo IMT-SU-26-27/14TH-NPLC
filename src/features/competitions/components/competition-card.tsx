@@ -1,55 +1,92 @@
 import Link from "next/link";
-import { CalendarIcon, UsersIcon, WalletIcon } from "lucide-react";
+import { ArrowRightIcon, ClockIcon, CodeXmlIcon, NetworkIcon, UsersIcon, WalletIcon } from "lucide-react";
 import { formatDateTime, formatRupiah, formatTeamSize } from "@/lib/format";
 import { isRegistrationOpen } from "@/lib/data/competitions";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import type { CompetitionCardProps } from "@/types/competition";
 
-export function CompetitionCard({ competition, lang }: CompetitionCardProps) {
+const microLabel = "text-primary flex items-center gap-1.5 font-mono text-[0.65rem] tracking-[0.2em] uppercase";
+
+// Figma "08 // Daftar tim" card: numbered name, open badge, members and fee side by side, deadline and CTA.
+export function CompetitionCard({ competition, lang, index }: CompetitionCardProps) {
   const t = getT(lang);
   const open = isRegistrationOpen(competition);
+  const typeLabel = t(`competition.type.${competition.type}`);
+  const isCp = competition.type === "competitive_programming";
+  const Icon = isCp ? CodeXmlIcon : NetworkIcon;
+  const extraMin = Math.max(competition.min_members - 1, 0);
+  const extraMax = Math.max(competition.max_members - 1, 0);
+  const range = extraMin === extraMax ? `${extraMax}` : `${extraMin}–${extraMax}`;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{competition.name}</CardTitle>
-        {t(`competition.type.${competition.type}`).toLowerCase() !== competition.name.toLowerCase() && (
-          <CardDescription>{t(`competition.type.${competition.type}`)}</CardDescription>
-        )}
-        <CardAction>
-          <Badge variant={open ? "default" : "outline"}>{open ? t("competition.open") : t("competition.closed")}</Badge>
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Card className="ring-border gap-6 rounded-xl py-6 sm:py-8">
+      <CardHeader className="gap-3 px-6 sm:px-8">
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{`${String(index + 1).padStart(2, "0")} // ${competition.name}`}</p>
+          <Badge variant="outline" className="shrink-0 font-mono text-[0.6rem] tracking-[0.15em] uppercase">
+            <span aria-hidden className={cn("size-2 rounded-full", open ? "bg-highlight ring-highlight-foreground/40 ring-1" : "bg-muted-foreground")} />
+            {open ? t("competition.open") : t("competition.closed")}
+          </Badge>
+        </div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold sm:text-3xl">{competition.name}</h2>
+            {typeLabel.toLowerCase() !== competition.name.toLowerCase() && <p className="text-muted-foreground text-sm">{typeLabel}</p>}
+          </div>
+          <span
+            className={cn(
+              "flex size-12 shrink-0 items-center justify-center rounded-full",
+              isCp ? "bg-primary text-primary-foreground" : "bg-highlight text-highlight-foreground",
+            )}
+          >
+            <Icon aria-hidden className="size-5" />
+          </span>
+        </div>
         {competition.description && <p className="text-muted-foreground">{competition.description}</p>}
-        <ul className="text-muted-foreground space-y-2">
-          <li className="flex items-center gap-2">
-            <UsersIcon className="size-4" />
-            {t("competition.teamOf", { size: formatTeamSize(competition.min_members, competition.max_members, lang) })}
-          </li>
-          <li className="flex items-center gap-2">
-            <WalletIcon className="size-4" />
-            {formatRupiah(competition.fee, lang)}
-          </li>
-          {competition.registration_closes_at && (
-            <li className="flex items-center gap-2">
-              <CalendarIcon className="size-4" />
-              {t("competition.closes", { date: formatDateTime(competition.registration_closes_at, lang) })}
-            </li>
-          )}
-        </ul>
+      </CardHeader>
+
+      <CardContent className="mx-6 grid grid-cols-2 border-y px-0 sm:mx-8">
+        <div className="space-y-1 py-4 pr-4">
+          <p className={microLabel}>
+            <UsersIcon aria-hidden className="size-3.5" />
+            {t("competition.members")}
+          </p>
+          <p className="font-heading text-xl font-bold sm:text-2xl">{formatTeamSize(competition.min_members, competition.max_members, lang)}</p>
+          <p className="text-muted-foreground text-sm">
+            {extraMax === 0 ? t("competition.leaderOnly") : t("competition.leaderPlus", { range })}
+          </p>
+        </div>
+        <div className="space-y-1 border-l py-4 pl-4">
+          <p className={microLabel}>
+            <WalletIcon aria-hidden className="size-3.5" />
+            {t("competition.fee")}
+          </p>
+          <p className="font-heading text-xl font-bold sm:text-2xl">{formatRupiah(competition.fee, lang)}</p>
+        </div>
       </CardContent>
-      <CardFooter className="mt-auto">
+
+      <CardFooter className="mt-auto flex-col items-start gap-4 border-t-0 bg-transparent px-6 py-0 sm:px-8">
+        {competition.registration_closes_at && (
+          <p className="text-muted-foreground flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase">
+            <ClockIcon aria-hidden className="size-3.5" />
+            {t("competition.closes", { date: formatDateTime(competition.registration_closes_at, lang) })}
+          </p>
+        )}
         {open ? (
-          <Link href={localePath(lang, `/register/${competition.slug}`)} className={buttonVariants({ className: "w-full" })}>
+          <Link
+            href={localePath(lang, `/register/${competition.slug}`)}
+            className={cn(buttonVariants({ size: "lg" }), "bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 px-5")}
+          >
             {t("competition.registerTeam")}
+            <ArrowRightIcon />
           </Link>
         ) : (
-          <span className={buttonVariants({ variant: "outline", className: "pointer-events-none w-full opacity-50" })}>
+          <span className={cn(buttonVariants({ variant: "outline", size: "lg" }), "pointer-events-none h-11 opacity-60")}>
             {t("competition.registrationClosed")}
           </span>
         )}

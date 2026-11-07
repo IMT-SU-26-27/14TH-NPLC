@@ -30,6 +30,8 @@ export type PaymentDetails = Pick<Competition, "name" | "fee" | "payment_method"
 export type PaymentInstructionsProps = {
   details: PaymentDetails;
   qrisUrl: string | null;
+  // "Team Name - Competition", shown with a copy button while registering.
+  transferNote?: string;
 };
 
 export type RegistrationWindow = Pick<Competition, "registration_opens_at" | "registration_closes_at">;
@@ -37,4 +39,5 @@ export type RegistrationWindow = Pick<Competition, "registration_opens_at" | "re
 export type CompetitionCardProps = {
   competition: PublicCompetition;
   lang: Locale;
+  index: number;
 };
