@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { TriangleAlertIcon } from "lucide-react";
+import { InfoIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
 import { hasRegistration } from "@/lib/data/registrations";
 import { localePath } from "@/lib/i18n/config";
@@ -15,8 +15,8 @@ export async function RegisterIndexSection({ lang }: LangProps) {
 
   return (
     <div className="space-y-6">
-      <Alert>
-        <TriangleAlertIcon />
+      <Alert className="border-l-highlight bg-accent border-l-4">
+        <InfoIcon />
         <AlertDescription>{t("register.oneCompetitionWarning")}</AlertDescription>
       </Alert>
       <CompetitionList lang={lang} />

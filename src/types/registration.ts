@@ -70,6 +70,8 @@ export type RegisterTeamFormProps = {
   competition: PublicCompetition;
   user: CurrentUser;
   qrisUrl: string | null;
+  // What the team pays now, from currentFee().
+  fee: number;
 };
 
 export type RegisterPageProps = {
@@ -177,4 +179,33 @@ export type DeleteTeamButtonProps = {
 
 export type RegistrationRealtimeProps = {
   registrationIds: string[];
+};
+
+export type RegisterBannerProps = {
+  index: string;
+  label: string;
+  title: string;
+  lead: string;
+};
+
+export type RegisterSummaryProps = {
+  competition: PublicCompetition;
+  lang: Locale;
+  // What the team pays now, from currentFee().
+  fee: number;
+};
+
+export type FilePickerProps = {
+  id: string;
+  accept: string;
+  disabled: boolean;
+  invalid: boolean;
+  onFileChange: (file: File | null) => void;
+};
+
+export type FormStepHeadingProps = {
+  id: string;
+  step: number;
+  title: string;
+  description?: string;
 };

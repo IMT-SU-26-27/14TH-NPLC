@@ -17,7 +17,7 @@ export async function CompetitionList({ lang }: LangProps) {
 
   if (competitions.length === 0) {
     return (
-      <Empty className="border">
+      <Empty className="bg-card border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <TrophyIcon />
@@ -31,8 +31,8 @@ export async function CompetitionList({ lang }: LangProps) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {competitions.map((competition) => (
-        <CompetitionCard key={competition.id} competition={competition} lang={lang} />
+      {competitions.map((competition, i) => (
+        <CompetitionCard key={competition.id} competition={competition} lang={lang} index={i} />
       ))}
     </div>
   );

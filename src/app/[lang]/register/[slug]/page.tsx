@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: RegisterPageProps): Promise<M
 
 export default function RegisterPage({ params }: RegisterPageProps) {
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12">
-      <Suspense fallback={<Skeleton className="h-[32rem]" />}>
+    <main className="flex-1">
+      <Suspense fallback={<Skeleton className="mx-auto my-12 h-128 max-w-6xl" />}>
         <RegisterSection params={params} />
       </Suspense>
     </main>
