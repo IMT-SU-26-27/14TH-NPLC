@@ -1,34 +1,60 @@
 "use client";
 
-import { startTransition, useActionState, useState } from "react";
-import { OctagonXIcon, TriangleAlertIcon } from "lucide-react";
+import { startTransition, useActionState, useEffect, useState } from "react";
+import { ArrowRightIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature, getTwibbonUploadSignature } from "@/lib/actions/registration";
-import { initialFormState } from "@/lib/form";
+import { fieldErrorState, initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
+import { createRegistrationSchema } from "@/lib/validations/registration";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import { useFormDraft } from "@/hooks/use-form-draft";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { FormDraftBanner } from "@/components/shared/form-draft-banner";
 import { FormDraftStatus } from "@/components/shared/form-draft-status";
+import { FilePicker } from "@/features/registration/components/file-picker";
+import { FormStepHeading } from "@/features/registration/components/form-step-heading";
 import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
 import { TwibbonProofField } from "@/features/registration/components/twibbon-proof-field";
+import type { FieldErrors } from "@/types";
 import type { RegisterTeamFormProps } from "@/types/registration";
 
 const ACCEPT = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 const TWIBBON_ACCEPT = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
 
+// The typed fields, checked in the browser before anything is uploaded. The Server Action checks them again.
+const typedFieldsSchema = createRegistrationSchema.pick({
+  teamName: true,
+  school: true,
+  lineId: true,
+  leaderName: true,
+  leaderPhone: true,
+  leaderNisn: true,
+});
+
+const FIELD_ORDER = ["teamName", "school", "lineId", "leaderName", "leaderPhone", "leaderNisn"];
+
+const label = "text-primary font-mono text-xs tracking-[0.15em] uppercase";
+
+const requiredMark = (
+  <span aria-hidden className="text-destructive">
+    *
+  </span>
+);
+
 // Registering = creating the team AND paying: the proof is uploaded first, then the team is created with it.
-export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFormProps) {
+export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTeamFormProps) {
   const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: `register-team-${competition.slug}`, userId: user.id });
   const [state, action, pending] = useActionState(clearOnSuccess(createRegistration), initialFormState);
   const { t, fieldErrors } = useI18n();
+  const [teamName, setTeamName] = useState("");
+  const [clientErrors, setClientErrors] = useState<FieldErrors>({});
   const [file, setFile] = useState<File | null>(null);
   const [missingProof, setMissingProof] = useState(false);
   const { upload, uploading, progress, error: uploadError, errorParams } = useCloudinaryUpload({
@@ -39,27 +65,40 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
   const [twibbonFile, setTwibbonFile] = useState<File | null>(null);
   const [missingTwibbon, setMissingTwibbon] = useState(false);
   const twibbon = useCloudinaryUpload({ getSignature: getTwibbonUploadSignature, maxBytes: MAX_BYTES, accept: TWIBBON_ACCEPT });
-  const errors = state.fieldErrors ?? {};
+  const errors: FieldErrors = { ...(state.fieldErrors ?? {}), ...clientErrors };
   const busy = uploading || twibbon.uploading || pending;
+  const hasClientErrors = Object.values(clientErrors).some(Boolean);
+
+  // The draft hook fills the inputs without firing events, so read the restored team name for the transfer note.
+  useEffect(() => {
+    const input = formRef.current?.elements.namedItem("teamName");
+    if (input instanceof HTMLInputElement) setTeamName(input.value);
+  }, [draftRestored, formRef]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    if (!file) {
-      setMissingProof(true);
+    const data = new FormData(form);
+
+    // Show every problem at once instead of one per submit.
+    const typed = typedFieldsSchema.safeParse(Object.fromEntries(data));
+    const nextErrors = typed.success ? {} : (fieldErrorState(typed.error).fieldErrors ?? {});
+    const proofMissing = !file;
+    const twibbonMissing = !!competition.twibbon_url && !twibbonFile;
+    setClientErrors(nextErrors);
+    setMissingProof(proofMissing);
+    setMissingTwibbon(twibbonMissing);
+    if (!typed.success || proofMissing || twibbonMissing) {
+      // Field ids match their names, so the first problem in form order gets the focus.
+      const first = FIELD_ORDER.find((name) => nextErrors[name]) ?? (proofMissing ? "paymentProof" : "twibbonProof");
+      document.getElementById(first)?.focus();
       return;
     }
-    setMissingProof(false);
-    if (competition.twibbon_url && !twibbonFile) {
-      setMissingTwibbon(true);
-      return;
-    }
-    setMissingTwibbon(false);
+
     const uploadedTwibbon = twibbonFile ? await twibbon.upload(twibbonFile) : null;
     if (twibbonFile && !uploadedTwibbon) return;
     const uploaded = await upload(file);
     if (!uploaded) return;
-    const data = new FormData(form);
     if (uploadedTwibbon) {
       data.set("twibbonProofPublicId", uploadedTwibbon.publicId);
       data.set("twibbonProofFormat", uploadedTwibbon.format);
@@ -77,115 +116,165 @@ export function RegisterTeamForm({ competition, user, qrisUrl }: RegisterTeamFor
         ? t(errors.paymentProofPublicId[0].message)
         : null;
   const twibbonError = missingTwibbon ? t("errors.twibbonRequired") : twibbon.error ? t(twibbon.error, twibbon.errorParams) : null;
+  const formMessage = hasClientErrors || missingProof || missingTwibbon ? "validation.fixFields" : state.status === "error" ? state.message : null;
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit}>
+    <form ref={formRef} onSubmit={handleSubmit} noValidate>
       <input type="hidden" name="competitionId" value={competition.id} />
       <FieldGroup>
         {draftRestored && <FormDraftBanner hasFiles onDiscard={discardDraft} />}
-        <Alert>
+        <Alert className="border-l-highlight border-l-4">
           <TriangleAlertIcon />
           <AlertDescription>{t("register.oneCompetitionWarning")}</AlertDescription>
         </Alert>
 
-        <Field data-invalid={!!errors.teamName}>
-          <FieldLabel htmlFor="teamName">{t("register.teamName")}</FieldLabel>
-          <Input id="teamName" name="teamName" maxLength={60} aria-invalid={!!errors.teamName} required />
-          <FieldDescription>{t("register.teamNameHint")}</FieldDescription>
-          <FieldError errors={fieldErrors(errors.teamName)} />
-        </Field>
-
+        <FormStepHeading id="step-team" step={1} title={t("register.stepTeam")} />
         <div className="grid gap-6 sm:grid-cols-2">
+          <Field data-invalid={!!errors.teamName}>
+            <FieldLabel htmlFor="teamName" className={label}>
+              {t("register.teamName")} {requiredMark}
+            </FieldLabel>
+            <Input
+              id="teamName"
+              name="teamName"
+              maxLength={60}
+              aria-invalid={!!errors.teamName}
+              required
+              onChange={(e) => setTeamName(e.target.value)}
+            />
+            <FieldDescription>{t("register.teamNameHint")}</FieldDescription>
+            <FieldError errors={fieldErrors(errors.teamName)} />
+          </Field>
           <Field data-invalid={!!errors.school}>
-            <FieldLabel htmlFor="school">{t("register.school")}</FieldLabel>
+            <FieldLabel htmlFor="school" className={label}>
+              {t("register.school")} {requiredMark}
+            </FieldLabel>
             <Input id="school" name="school" maxLength={120} autoComplete="organization" aria-invalid={!!errors.school} required />
+            <FieldDescription>{t("register.schoolHint")}</FieldDescription>
             <FieldError errors={fieldErrors(errors.school)} />
           </Field>
-          <Field data-invalid={!!errors.lineId}>
-            <FieldLabel htmlFor="lineId">{t("register.lineId")}</FieldLabel>
-            <Input id="lineId" name="lineId" maxLength={21} autoCapitalize="none" spellCheck={false} aria-invalid={!!errors.lineId} required />
-            <FieldDescription>{t("register.lineIdHint")}</FieldDescription>
-            <FieldError errors={fieldErrors(errors.lineId)} />
+        </div>
+        <Field data-invalid={!!errors.lineId}>
+          <FieldLabel htmlFor="lineId" className={label}>
+            {t("register.lineId")} {requiredMark}
+          </FieldLabel>
+          <Input id="lineId" name="lineId" maxLength={21} autoCapitalize="none" spellCheck={false} aria-invalid={!!errors.lineId} required />
+          <FieldDescription>{t("register.lineIdHint")}</FieldDescription>
+          <FieldError errors={fieldErrors(errors.lineId)} />
+        </Field>
+
+        <FieldSeparator />
+
+        <FormStepHeading id="step-leader" step={2} title={t("register.stepLeader")} description={t("register.leaderHint")} />
+        <Field data-invalid={!!errors.leaderName}>
+          <FieldLabel htmlFor="leaderName" className={label}>
+            {t("common.fullName")} {requiredMark}
+          </FieldLabel>
+          <Input id="leaderName" name="leaderName" defaultValue={user.full_name} autoComplete="name" aria-invalid={!!errors.leaderName} required />
+          <FieldError errors={fieldErrors(errors.leaderName)} />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="leaderEmail" className={label}>
+            {t("common.email")}
+          </FieldLabel>
+          <Input id="leaderEmail" value={user.email} disabled readOnly />
+          <FieldDescription>{t("common.fromAccount")}</FieldDescription>
+        </Field>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Field data-invalid={!!errors.leaderPhone}>
+            <FieldLabel htmlFor="leaderPhone" className={label}>
+              {t("common.phoneWhatsapp")} {requiredMark}
+            </FieldLabel>
+            <Input
+              id="leaderPhone"
+              name="leaderPhone"
+              type="tel"
+              inputMode="tel"
+              placeholder={t("common.phonePlaceholder")}
+              autoComplete="tel"
+              aria-invalid={!!errors.leaderPhone}
+              required
+            />
+            <FieldError errors={fieldErrors(errors.leaderPhone)} />
+          </Field>
+          <Field data-invalid={!!errors.leaderNisn}>
+            <FieldLabel htmlFor="leaderNisn" className={label}>
+              {t("common.nisn")} {requiredMark}
+            </FieldLabel>
+            <Input
+              id="leaderNisn"
+              name="leaderNisn"
+              inputMode="numeric"
+              maxLength={10}
+              placeholder={t("common.nisnPlaceholder")}
+              aria-invalid={!!errors.leaderNisn}
+              required
+            />
+            <FieldError errors={fieldErrors(errors.leaderNisn)} />
           </Field>
         </div>
 
-        <FieldSet>
-          <FieldLegend>{t("register.leader")}</FieldLegend>
-          <FieldDescription>{t("register.leaderHint")}</FieldDescription>
-          <FieldGroup>
-            <Field data-invalid={!!errors.leaderName}>
-              <FieldLabel htmlFor="leaderName">{t("common.fullName")}</FieldLabel>
-              <Input id="leaderName" name="leaderName" defaultValue={user.full_name} autoComplete="name" aria-invalid={!!errors.leaderName} required />
-              <FieldError errors={fieldErrors(errors.leaderName)} />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="leaderEmail">{t("common.email")}</FieldLabel>
-              <Input id="leaderEmail" value={user.email} disabled readOnly />
-              <FieldDescription>{t("common.fromAccount")}</FieldDescription>
-            </Field>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <Field data-invalid={!!errors.leaderPhone}>
-                <FieldLabel htmlFor="leaderPhone">{t("common.phoneWhatsapp")}</FieldLabel>
-                <Input id="leaderPhone" name="leaderPhone" type="tel" inputMode="tel" placeholder={t("common.phonePlaceholder")} autoComplete="tel" aria-invalid={!!errors.leaderPhone} required />
-                <FieldError errors={fieldErrors(errors.leaderPhone)} />
-              </Field>
-              <Field data-invalid={!!errors.leaderNisn}>
-                <FieldLabel htmlFor="leaderNisn">{t("common.nisn")}</FieldLabel>
-                <Input id="leaderNisn" name="leaderNisn" inputMode="numeric" maxLength={10} placeholder={t("common.nisnPlaceholder")} aria-invalid={!!errors.leaderNisn} required />
-                <FieldError errors={fieldErrors(errors.leaderNisn)} />
-              </Field>
-            </div>
-            <TwibbonProofField
-              twibbonUrl={competition.twibbon_url}
-              disabled={busy}
-              error={twibbonError}
-              uploading={twibbon.uploading}
-              progress={twibbon.progress}
-              reselectHint={draftRestored && !twibbonFile}
-              onFileChange={(next) => {
-                setTwibbonFile(next);
-                setMissingTwibbon(false);
-              }}
-            />
-          </FieldGroup>
-        </FieldSet>
+        <FieldSeparator />
 
-        <FieldSet>
-          <FieldLegend>{t("register.paymentTitle")}</FieldLegend>
-          <FieldDescription>{t("register.paymentLead")}</FieldDescription>
-          <div className="grid gap-6 sm:grid-cols-[14rem_1fr]">
-            <PaymentInstructions details={competition} qrisUrl={qrisUrl} />
-            <Field data-invalid={!!proofError}>
-              <FieldLabel htmlFor="paymentProof">{t("payment.proof")}</FieldLabel>
-              <Input
-                id="paymentProof"
-                type="file"
-                accept={ACCEPT.join(",")}
-                disabled={busy}
-                aria-invalid={!!proofError}
-                onChange={(e) => {
-                  setFile(e.target.files?.[0] ?? null);
-                  setMissingProof(false);
-                }}
-              />
-              <FieldDescription>{t("payment.proofHint")}</FieldDescription>
-              {draftRestored && !file && <FieldDescription className="text-warning">{t("draft.reselectFile")}</FieldDescription>}
-              <FieldError errors={proofError ? [{ message: proofError }] : undefined} />
-              {uploading && <Progress value={progress} />}
-            </Field>
-          </div>
-        </FieldSet>
+        <FormStepHeading id="step-payment" step={3} title={t("register.stepPayment")} description={t("register.paymentStepLead")} />
+        <PaymentInstructions
+          details={competition}
+          fee={fee}
+          qrisUrl={qrisUrl}
+          transferNote={`${teamName.trim() || t("register.teamName")} - ${competition.name}`}
+        />
+        <Field data-invalid={!!proofError}>
+          <FieldLabel htmlFor="paymentProof" className={label}>
+            {t("payment.proof")} {requiredMark}
+          </FieldLabel>
+          <FilePicker
+            id="paymentProof"
+            accept={ACCEPT.join(",")}
+            disabled={busy}
+            invalid={!!proofError}
+            onFileChange={(next) => {
+              setFile(next);
+              setMissingProof(false);
+            }}
+          />
+          <FieldDescription>{t("payment.proofPick")}</FieldDescription>
+          {draftRestored && !file && <FieldDescription className="text-warning">{t("draft.reselectFile")}</FieldDescription>}
+          <FieldError errors={proofError ? [{ message: proofError }] : undefined} />
+          {uploading && <Progress value={progress} />}
+        </Field>
 
-        {state.status === "error" && state.message && !state.fieldErrors && (
+        <FieldSeparator />
+
+        <FormStepHeading id="step-twibbon" step={4} title={t("register.stepTwibbon")} description={t("register.twibbonLead")} />
+        <TwibbonProofField
+          twibbonUrl={competition.twibbon_url}
+          disabled={busy}
+          error={twibbonError}
+          uploading={twibbon.uploading}
+          progress={twibbon.progress}
+          reselectHint={draftRestored && !twibbonFile}
+          onFileChange={(next) => {
+            setTwibbonFile(next);
+            setMissingTwibbon(false);
+          }}
+        />
+
+        {formMessage && (
           <Alert variant="destructive">
             <OctagonXIcon />
-            <AlertDescription>{t(state.message)}</AlertDescription>
+            <AlertDescription>{t(formMessage)}</AlertDescription>
           </Alert>
         )}
 
-        <Button type="submit" size="lg" disabled={busy || !isPaymentReady(competition, qrisUrl)}>
+        <Button
+          type="submit"
+          size="lg"
+          className="bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 w-full"
+          disabled={busy || !isPaymentReady(competition, qrisUrl)}
+        >
           {busy && <Spinner />}
           {uploading ? t("payment.uploading", { progress }) : t("register.submit")}
+          {!busy && <ArrowRightIcon data-icon="inline-end" />}
         </Button>
         <FormDraftStatus savedAt={draftSavedAt} className="-mt-3 justify-center" />
       </FieldGroup>
