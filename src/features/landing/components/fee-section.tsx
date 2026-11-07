@@ -2,10 +2,11 @@ import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 import { COMPETITIONS_TAG, getActiveCompetitions } from "@/lib/data/competitions";
-import { EARLY_BIRD, earlyBirdEndsAt, isEarlyBird } from "@/lib/event-info";
+import { EARLY_BIRD, earlyBirdEndsAt } from "@/lib/event-info";
 import { formatDateRange, formatRupiah } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { currentFee } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,7 +27,9 @@ export async function FeeSection({ lang }: LangProps) {
   if (competitions.length === 0) return null;
 
   const normalFee = Math.max(...competitions.map((c) => c.fee));
-  const earlyBird = isEarlyBird(new Date()) && normalFee > EARLY_BIRD.fee;
+  // Same price the registration form charges, so Home and the payment step never disagree.
+  const fee = currentFee(normalFee);
+  const earlyBird = fee < normalFee;
   const endsAt = earlyBirdEndsAt();
   const totalDays = Math.round((endsAt.getTime() - new Date(`${EARLY_BIRD.startsOn}T00:00:00+07:00`).getTime()) / DAY);
   const lastDay = formatDateRange(EARLY_BIRD.endsOn, null, lang);
@@ -34,7 +37,7 @@ export async function FeeSection({ lang }: LangProps) {
   return (
     <section id="fees" className="mx-auto max-w-6xl scroll-mt-14 space-y-10 px-4 py-20 sm:py-28">
       <SectionHeading index="05" label={t("landing.fees.label")} title={t("landing.fees.title")} />
-      <Card className="ring-border rounded-xl py-0">
+      <Card className="ring-border rounded-[12px] py-0">
         <CardContent className={cn("grid items-center gap-8 p-6 sm:p-8", earlyBird ? "lg:grid-cols-[auto_1fr_auto]" : "lg:grid-cols-[1fr_auto]")}>
           {earlyBird && <EarlyBirdRing totalDays={totalDays} endsAt={endsAt.toISOString()} />}
 
@@ -50,7 +53,7 @@ export async function FeeSection({ lang }: LangProps) {
                 </p>
                 <p className="font-heading text-5xl leading-none font-bold tracking-tight sm:text-6xl">
                   <span className="sr-only">{`${t("landing.competitions.earlyPrice")} `}</span>
-                  {formatRupiah(EARLY_BIRD.fee, lang)}
+                  {formatRupiah(fee, lang)}
                 </p>
               </>
             ) : (
