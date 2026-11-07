@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLinkIcon } from "lucide-react";
+import { ExternalLinkIcon, ImageIcon } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -16,9 +16,10 @@ export function TwibbonProofField({ twibbonUrl, disabled, error, uploading, prog
     <Field data-invalid={!!error}>
       <FieldLabel htmlFor="twibbonProof" className="text-primary font-mono text-xs tracking-[0.15em] uppercase">{t(twibbonUrl ? "twibbon.proof" : "twibbon.proofOptional")}</FieldLabel>
       {twibbonUrl ? (
-        <a href={twibbonUrl} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-primary text-foreground w-fit")}>
-          <ExternalLinkIcon />
+        <a href={twibbonUrl} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-primary text-foreground h-10 w-fit! px-4")}>
+          <ImageIcon />
           {t("twibbon.open")}
+          <ExternalLinkIcon data-icon="inline-end" />
         </a>
       ) : (
         <FieldDescription>{t("twibbon.noLink")}</FieldDescription>

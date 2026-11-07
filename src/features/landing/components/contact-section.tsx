@@ -39,7 +39,7 @@ export function ContactSection({ lang }: LangProps) {
         </div>
         <div aria-hidden className="relative mx-auto w-56 sm:w-72">
           <div className="bg-primary-foreground/20 absolute inset-6 -z-10 rounded-full blur-3xl" />
-          <Image src="/landing/maskot-4.webp" alt="" width={446} height={446} sizes="(min-width: 640px) 288px, 224px" className="h-auto w-full" />
+          <Image src="/shared/maskot-4.webp" alt="" width={446} height={446} sizes="(min-width: 640px) 288px, 224px" className="h-auto w-full" />
         </div>
       </div>
     </section>

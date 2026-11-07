@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageBand } from "@/components/shared/page-band";
 import { AuthFormLoader } from "@/features/auth/components/auth-form-loader";
 import type { AuthPageProps } from "@/types/auth";
 
@@ -17,18 +18,22 @@ export default async function SignupPage({ params, searchParams }: AuthPageProps
   const t = getT(lang);
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-16">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-xl">{t("auth.signupTitle")}</CardTitle>
-          <CardDescription>{t("auth.signupSubtitle")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-            <AuthFormLoader mode="signup" lang={lang} searchParams={searchParams} />
-          </Suspense>
-        </CardContent>
-      </Card>
+    <main className="flex-1">
+      <PageBand index="03" label={t("auth.signupTitle")} title={t("auth.signupTitle")} lead={t("auth.signupSubtitle")} mascot={{ src: "/auth/maskot-1.webp" }} />
+      <div className="flex justify-center px-4 pt-6 pb-16 sm:pt-10 sm:pb-24">
+        <Card className="w-full max-w-xl px-2 py-8 sm:px-8 sm:py-10">
+          <CardHeader>
+            <CardTitle className="text-primary font-mono text-sm font-medium tracking-[0.2em] uppercase">
+              {"//"} {t("auth.signupCard")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <AuthFormLoader mode="signup" lang={lang} searchParams={searchParams} />
+            </Suspense>
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }

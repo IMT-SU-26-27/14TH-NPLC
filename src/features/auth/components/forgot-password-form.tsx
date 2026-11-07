@@ -2,15 +2,22 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { MailCheckIcon, OctagonXIcon } from "lucide-react";
+import { ArrowRightIcon, MailCheckIcon, MailIcon, OctagonXIcon } from "lucide-react";
 import { requestPasswordReset } from "@/lib/actions/auth";
 import { initialFormState } from "@/lib/form";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
+
+const labelClass = "text-primary font-mono text-xs font-medium tracking-[0.2em] uppercase";
+const requiredMark = (
+  <span aria-hidden className="text-destructive">
+    *
+  </span>
+);
 
 export function ForgotPasswordForm() {
   const [state, action, pending] = useActionState(requestPasswordReset, initialFormState);
@@ -36,8 +43,25 @@ export function ForgotPasswordForm() {
     <form action={action}>
       <FieldGroup>
         <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="email">{t("common.email")}</FieldLabel>
-          <Input id="email" name="email" type="email" autoComplete="email" aria-invalid={!!errors.email} required />
+          <FieldLabel htmlFor="email" className={labelClass}>
+            {t("common.email")} {requiredMark}
+          </FieldLabel>
+          <InputGroup className="h-12">
+            <InputGroupAddon>
+              <MailIcon />
+            </InputGroupAddon>
+            <InputGroupInput
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder={t("auth.emailPlaceholder")}
+              aria-invalid={!!errors.email}
+              aria-describedby="email-hint"
+              required
+            />
+          </InputGroup>
+          <FieldDescription id="email-hint">{t("auth.forgotEmailHint")}</FieldDescription>
           <FieldError errors={fieldErrors(errors.email)} />
         </Field>
         {state.status === "error" && state.message && (
@@ -47,9 +71,10 @@ export function ForgotPasswordForm() {
           </Alert>
         )}
         <Field>
-          <Button type="submit" size="lg" disabled={pending}>
+          <Button type="submit" size="lg" className="h-12 text-base" disabled={pending}>
             {pending && <Spinner />}
             {t("auth.sendResetLink")}
+            {!pending && <ArrowRightIcon />}
           </Button>
           <FieldDescription className="text-center">
             {t("auth.rememberPassword")} <Link href={href("/login")}>{t("auth.signIn")}</Link>
