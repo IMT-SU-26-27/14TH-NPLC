@@ -219,6 +219,12 @@ export type AccountCardProps = {
   lang: Locale;
 };
 
+export type DashboardNoteProps = {
+  icon: LucideIcon;
+  title?: string;
+  description: string;
+};
+
 export type AccountNoteProps = {
   teamName: string;
   lang: Locale;

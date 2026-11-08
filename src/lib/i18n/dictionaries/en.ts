@@ -418,6 +418,7 @@ export const en: Dictionary = {
     },
     team: {
       qrTitle: "Rally Games QR",
+      qrLabel: "Team QR",
       qrLead: "Show this QR to the LO after playing at a post. Turn up the screen brightness so it's easy to read.",
       backupCode: "Backup code:",
       regenerate: "Regenerate QR",

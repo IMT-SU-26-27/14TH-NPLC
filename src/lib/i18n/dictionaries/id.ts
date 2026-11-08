@@ -417,6 +417,7 @@ export const id = {
     },
     team: {
       qrTitle: "QR Rally Games",
+      qrLabel: "QR tim",
       qrLead: "Tunjukkan QR ini ke LO setelah selesai bermain di pos. Naikkan kecerahan layar supaya mudah terbaca.",
       backupCode: "Kode cadangan:",
       regenerate: "Buat ulang QR",

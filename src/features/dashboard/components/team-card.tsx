@@ -17,6 +17,7 @@ import { DeleteTeamButton } from "@/features/dashboard/components/delete-team-bu
 import { RallyTeamQr } from "@/features/rally/components/rally-team-qr";
 import { CpContestRefresh } from "@/features/dashboard/components/cp-contest-refresh";
 import { RallySessionRefresh } from "@/features/dashboard/components/rally-session-refresh";
+import { DashboardNote } from "@/features/dashboard/components/dashboard-note";
 import type { TeamCardProps } from "@/types/registration";
 
 export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStatus }: TeamCardProps) {
@@ -70,12 +71,10 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStat
       )}
 
       {belowMinimum && (
-        <Alert>
-          <UsersIcon />
-          <AlertDescription>
-            {t(minMembers === maxMembers ? "dashboard.teamExactSize" : "dashboard.teamMinSize", { short, count: minMembers })}
-          </AlertDescription>
-        </Alert>
+        <DashboardNote
+          icon={UsersIcon}
+          description={t(minMembers === maxMembers ? "dashboard.teamExactSize" : "dashboard.teamMinSize", { short, count: minMembers })}
+        />
       )}
 
       {team.status === "accepted" && isCp && (
