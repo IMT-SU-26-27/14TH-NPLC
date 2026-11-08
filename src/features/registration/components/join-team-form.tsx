@@ -82,18 +82,6 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
           <FieldDescription>{t("common.fromAccount")}</FieldDescription>
         </Field>
         <div className="grid gap-6 sm:grid-cols-2">
-          <Field data-invalid={!!errors.nisn}>
-            <FieldLabel htmlFor="nisn" className={label}>
-              {t("common.nisn")} {requiredMark}
-            </FieldLabel>
-            <InputGroup className={inputGroup}>
-              <InputGroupInput id="nisn" name="nisn" inputMode="numeric" maxLength={10} placeholder={t("common.nisnPlaceholder")} aria-invalid={!!errors.nisn} required />
-              <InputGroupAddon className="pl-4">
-                <IdCardIcon />
-              </InputGroupAddon>
-            </InputGroup>
-            <FieldError errors={fieldErrors(errors.nisn)} />
-          </Field>
           <Field data-invalid={!!errors.phone}>
             <FieldLabel htmlFor="phone" className={label}>
               {t("common.phoneWhatsapp")} {requiredMark}
@@ -114,6 +102,18 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
               </InputGroupAddon>
             </InputGroup>
             <FieldError errors={fieldErrors(errors.phone)} />
+          </Field>
+          <Field data-invalid={!!errors.nisn}>
+            <FieldLabel htmlFor="nisn" className={label}>
+              {t("common.nisn")} {requiredMark}
+            </FieldLabel>
+            <InputGroup className={inputGroup}>
+              <InputGroupInput id="nisn" name="nisn" inputMode="numeric" maxLength={10} placeholder={t("common.nisnPlaceholder")} aria-invalid={!!errors.nisn} required />
+              <InputGroupAddon className="pl-4">
+                <IdCardIcon />
+              </InputGroupAddon>
+            </InputGroup>
+            <FieldError errors={fieldErrors(errors.nisn)} />
           </Field>
         </div>
 

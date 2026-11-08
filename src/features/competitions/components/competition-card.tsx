@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRightIcon, ClockIcon, CodeXmlIcon, NetworkIcon, UsersIcon, WalletIcon } from "lucide-react";
-import { formatDateTime, formatTeamSize } from "@/lib/format";
+import { competitionDescription, formatDateTime, formatTeamSize } from "@/lib/format";
 import { isRegistrationOpen } from "@/lib/data/competitions";
 import { localePath } from "@/lib/i18n/config";
 import { currentFee } from "@/lib/pricing";
@@ -50,7 +50,7 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
           </span>
         </div>
         {/* Three lines tall on desktop, so the members/fee rows of both cards line up. */}
-        <p className="text-muted-foreground md:min-h-[3lh]">{competition.description}</p>
+        <p className="text-muted-foreground md:min-h-[3lh]">{competitionDescription(competition, lang)}</p>
       </CardHeader>
 
       <CardContent className="mx-6 grid grid-cols-2 border-y px-0 sm:mx-8">

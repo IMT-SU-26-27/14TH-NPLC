@@ -58,7 +58,7 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
               const active = event.starts_on <= today && today <= (event.ends_on ?? event.starts_on);
               const description = lang === "id" ? event.description_id : event.description_en;
               return (
-                <li key={event.id} className="relative space-y-3">
+                <li key={event.id} className="relative flex flex-col gap-3">
                   {i < events.length - 1 && (
                     <span aria-hidden className="bg-brand-sky/40 absolute top-4 right-[-1rem] left-9 hidden h-px md:block" />
                   )}
@@ -71,12 +71,9 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
                     {n}
                   </span>
                   <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{t("landing.timeline.phase", { n })}</p>
-                  <Card
-                    className={cn(
-                      "bg-band-card text-band-foreground rounded-[12px]",
-                      active ? "ring-highlight shadow-band-glow-lime ring-2" : "ring-band-line",
-                    )}
-                  >
+                  {/* Every card stretches to the tallest one in the row and keeps the same border; the running
+                      phase shows through its lime number and badge. */}
+                  <Card className="bg-band-card text-band-foreground ring-band-line flex-1 rounded-[12px]">
                     <CardHeader className="gap-1.5">
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-brand-sky font-mono text-xs tracking-wider">{formatDateRange(event.starts_on, event.ends_on, lang)}</p>

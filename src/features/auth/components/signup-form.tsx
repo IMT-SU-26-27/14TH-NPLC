@@ -114,7 +114,7 @@ export function SignupForm({ next }: AuthFormProps) {
           {draftSavedAt !== null && (
             <p className="text-muted-foreground flex items-center gap-2 font-mono text-xs tracking-[0.15em] uppercase">
               <span aria-hidden className="bg-success size-2 shrink-0 rounded-full" />
-              {t("draft.savedNoPassword", { time: formatTimeOfDay(draftSavedAt, lang) })}
+              {t("draft.saved", { time: formatTimeOfDay(draftSavedAt, lang) })}
             </p>
           )}
           <FieldDescription>

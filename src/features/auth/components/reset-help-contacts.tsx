@@ -1,9 +1,9 @@
-import { MessageCircleIcon } from "lucide-react";
 import { COMMITTEE_CONTACTS, whatsappUrl } from "@/lib/event-info";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { WhatsappIcon } from "@/components/shared/whatsapp-icon";
 import type { LangProps } from "@/types/i18n";
 
 // Fallback under the reset form: if the email never arrives, the competition's contact person resets the password by hand.
@@ -20,11 +20,11 @@ export function ResetHelpContacts({ lang }: LangProps) {
             key={contact.whatsapp}
             href={whatsappUrl(contact.whatsapp)}
             target="_blank"
-            rel="noopener"
-            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+            rel="noopener noreferrer"
+            className={cn(buttonVariants({ variant: "outline" }), "w-full tabular-nums")}
           >
-            <MessageCircleIcon data-icon="inline-start" />
-            {`${contact.competition} · ${contact.name}`}
+            <WhatsappIcon data-icon="inline-start" />
+            {`${contact.label} · ${contact.display} · ${contact.name}`}
             <span className="sr-only">{` (${t("landing.contact.opensWhatsapp")})`}</span>
           </a>
         ))}

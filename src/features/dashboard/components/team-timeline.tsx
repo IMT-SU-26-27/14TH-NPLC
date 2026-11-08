@@ -1,6 +1,6 @@
 import { HistoryIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, memberRange } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,7 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
     {
       key: "joined",
       title: t("timeline.joined"),
-      description: `${t("timeline.joinedDescription", { count: memberCount, min, max })}${teamComplete ? "" : ` · ${t("timeline.joinedHint", { min })}`}`,
+      description: `${t("timeline.joinedDescription", { count: memberCount, range: memberRange(min, max) })}${teamComplete ? "" : ` · ${t("timeline.joinedHint", { min })}`}`,
       state: teamComplete ? "done" : "current",
     },
     {

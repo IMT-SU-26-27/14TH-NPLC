@@ -4,8 +4,8 @@ insert into public.competitions (slug, name, type, description, min_members, max
 values
   ('competitive-programming', 'Competitive Programming', 'competitive_programming',
    'Solve algorithmic problems in Python, C++ or Java.', 1, 3, 0, 1),
-  ('category-2', 'Category 2', 'logic',
-   'Logic and problem-solving competition.', 1, 3, 0, 2)
+  ('logic-rally-games', 'Logic Rally Games', 'logic',
+   'Logic and problem-solving competition.', 3, 3, 0, 2)
 on conflict (slug) do nothing;
 
 insert into public.cp_sessions (competition_id)
