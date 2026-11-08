@@ -63,12 +63,14 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
                   {labels.selected}
                 </Badge>
               </span>
-              <span className="flex items-end justify-between gap-4">
+              {/* Fills the rest of the card, text at the top and the icon in the bottom corner, so the icons of both
+                  (equal-height) cards line up whatever the description length. */}
+              <span className="flex flex-1 items-start justify-between gap-4">
                 <span className="space-y-1">
                   <span className="font-heading block text-xl font-bold sm:text-2xl">{item.name}</span>
                   {item.description && <span className="text-muted-foreground block text-sm font-normal">{item.description}</span>}
                 </span>
-                <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-full", tint)}>
+                <span className={cn("flex size-11 shrink-0 items-center justify-center self-end rounded-full", tint)}>
                   <Icon aria-hidden className="size-5" />
                 </span>
               </span>
