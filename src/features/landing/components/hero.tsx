@@ -131,10 +131,11 @@ export function Hero({ status }: HeroProps) {
             <div className="bg-brand-purple/20 absolute inset-[22%] rounded-full blur-3xl" />
             <div
               data-hero-art
-              className="relative aspect-[540/520] motion-safe:animate-[hero-art-failsafe_0s_linear_3s_forwards] motion-safe:[&:not([data-hero-ready])]:invisible"
+              className="relative aspect-[540/520] motion-safe:sm:animate-[hero-art-failsafe_0s_linear_2s_forwards] motion-safe:sm:[&:not([data-hero-ready])]:invisible"
             >
-              {/* With motion, hidden until the hero script marks it ready (every layer at its start), so nothing shows
-                  twice. If the script fails or is over 3 s late, the CSS failsafe shows it as it is. */}
+              {/* From 640px up with motion, hidden until the hero script marks it ready (every layer at its start), so
+                  nothing shows twice; the CSS failsafe shows it as it is if the script is over 2 s late. Phones show it
+                  at once and only get the idle motion. */}
               <div data-hero-float className="absolute inset-0">
                 <HeroCube className="size-full" />
               </div>
