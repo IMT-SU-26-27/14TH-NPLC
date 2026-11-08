@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { ArrowLeftIcon, ListChecksIcon, ReceiptIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
 import { getRegistrationDetail } from "@/lib/data/admin";
-import { formatDateTime, formatRupiah } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
+import { currentFee } from "@/lib/pricing";
 import { privateAssetUrl } from "@/lib/cloudinary/server";
 import Image from "next/image";
 import { localePath } from "@/lib/i18n/config";
@@ -13,6 +14,7 @@ import { uuidSchema } from "@/lib/validations/admin";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { FeeAmount } from "@/components/shared/fee-amount";
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
 import { TeamTimeline } from "@/features/dashboard/components/team-timeline";
 import { AdminMembersTable } from "@/features/admin/components/admin-members-table";
@@ -109,7 +111,15 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
               <dl className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <dt className="text-muted-foreground">{t("payment.amount")}</dt>
-                  <dd className="font-medium">{formatRupiah(team.competition.fee, lang)}</dd>
+                  {/* Same date as the participant's payment panel: the price when the team registered. */}
+                  <dd className="font-medium">
+                    <FeeAmount
+                      fee={currentFee(team.competition.fee, new Date(team.created_at))}
+                      normalFee={team.competition.fee}
+                      lang={lang}
+                      labels={{ normal: t("competition.normalPrice"), early: t("competition.earlyPrice") }}
+                    />
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">{t("admin.registrations.paymentSubmitted")}</dt>

@@ -771,7 +771,7 @@ export const en: Dictionary = {
       minMembers: "Minimum members",
       maxMembers: "Maximum members",
       teamSizeHint: "Including the leader.",
-      fee: "Fee (Rupiah)",
+      fee: "Normal price (Rupiah)",
       opensAt: "Registration opens (WIB)",
       closesAt: "Registration closes (WIB)",
       windowHint: "Leave empty for no limit.",

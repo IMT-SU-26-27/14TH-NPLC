@@ -770,7 +770,7 @@ export const id = {
       minMembers: "Anggota minimal",
       maxMembers: "Anggota maksimal",
       teamSizeHint: "Termasuk ketua.",
-      fee: "Biaya (Rupiah)",
+      fee: "Harga normal (Rupiah)",
       opensAt: "Pendaftaran dibuka (WIB)",
       closesAt: "Pendaftaran ditutup (WIB)",
       windowHint: "Kosongkan untuk tanpa batas waktu.",

@@ -39,7 +39,7 @@ export function PaymentSettingsCard({ competitions, lang }: PaymentSettingsCardP
                       </>
                     )}
                     {" · "}
-                    {formatRupiah(c.fee, lang)}
+                    {`${t("competition.normalPrice")} ${formatRupiah(c.fee, lang)}`}
                   </ItemDescription>
                 </ItemContent>
                 <ItemActions>
