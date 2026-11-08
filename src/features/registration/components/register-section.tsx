@@ -6,6 +6,7 @@ import { getActiveCompetitionBySlug, isRegistrationOpen } from "@/lib/data/compe
 import { hasRegistration } from "@/lib/data/registrations";
 import { formatRupiah, formatTeamSize } from "@/lib/format";
 import { currentFee } from "@/lib/pricing";
+import { sectionHref } from "@/lib/home-sections";
 import { localePath } from "@/lib/i18n/config";
 import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -38,7 +39,7 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
             <EmptyDescription>{competition ? t("register.closedDescription") : t("register.notFoundDescription")}</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Link href={`${localePath(lang, "/")}#competitions`} className={buttonVariants({ variant: "outline" })}>
+            <Link href={sectionHref(lang, "competitions")} className={buttonVariants({ variant: "outline" })}>
               {t("register.seeAll")}
             </Link>
           </EmptyContent>

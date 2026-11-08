@@ -6,6 +6,7 @@ import { EARLY_BIRD, earlyBirdEndsAt } from "@/lib/event-info";
 import { formatDateRange, formatRupiah } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { sectionId } from "@/lib/home-sections";
 import { currentFee } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -35,7 +36,7 @@ export async function FeeSection({ lang }: LangProps) {
   const lastDay = formatDateRange(EARLY_BIRD.endsOn, null, lang);
 
   return (
-    <section id="fees" className="mx-auto max-w-6xl scroll-mt-14 space-y-10 px-4 py-20 sm:py-28">
+    <section id={sectionId(lang, "fees")} className="mx-auto max-w-6xl scroll-mt-14 space-y-10 px-4 py-20 sm:py-28">
       <SectionHeading index="05" label={t("landing.fees.label")} title={t("landing.fees.title")} />
       <Card className="ring-border rounded-[12px] py-0">
         <CardContent className={cn("grid items-center gap-8 p-6 sm:p-8", earlyBird ? "lg:grid-cols-[auto_1fr_auto]" : "lg:grid-cols-[1fr_auto]")}>

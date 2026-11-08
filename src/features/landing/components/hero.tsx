@@ -5,8 +5,10 @@ import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 import { useHeroAnimation } from "@/hooks/use-hero-animation";
 import { useI18n } from "@/hooks/use-i18n";
+import { sectionHref } from "@/lib/home-sections";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { SectionLink } from "@/components/shared/section-link";
 import type { HeroProps } from "@/types/landing";
 
 // Decorative binary rows behind the cube ("NPLCXIV" and "DECODE" in ASCII).
@@ -17,7 +19,7 @@ const SLASH_COLORS = ["text-primary", "text-highlight", "text-brand-purple"];
 
 export function Hero({ status }: HeroProps) {
   const scope = useHeroAnimation<HTMLElement>();
-  const { t, href } = useI18n();
+  const { t, href, lang } = useI18n();
   const motto = [t("landing.hero.analyze"), t("landing.hero.think"), t("landing.hero.solve")];
 
   return (
@@ -98,12 +100,12 @@ export function Hero({ status }: HeroProps) {
                 {t("landing.hero.register")}
                 <ArrowRightIcon />
               </Link>
-              <Link
-                href="#competitions"
+              <SectionLink
+                href={sectionHref(lang, "competitions")}
                 className={cn(buttonVariants({ size: "lg", variant: "outline" }), "border-primary h-12 bg-transparent px-5")}
               >
                 {t("landing.hero.seeCompetitions")}
-              </Link>
+              </SectionLink>
             </div>
 
             {status.open && (
@@ -119,7 +121,7 @@ export function Hero({ status }: HeroProps) {
 
           {/* The cube and its two fragments move as one group. */}
           <div aria-hidden className="relative order-first mx-auto w-full max-w-[300px] sm:max-w-[420px] lg:order-none lg:max-w-[540px]">
-            <div className="text-foreground/6 absolute inset-x-[-15%] top-[28%] space-y-5 overflow-hidden font-mono text-xs whitespace-nowrap">
+            <div className="text-foreground pointer-events-none absolute -inset-x-[12%] top-[31.8%] z-0 flex flex-col gap-[18px] overflow-hidden font-mono text-[11px] leading-4 tracking-[0.32em] whitespace-nowrap opacity-6 sm:-right-[11.1%] sm:-left-[14.8%] sm:top-[28.85%] sm:gap-[22px] sm:text-[13px]">
               <p>{BINARY_TOP}</p>
               <p>{CODE_LINE}</p>
               <p>{BINARY_BOTTOM}</p>

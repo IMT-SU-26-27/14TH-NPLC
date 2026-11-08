@@ -1,4 +1,5 @@
 import { getT } from "@/lib/i18n/get-dictionary";
+import { sectionId } from "@/lib/home-sections";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import type { LangProps } from "@/types/i18n";
 
@@ -9,7 +10,7 @@ export function StepsSection({ lang }: LangProps) {
   const t = getT(lang);
 
   return (
-    <section id="how-to-register" className="mx-auto max-w-6xl scroll-mt-14 space-y-10 px-4 py-20 sm:py-28">
+    <section id={sectionId(lang, "howToRegister")} className="mx-auto max-w-6xl scroll-mt-14 space-y-10 px-4 py-20 sm:py-28">
       <SectionHeading index="03" label={t("landing.steps.label")} title={t("landing.steps.title")} lead={t("landing.steps.lead")} />
       <ol className="grid gap-8 md:grid-cols-4 md:gap-6">
         {STEPS.map((step, i) => {
