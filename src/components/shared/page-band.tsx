@@ -7,11 +7,13 @@ import type { PageBandProps } from "@/types";
 // The mascot is decoration for wide screens only; phones get the band without it.
 export function PageBand({ index, label, title, lead, mascot, children }: PageBandProps) {
   return (
-    <section className="bg-band relative isolate pt-12 pb-20 [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:pt-16 sm:pb-24">
+    // Desktop spacing as design-ref .page-band: 44px top, 96px bottom, 14px between lines, a 20px label line (264px
+    // band with a one-line title and lead).
+    <section className="bg-band relative isolate pt-12 pb-20 [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:pt-11 sm:pb-24">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 [background:var(--band-grid)]" />
       {/* With a mascot, the text keeps clear of it: right 12% of the viewport, 168px wide. */}
-      <div className={cn("mx-auto max-w-6xl space-y-3 px-4", mascot && "md:pr-[calc(12vw+176px)]")}>
-        <p className="text-brand-sky flex items-center gap-2 font-mono text-xs tracking-[0.2em] uppercase">
+      <div className={cn("mx-auto max-w-6xl space-y-3 px-4 sm:space-y-3.5", mascot && "md:pr-[calc(12vw+176px)]")}>
+        <p className="text-brand-sky flex items-center gap-2 font-mono text-xs tracking-[0.2em] uppercase sm:leading-5">
           <BoxIcon aria-hidden className="text-brand-purple size-3.5 shrink-0" />
           {`${index} // ${label}`}
         </p>
