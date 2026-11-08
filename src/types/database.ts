@@ -1383,7 +1383,7 @@ export type Database = {
           p_leader_name: string
           p_leader_nisn: string
           p_leader_phone: string
-          p_line_id: string
+          p_line_id: string | null
           p_payment_proof_format: string
           p_payment_proof_public_id: string
           p_school: string

@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useState } from "react";
-import { ArrowRightIcon, AtSignIcon, IdCardIcon, MailIcon, MessageCircleIcon, OctagonXIcon, SchoolIcon, TriangleAlertIcon, UserIcon, UsersIcon } from "lucide-react";
+import { ArrowRightIcon, IdCardIcon, MailIcon, MessageCircleIcon, OctagonXIcon, SchoolIcon, TriangleAlertIcon, UserIcon, UsersIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature, getTwibbonUploadSignature } from "@/lib/actions/registration";
 import { fieldErrorState, initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
@@ -32,13 +32,12 @@ const MAX_BYTES = 5 * 1024 * 1024;
 const typedFieldsSchema = createRegistrationSchema.pick({
   teamName: true,
   school: true,
-  lineId: true,
   leaderName: true,
   leaderPhone: true,
   leaderNisn: true,
 });
 
-const FIELD_ORDER = ["teamName", "school", "lineId", "leaderName", "leaderPhone", "leaderNisn"];
+const FIELD_ORDER = ["teamName", "school", "leaderName", "leaderPhone", "leaderNisn"];
 
 const label = "text-primary font-mono text-xs tracking-[0.15em] uppercase";
 
@@ -164,19 +163,6 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
             <FieldError errors={fieldErrors(errors.school)} />
           </Field>
         </div>
-        <Field data-invalid={!!errors.lineId}>
-          <FieldLabel htmlFor="lineId" className={label}>
-            {t("register.lineId")} {requiredMark}
-          </FieldLabel>
-          <InputGroup className="h-12">
-            <InputGroupAddon>
-              <AtSignIcon />
-            </InputGroupAddon>
-            <InputGroupInput id="lineId" name="lineId" maxLength={21} autoCapitalize="none" spellCheck={false} aria-invalid={!!errors.lineId} required />
-          </InputGroup>
-          <FieldDescription>{t("register.lineIdHint")}</FieldDescription>
-          <FieldError errors={fieldErrors(errors.lineId)} />
-        </Field>
 
         <FieldSeparator />
 

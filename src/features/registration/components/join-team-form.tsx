@@ -103,10 +103,19 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
           </Field>
           <Field data-invalid={!!errors.phone}>
             <FieldLabel htmlFor="phone" className={label}>
-              {t("common.phoneOptional")}
+              {t("common.phoneWhatsapp")} {requiredMark}
             </FieldLabel>
             <InputGroup className={inputGroup}>
-              <InputGroupInput id="phone" name="phone" type="tel" inputMode="tel" placeholder={t("common.phonePlaceholder")} aria-invalid={!!errors.phone} />
+              <InputGroupInput
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                placeholder={t("common.phonePlaceholder")}
+                autoComplete="tel"
+                aria-invalid={!!errors.phone}
+                required
+              />
               <InputGroupAddon className="pl-4">
                 <MessageCircleIcon />
               </InputGroupAddon>

@@ -49,11 +49,6 @@ export function AdminCreateRegistrationForm({ competitions }: AdminCreateRegistr
             <Input id="school" name="school" maxLength={120} aria-invalid={!!errors.school} required />
             <FieldError errors={fieldErrors(errors.school)} />
           </Field>
-          <Field data-invalid={!!errors.lineId}>
-            <FieldLabel htmlFor="lineId">{t("register.lineId")}</FieldLabel>
-            <Input id="lineId" name="lineId" maxLength={21} autoCapitalize="none" spellCheck={false} aria-invalid={!!errors.lineId} required />
-            <FieldError errors={fieldErrors(errors.lineId)} />
-          </Field>
         </div>
         <Field data-invalid={!!errors.leaderEmail}>
           <FieldLabel htmlFor="leaderEmail">{t("admin.create.leaderEmail")}</FieldLabel>

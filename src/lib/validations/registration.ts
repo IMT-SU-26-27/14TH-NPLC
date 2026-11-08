@@ -1,8 +1,10 @@
 import { z } from "zod";
 
+// WhatsApp number: required, the committee contacts teams on it (LINE ID is no longer asked for).
 const phone = z
   .string()
   .trim()
+  .min(1, "validation.phoneRequired")
   .transform((v) => v.replace(/[\s-]/g, ""))
   .pipe(z.string().regex(/^\+?[0-9]{8,15}$/, "validation.phone"));
 
@@ -11,13 +13,6 @@ const nisn = z.string().trim().regex(/^[0-9]{10}$/, "validation.nisn");
 const fullName = z.string().trim().min(2, "validation.fullName").max(100);
 
 export const schoolSchema = z.string().trim().min(2, "validation.school").max(120, "validation.school");
-
-// LINE IDs are 4-20 characters and case-insensitive. People often paste them with a leading @.
-export const lineIdSchema = z
-  .string()
-  .trim()
-  .transform((v) => v.replace(/^@/, "").toLowerCase())
-  .pipe(z.string().regex(/^[a-z0-9._-]{4,20}$/, "validation.lineId"));
 
 export const referralCodeSchema = z
   .string()
@@ -41,7 +36,6 @@ export const createRegistrationSchema = z.object({
   paymentProofFormat: z.enum(PAYMENT_PROOF_FORMATS_LIST, "errors.proofRequired"),
   teamName: z.string().trim().min(2, "validation.teamNameMin").max(60, "validation.teamNameMax"),
   school: schoolSchema,
-  lineId: lineIdSchema,
   leaderName: fullName,
   leaderPhone: phone,
   leaderNisn: nisn,
@@ -52,7 +46,7 @@ export const joinTeamSchema = z.object({
   referralCode: referralCodeSchema,
   fullName,
   nisn,
-  phone: z.union([z.literal("").transform(() => undefined), phone]).optional(),
+  phone,
   ...twibbonProof,
 });
 
