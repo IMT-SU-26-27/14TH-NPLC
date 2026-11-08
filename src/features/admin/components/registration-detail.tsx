@@ -78,10 +78,13 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
                   <dt className="text-muted-foreground">{t("register.school")}</dt>
                   <dd className="font-medium">{team.school ?? "—"}</dd>
                 </div>
-                <div>
-                  <dt className="text-muted-foreground">{t("register.lineId")}</dt>
-                  <dd className="font-mono font-medium">{team.line_id ?? "—"}</dd>
-                </div>
+                {/* LINE ID is no longer asked for; only older teams have one. */}
+                {team.line_id && (
+                  <div>
+                    <dt className="text-muted-foreground">{t("register.lineId")}</dt>
+                    <dd className="font-mono font-medium">{team.line_id}</dd>
+                  </div>
+                )}
               </dl>
               <AdminMembersTable team={team} />
               <TeamNameForm registrationId={team.id} teamName={team.team_name} />

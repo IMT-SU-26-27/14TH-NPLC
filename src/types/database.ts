@@ -1104,6 +1104,7 @@ export type Database = {
           registration_id: string
           twibbon_proof_format: string | null
           twibbon_proof_public_id: string | null
+          twibbon_post_url: string | null
           updated_at: string
           user_id: string
         }
@@ -1119,6 +1120,7 @@ export type Database = {
           registration_id: string
           twibbon_proof_format?: string | null
           twibbon_proof_public_id?: string | null
+          twibbon_post_url?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1134,6 +1136,7 @@ export type Database = {
           registration_id?: string
           twibbon_proof_format?: string | null
           twibbon_proof_public_id?: string | null
+          twibbon_post_url?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1383,13 +1386,14 @@ export type Database = {
           p_leader_name: string
           p_leader_nisn: string
           p_leader_phone: string
-          p_line_id: string
+          p_line_id: string | null
           p_payment_proof_format: string
           p_payment_proof_public_id: string
           p_school: string
           p_team_name: string
           p_twibbon_proof_format?: string
           p_twibbon_proof_public_id?: string
+          p_twibbon_post_url?: string
         }
         Returns: string
       }
@@ -1401,6 +1405,7 @@ export type Database = {
           p_referral_code: string
           p_twibbon_proof_format?: string
           p_twibbon_proof_public_id?: string
+          p_twibbon_post_url?: string
         }
         Returns: string
       }
