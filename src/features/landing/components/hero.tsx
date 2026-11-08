@@ -121,7 +121,7 @@ export function Hero({ status }: HeroProps) {
 
           {/* The cube and its two fragments move as one group. */}
           <div aria-hidden className="relative order-first mx-auto w-full max-w-[300px] sm:max-w-[420px] lg:order-none lg:max-w-[540px]">
-            <div className="text-foreground/6 absolute inset-x-[-15%] top-[28%] space-y-5 overflow-hidden font-mono text-xs whitespace-nowrap">
+            <div className="text-foreground pointer-events-none absolute -inset-x-[12%] top-[31.8%] z-0 flex flex-col gap-[18px] overflow-hidden font-mono text-[11px] leading-4 tracking-[0.32em] whitespace-nowrap opacity-6 sm:-right-[11.1%] sm:-left-[14.8%] sm:top-[28.85%] sm:gap-[22px] sm:text-[13px]">
               <p>{BINARY_TOP}</p>
               <p>{CODE_LINE}</p>
               <p>{BINARY_BOTTOM}</p>
