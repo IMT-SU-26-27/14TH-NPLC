@@ -109,10 +109,20 @@ function assembleCube(root: HTMLElement, art: HTMLElement, phone: boolean): Inte
       entrance.from(ring, { autoAlpha: 0, duration, ease: "power1.inOut" }, at);
       return;
     }
+    // Drawn with attributes on a pathLength of 1000: tweening the CSS property rounds its px value, which turned
+    // the 0–1 draw into a jump and showed the half ring at once.
     entrance.fromTo(
       line,
-      { strokeDasharray: 1, strokeDashoffset: 1 },
-      { strokeDashoffset: 0, duration, ease: "power1.inOut", clearProps: "strokeDasharray,strokeDashoffset" },
+      { attr: { "stroke-dasharray": "1000 1000", "stroke-dashoffset": 1000 } },
+      {
+        attr: { "stroke-dashoffset": 0 },
+        duration,
+        ease: "power1.inOut",
+        onComplete: () => {
+          line.removeAttribute("stroke-dasharray");
+          line.removeAttribute("stroke-dashoffset");
+        },
+      },
       at,
     );
   });
@@ -135,9 +145,12 @@ function assembleCube(root: HTMLElement, art: HTMLElement, phone: boolean): Inte
     entrance.from(fragment, { scale: 0.6, autoAlpha: 0, svgOrigin: FRAGMENT_CENTER[i], duration: 0.4, ease: "back.out(1.7)" }, i === 0 ? 1.1 : 1.25);
   });
 
-  // Every layer now sits at its start, so the art can be shown in this same frame.
+  // Every layer now sits at its start, so the art can be shown in this same frame (the CSS keeps it hidden until
+  // data-hero-ready, or for at most 3 s).
   gsap.set(pieces, { willChange: "transform, opacity" });
-  gsap.set(art, { visibility: "visible" });
+  art.setAttribute("data-hero-ready", "");
+  // Over 3 s late, the CSS failsafe has already shown the finished cube: skip the entrance, keep the idle.
+  if (performance.now() > 2900) entrance.progress(1);
 
   // The idle loop stops while the hero is off screen and picks up again when it scrolls back.
   const observer = new IntersectionObserver(([entry]) => {

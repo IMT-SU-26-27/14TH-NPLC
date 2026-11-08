@@ -80,7 +80,7 @@ export function HeroCube({ className }: HeroArtProps) {
         </clipPath>
       </defs>
       <g clipPath="url(#hc-back)" data-hero-ring="back">
-        <ellipse cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="1.5" transform="rotate(-14 272 282)" opacity="0.55" pathLength="1" />
+        <ellipse cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="1.5" transform="rotate(-14 272 282)" opacity="0.55" pathLength="1000" />
       </g>
       <g data-hero-pieces>
         <g data-hero-piece data-index="0">
@@ -199,7 +199,7 @@ export function HeroCube({ className }: HeroArtProps) {
         </g>
       </g>
       <g clipPath="url(#hc-front)" data-hero-ring="front">
-        <ellipse cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="2.2" transform="rotate(-14 272 282)" opacity="0.9" pathLength="1" />
+        <ellipse cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="2.2" transform="rotate(-14 272 282)" opacity="0.9" pathLength="1000" />
       </g>
     </svg>
   );

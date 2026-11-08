@@ -127,8 +127,12 @@ export function Hero({ status }: HeroProps) {
               <p>{BINARY_BOTTOM}</p>
             </div>
             <div className="bg-brand-purple/20 absolute inset-[22%] rounded-full blur-3xl" />
-            <div data-hero-art className="relative aspect-[540/520] motion-safe:invisible">
-              {/* Hidden until the entrance sets every layer to its start, so the cube never shows twice. */}
+            <div
+              data-hero-art
+              className="relative aspect-[540/520] motion-safe:animate-[hero-art-failsafe_0s_linear_3s_forwards] motion-safe:[&:not([data-hero-ready])]:invisible"
+            >
+              {/* With motion, hidden until the hero script marks it ready (every layer at its start), so nothing shows
+                  twice. If the script fails or is over 3 s late, the CSS failsafe shows it as it is. */}
               <div data-hero-float className="absolute inset-0">
                 <HeroCube className="size-full" />
               </div>

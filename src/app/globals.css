@@ -204,3 +204,11 @@
 [data-sonner-toaster] [data-sonner-toast].cn-toast [data-description] {
   color: var(--muted-foreground);
 }
+
+/* Hero cube art: hidden by the hero script until every layer sits at its start (motion only). If the script
+   fails or runs more than 3 s late, this reveals the art as it is in the markup, at its final state. */
+@keyframes hero-art-failsafe {
+  to {
+    visibility: visible;
+  }
+}
