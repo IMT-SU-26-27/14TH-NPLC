@@ -185,7 +185,7 @@ export const id = {
       registerBody: "Ketua memilih lomba, mengisi data tim, lalu membayar biaya pendaftaran.",
       shareTitle: "Bagikan kode tim",
       shareBody: "Anggota bergabung memakai kode tim dari dasbor ketua.",
-      verifyTitle: "Diverifikasi panitia",
+      verifyTitle: "Verifikasi",
       verifyBody: "Panitia mengecek pembayaran dan data tim, lalu menerima tim.",
     },
     timeline: {

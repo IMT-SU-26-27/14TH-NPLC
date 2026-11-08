@@ -186,7 +186,7 @@ export const en: Dictionary = {
       registerBody: "The leader picks a competition, fills in the team details, then pays the registration fee.",
       shareTitle: "Share the team code",
       shareBody: "Members join with the team code from the leader's dashboard.",
-      verifyTitle: "Committee verifies",
+      verifyTitle: "Verification",
       verifyBody: "The committee checks the payment and team details, then accepts the team.",
     },
     timeline: {
