@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { Badge } from "@/components/ui/badge";
 import type { TeamStatusPillProps } from "@/types/registration";
 
 const DOT = {
@@ -14,9 +15,12 @@ export function TeamStatusPill({ status, lang }: TeamStatusPillProps) {
   const t = getT(lang);
 
   return (
-    <span className="bg-card ring-border text-foreground inline-flex h-6 shrink-0 items-center gap-1.5 rounded-md px-2.5 font-mono text-[11px] font-medium tracking-[0.12em] uppercase ring-1">
+    <Badge
+      variant="outline"
+      className="bg-card/80 border-primary/45 h-6 gap-1.5 rounded-[6px] px-2.5 font-mono text-[11px] tracking-[0.12em] uppercase"
+    >
       <span aria-hidden className={cn("size-[7px] rounded-full", DOT[status])} />
       {t(`status.${status}`)}
-    </span>
+    </Badge>
   );
 }

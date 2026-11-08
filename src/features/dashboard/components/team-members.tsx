@@ -53,7 +53,7 @@ function MemberAction({ member, isSelf }: MemberActionProps) {
   );
 }
 
-const chip = "h-5 rounded-md px-1.5 font-mono text-[11px] tracking-[0.1em] uppercase";
+const chip = "h-5 rounded-[6px] px-1.5 font-mono text-[11px] tracking-[0.1em] uppercase";
 
 export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
   const { t } = useI18n();

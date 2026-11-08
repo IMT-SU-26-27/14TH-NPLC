@@ -70,7 +70,7 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
                 className={cn("absolute top-6 bottom-0 left-[11px] w-0.5", step.state === "done" ? "bg-(image:--tagline-gradient)" : "bg-border")}
               />
             )}
-            <StepMarker state={step.state} />
+            <StepMarker state={step.state} final={i === steps.length - 1} />
             <div className="min-w-0 text-sm">
               <p className={cn("font-medium", step.state === "upcoming" && "text-muted-foreground")}>{step.title}</p>
               {step.description && (
@@ -83,8 +83,15 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
 
       {/* One segment per step: filled once the step is done. */}
       <div aria-hidden className="flex gap-1">
-        {steps.map((step) => (
-          <span key={step.key} className={cn("h-2 flex-1 rounded-full", step.state === "done" ? "bg-(image:--tagline-gradient)" : "bg-primary/15")} />
+        {steps.map((step, i) => (
+          <span
+            key={step.key}
+            className={cn(
+              "h-2 flex-1 rounded-full",
+              step.state !== "done" && "bg-primary/15",
+              step.state === "done" && (i === steps.length - 1 ? "bg-highlight" : "bg-(image:--tagline-gradient)"),
+            )}
+          />
         ))}
       </div>
 

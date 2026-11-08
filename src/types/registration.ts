@@ -136,6 +136,7 @@ export type StepState = "done" | "current" | "upcoming" | "failed";
 
 export type StepMarkerProps = {
   state: StepState;
+  final?: boolean;
 };
 
 export type TimelineStep = {

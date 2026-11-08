@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CodeIcon, InfoIcon, OctagonXIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { isRegistrationOpen } from "@/lib/data/competitions";
@@ -66,7 +67,7 @@ export function TeamCard({ team, userId, qrisUrl, lang }: TeamCardProps) {
             <p className="font-medium">{t("dashboard.cpAcceptedTitle")}</p>
             <p className="text-muted-foreground">{t("dashboard.cpAcceptedDescription")}</p>
           </div>
-          <Link href={localePath(lang, "/cp")} className={buttonVariants({ className: "rounded-lg" })}>
+          <Link href={localePath(lang, "/cp")} className={cn(buttonVariants(), "rounded-[8px]")}>
             {t("dashboard.goToContest")}
           </Link>
         </div>
