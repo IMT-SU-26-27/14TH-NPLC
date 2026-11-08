@@ -246,6 +246,7 @@ export const en: Dictionary = {
     closed: "Closed",
     teamOf: "Team of {size}",
     person: "{count} person",
+    persons: "{count} people",
     people: "{min}–{max} people",
     closes: "Closes {date}",
     registerTeam: "Register a team",

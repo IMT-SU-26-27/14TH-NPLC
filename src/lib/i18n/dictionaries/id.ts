@@ -245,6 +245,7 @@ export const id = {
     closed: "Ditutup",
     teamOf: "Tim {size}",
     person: "{count} orang",
+    persons: "{count} orang",
     people: "{min}–{max} orang",
     closes: "Tutup {date}",
     registerTeam: "Daftarkan tim",

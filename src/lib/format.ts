@@ -35,7 +35,8 @@ export function formatTimestamp(value: string, lang: Locale): string {
 
 export function formatTeamSize(min: number, max: number, lang: Locale): string {
   const t = getT(lang);
-  return min === max ? t("competition.person", { count: min }) : t("competition.people", { min, max });
+  if (min !== max) return t("competition.people", { min, max });
+  return t(min === 1 ? "competition.person" : "competition.persons", { count: min });
 }
 
 // Value for <input type="datetime-local">, in WIB.
