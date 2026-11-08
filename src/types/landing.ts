@@ -84,6 +84,20 @@ export type SectionLink = {
 
 export type HomeSection = "about" | "competitions" | "howToRegister" | "timeline" | "fees" | "faq" | "contact";
 
+// Where the visitor was when they switched language, kept in sessionStorage until the new page restores it.
+export type LanguageSwitchPosition = {
+  // The page being opened (pathname, new language).
+  to: string;
+  // Homepage: the section at the top of the screen and how far into it, in px. Null above the first section.
+  section: HomeSection | null;
+  offset: number;
+  // Any page: how far down, from 0 (top) to 1 (bottom). Used when there is no section.
+  ratio: number;
+  // Homepage: the section in the URL hash, to put back in the new language.
+  hash: HomeSection | null;
+  at: number;
+};
+
 export type SectionLinkProps = Omit<ComponentProps<typeof Link>, "href"> & {
   href: string;
   // Called instead of scrolling right away, for a menu that has to close (and unlock page scroll) first.
