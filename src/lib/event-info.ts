@@ -12,15 +12,16 @@ export const EARLY_BIRD = {
 
 export const GUIDEBOOK_URL: string | null = null;
 
-// One contact person per competition. `whatsapp` is the international format without "+" or spaces.
+// One contact person per competition. `label` is the short competition name shown in every language;
+// `whatsapp` is the international format without "+" or spaces.
 export const COMMITTEE_CONTACTS = [
-  { competition: "Competitive Programming", name: "Jae", whatsapp: "6281232626369", display: "0812-3262-6369" },
-  { competition: "Logic Rally Games", name: "Caca", whatsapp: "6289506677376", display: "0895-0667-7376" },
+  { label: "Programming", name: "Jae", whatsapp: "6281232626369", display: "0812-3262-6369" },
+  { label: "Rally", name: "Caca", whatsapp: "6289506677376", display: "0895-0667-7376" },
 ] as const;
 
 export const INSTAGRAM = {
   handle: "@ucnplc",
-  url: "https://www.instagram.com/ucnplc",
+  url: "https://www.instagram.com/ucnplc/",
 } as const;
 
 // End of the early bird's last day in WIB, as an instant.

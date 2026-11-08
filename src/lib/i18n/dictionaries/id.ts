@@ -67,7 +67,6 @@ export const id = {
     restoredWithFiles: "Isian yang belum terkirim sudah diisi lagi. File tidak ikut tersimpan, jadi pilih ulang filenya.",
     discard: "Hapus draf",
     saved: "Draf tersimpan otomatis · {time}",
-    savedNoPassword: "Draf tersimpan otomatis · {time} · tanpa kata sandi",
     reselectFile: "Pilih ulang file. File tidak ikut tersimpan di draf.",
   },
   auth: {
@@ -185,7 +184,7 @@ export const id = {
       registerBody: "Ketua memilih lomba, mengisi data tim, lalu membayar biaya pendaftaran.",
       shareTitle: "Bagikan kode tim",
       shareBody: "Anggota bergabung memakai kode tim dari dasbor ketua.",
-      verifyTitle: "Diverifikasi panitia",
+      verifyTitle: "Verifikasi",
       verifyBody: "Panitia mengecek pembayaran dan data tim, lalu menerima tim.",
     },
     timeline: {
@@ -245,6 +244,7 @@ export const id = {
     closed: "Ditutup",
     teamOf: "Tim {size}",
     person: "{count} orang",
+    persons: "{count} orang",
     people: "{min}–{max} orang",
     closes: "Tutup {date}",
     registerTeam: "Daftarkan tim",
@@ -1177,8 +1177,7 @@ export const id = {
     },
   },
   footer: {
-    contact: "Kontak panitia",
-    contactLine: "CP {competition} · {name} ·",
+    contact: "Contact person",
     social: "Sosial media",
     instagram: "Instagram",
     tagline: "National Programming & Logic Competition ke-14, Universitas Ciputra.",

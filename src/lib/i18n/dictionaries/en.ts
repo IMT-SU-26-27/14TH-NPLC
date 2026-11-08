@@ -68,7 +68,6 @@ export const en: Dictionary = {
     restoredWithFiles: "Your unsent answers are back in the form. Files are not saved, so choose them again.",
     discard: "Delete draft",
     saved: "Draft saved automatically · {time}",
-    savedNoPassword: "Draft auto-saved · {time} · passwords excluded",
     reselectFile: "Choose the file again. Files are not saved in the draft.",
   },
   auth: {
@@ -186,7 +185,7 @@ export const en: Dictionary = {
       registerBody: "The leader picks a competition, fills in the team details, then pays the registration fee.",
       shareTitle: "Share the team code",
       shareBody: "Members join with the team code from the leader's dashboard.",
-      verifyTitle: "Committee verifies",
+      verifyTitle: "Verification",
       verifyBody: "The committee checks the payment and team details, then accepts the team.",
     },
     timeline: {
@@ -246,6 +245,7 @@ export const en: Dictionary = {
     closed: "Closed",
     teamOf: "Team of {size}",
     person: "{count} person",
+    persons: "{count} people",
     people: "{min}–{max} people",
     closes: "Closes {date}",
     registerTeam: "Register a team",
@@ -1178,8 +1178,7 @@ export const en: Dictionary = {
     },
   },
   footer: {
-    contact: "Committee contact",
-    contactLine: "{competition} contact · {name} ·",
+    contact: "Contact person",
     social: "Social media",
     instagram: "Instagram",
     tagline: "The 14th National Programming & Logic Competition, Universitas Ciputra.",

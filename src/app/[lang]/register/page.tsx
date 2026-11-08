@@ -18,7 +18,7 @@ export default async function RegisterIndexPage({ params }: LangPageProps) {
 
   return (
     <main className="flex-1">
-      <PageBand index="08" label={t("register.label")} title={t("register.pageTitle")} lead={t("register.pageLead")} />
+      <PageBand index="08" label={t("register.label")} title={t("register.pageTitle")} lead={t("register.pageLead")} mascot={{ src: "/auth/maskot-1.webp" }} />
       <div className="mx-auto w-full max-w-6xl px-4 py-12">
         <Suspense fallback={<Skeleton className="h-96" />}>
           <RegisterIndexSection lang={lang} />
