@@ -2,6 +2,7 @@ import Image from "next/image";
 import { MessageCircleIcon } from "lucide-react";
 import { COMMITTEE_CONTACTS, whatsappUrl } from "@/lib/event-info";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { sectionId } from "@/lib/home-sections";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import type { LangProps } from "@/types/i18n";
@@ -12,7 +13,7 @@ export function ContactSection({ lang }: LangProps) {
 
   return (
     <section
-      id="contact"
+      id={sectionId(lang, "contact")}
       className="bg-primary text-primary-foreground relative isolate overflow-hidden py-24 [clip-path:polygon(0_3rem,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:py-28"
     >
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 md:grid-cols-[1.2fr_1fr]">

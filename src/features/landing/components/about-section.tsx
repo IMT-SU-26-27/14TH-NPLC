@@ -5,6 +5,7 @@ import { CONTENT_TAG, getSiteContent } from "@/lib/data/content";
 import { GUIDEBOOK_URL } from "@/lib/event-info";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { sectionId } from "@/lib/home-sections";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,7 +38,7 @@ export async function AboutSection({ lang }: LangProps) {
 
   return (
     <section
-      id="about"
+      id={sectionId(lang, "about")}
       className="bg-band relative isolate scroll-mt-14 py-24 [clip-path:polygon(0_3rem,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:py-32"
     >
       <GridBackdrop />

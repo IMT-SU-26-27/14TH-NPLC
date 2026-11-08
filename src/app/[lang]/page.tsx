@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { sectionId } from "@/lib/home-sections";
 import { resolveLang } from "@/lib/i18n/server";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AboutHero } from "@/features/landing/components/about-hero";
@@ -9,6 +10,7 @@ import { CompetitionSection } from "@/features/landing/components/competition-se
 import { ContactSection } from "@/features/landing/components/contact-section";
 import { FaqSection } from "@/features/landing/components/faq-section";
 import { FeeSection } from "@/features/landing/components/fee-section";
+import { HomeHashScroll } from "@/features/landing/components/home-hash-scroll";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import { StepsSection } from "@/features/landing/components/steps-section";
 import { TimelineSection } from "@/features/landing/components/timeline-section";
@@ -33,7 +35,7 @@ export default async function HomePage({ params }: LangPageProps) {
         <AboutSection lang={lang} />
       </Suspense>
 
-      <section id="competitions" className="bg-secondary scroll-mt-14 py-20 sm:py-28">
+      <section id={sectionId(lang, "competitions")} className="bg-secondary scroll-mt-14 py-20 sm:py-28">
         <div className="mx-auto max-w-6xl space-y-10 px-4">
           <SectionHeading
             index="02"
@@ -69,6 +71,7 @@ export default async function HomePage({ params }: LangPageProps) {
 
       <FaqSection lang={lang} />
       <ContactSection lang={lang} />
+      <HomeHashScroll />
     </main>
   );
 }

@@ -5,8 +5,10 @@ import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 import { useHeroAnimation } from "@/hooks/use-hero-animation";
 import { useI18n } from "@/hooks/use-i18n";
+import { sectionHref } from "@/lib/home-sections";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { SectionLink } from "@/components/shared/section-link";
 import type { HeroProps } from "@/types/landing";
 
 // Decorative binary rows behind the cube ("NPLCXIV" and "DECODE" in ASCII).
@@ -17,7 +19,7 @@ const SLASH_COLORS = ["text-primary", "text-highlight", "text-brand-purple"];
 
 export function Hero({ status }: HeroProps) {
   const scope = useHeroAnimation<HTMLElement>();
-  const { t, href } = useI18n();
+  const { t, href, lang } = useI18n();
   const motto = [t("landing.hero.analyze"), t("landing.hero.think"), t("landing.hero.solve")];
 
   return (
@@ -98,12 +100,12 @@ export function Hero({ status }: HeroProps) {
                 {t("landing.hero.register")}
                 <ArrowRightIcon />
               </Link>
-              <Link
-                href="#competitions"
+              <SectionLink
+                href={sectionHref(lang, "competitions")}
                 className={cn(buttonVariants({ size: "lg", variant: "outline" }), "border-primary h-12 bg-transparent px-5")}
               >
                 {t("landing.hero.seeCompetitions")}
-              </Link>
+              </SectionLink>
             </div>
 
             {status.open && (

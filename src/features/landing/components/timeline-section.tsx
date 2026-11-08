@@ -3,6 +3,7 @@ import { CalendarIcon } from "lucide-react";
 import { CONTENT_TAG, getTimelineEvents } from "@/lib/data/content";
 import { formatDateRange } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { sectionId } from "@/lib/home-sections";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +29,7 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
 
   return (
     <section
-      id="timeline"
+      id={sectionId(lang, "timeline")}
       className="bg-band relative isolate scroll-mt-14 py-24 [clip-path:polygon(0_3rem,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:py-32"
     >
       <GridBackdrop />

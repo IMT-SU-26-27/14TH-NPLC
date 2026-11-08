@@ -1,19 +1,33 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { MenuIcon } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
+import { scrollToSection } from "@/lib/home-sections";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { SectionLink } from "@/components/shared/section-link";
 import type { MobileNavProps } from "@/types/landing";
 
 // Phone menu: the homepage sections, numbered like the Figma mobile frame.
 export function MobileNav({ links, accountLinks }: MobileNavProps) {
   const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  // The open sheet locks page scroll, so a section picked on the homepage is scrolled to once the sheet has closed.
+  const pendingSection = useRef<string | null>(null);
 
   return (
-    <Sheet>
+    <Sheet
+      open={open}
+      onOpenChange={setOpen}
+      onOpenChangeComplete={(isOpen) => {
+        if (isOpen || !pendingSection.current) return;
+        scrollToSection(pendingSection.current);
+        pendingSection.current = null;
+      }}
+    >
       <SheetTrigger render={<Button variant="outline" size="icon-lg" className="border-primary lg:hidden" aria-label={t("nav.openMenu")} />}>
         <MenuIcon />
       </SheetTrigger>
@@ -25,7 +39,16 @@ export function MobileNav({ links, accountLinks }: MobileNavProps) {
           {links.map((link, i) => (
             <SheetClose
               key={link.href}
-              render={<Link href={link.href} className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "justify-start gap-3")} />}
+              render={
+                <SectionLink
+                  href={link.href}
+                  onSectionClick={(id) => {
+                    pendingSection.current = id;
+                    setOpen(false);
+                  }}
+                  className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "justify-start gap-3")}
+                />
+              }
             >
               <span className="text-primary font-mono text-xs">{String(i + 1).padStart(2, "0")}</span>
               {link.label}
