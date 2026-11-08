@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/data/auth";
 import { getMyTeams } from "@/lib/data/registrations";
 import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { pushEnabledFor } from "@/lib/push/config";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AccountCard } from "@/features/dashboard/components/account-card";
 import { AccountNote } from "@/features/dashboard/components/account-note";
@@ -36,7 +37,7 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
         </Alert>
       )}
 
-      <PushPrompt hasTeams={teams.length > 0} />
+      {pushEnabledFor(user.role) && <PushPrompt hasTeams={teams.length > 0} />}
 
       {/* Design 07: the team takes two thirds, the account sits beside it. */}
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[2fr_1fr]">

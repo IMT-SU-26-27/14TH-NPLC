@@ -1203,6 +1203,7 @@ export const en: Dictionary = {
     label: "Profile",
     title: "Profile",
     lead: "Your account name, password and notifications.",
+    leadAccount: "Your account name and password.",
     detailsTitle: "Account details",
     detailsLead: "This name shows in the menu and is used when you create or join a team.",
     nameHint: "Member names on teams you're already on don't change.",

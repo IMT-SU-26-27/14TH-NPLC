@@ -1202,6 +1202,7 @@ export const id = {
     label: "Profil",
     title: "Profil",
     lead: "Nama akun, kata sandi, dan notifikasi.",
+    leadAccount: "Nama akun dan kata sandi.",
     detailsTitle: "Data akun",
     detailsLead: "Nama ini tampil di menu dan dipakai saat kamu membuat atau bergabung dengan tim.",
     nameHint: "Nama anggota di tim yang sudah ada tidak ikut berubah.",
