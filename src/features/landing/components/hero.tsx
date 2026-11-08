@@ -11,10 +11,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { SectionLink } from "@/components/shared/section-link";
 import type { HeroProps } from "@/types/landing";
 
-// Decorative binary rows behind the cube ("NPLCXIV" and "DECODE" in ASCII).
-const BINARY_TOP = "01001110 01010000 01001100 01000011 01011000 01001001 01010110 ".repeat(3);
-const BINARY_BOTTOM = "01000100 01000101 01000011 01001111 01000100 01000101 ".repeat(3);
-const CODE_LINE = "if (unknown) { decode(); } // analyze · think · solve // ".repeat(2);
 const SLASH_COLORS = ["text-primary", "text-highlight", "text-brand-purple"];
 
 export function Hero({ status }: HeroProps) {
@@ -121,11 +117,6 @@ export function Hero({ status }: HeroProps) {
 
           {/* The cube and its two fragments move as one group. */}
           <div aria-hidden className="relative order-first mx-auto w-full max-w-[300px] sm:max-w-[420px] lg:order-none lg:max-w-[540px]">
-            <div className="text-foreground pointer-events-none absolute -inset-x-[12%] top-[31.8%] z-0 flex flex-col gap-[18px] overflow-hidden font-mono text-[11px] leading-4 tracking-[0.32em] whitespace-nowrap opacity-6 sm:-right-[11.1%] sm:-left-[14.8%] sm:top-[28.85%] sm:gap-[22px] sm:text-[13px]">
-              <p>{BINARY_TOP}</p>
-              <p>{CODE_LINE}</p>
-              <p>{BINARY_BOTTOM}</p>
-            </div>
             <div className="bg-brand-purple/20 absolute inset-[22%] rounded-full blur-3xl" />
             <div data-hero-float className="relative aspect-[540/520]">
               <Image
