@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
-import type { Team, TeamPreview } from "@/types/registration";
+import type { Team, TeamPreview, WaGroup } from "@/types/registration";
 
 const TEAM_SELECT = `
   id, team_name, school, line_id, referral_code, rally_qr_token, status, leader_id, payment_proof_public_id, payment_submitted_at, rejection_reason, created_at,
@@ -32,6 +32,15 @@ export const getMyTeams = cache(async (): Promise<Team[]> => {
 });
 
 // One account can be on only one team across all competitions.
+// The WhatsApp group of the account's competition. The database decides who gets it (my_wa_group(): a member of an
+// accepted team); null otherwise, or when the competition has no link yet.
+export async function getMyWaGroup(): Promise<WaGroup | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("my_wa_group");
+  if (error) throw new Error(`Could not load the WhatsApp group: ${error.message}`);
+  return data[0] ?? null;
+}
+
 export async function hasRegistration(userId: string): Promise<boolean> {
   const supabase = await createSupabaseServerClient();
   const { count, error } = await supabase
