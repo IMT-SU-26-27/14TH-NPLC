@@ -2,10 +2,9 @@
 
 import { startTransition, useActionState, useState } from "react";
 import { ArrowRightIcon, IdCardIcon, ImageIcon, MailIcon, MessageCircleIcon, OctagonXIcon, UserIcon } from "lucide-react";
-import { getTwibbonUploadSignature, joinTeam } from "@/lib/actions/registration";
+import { joinTeam } from "@/lib/actions/registration";
 import { initialFormState } from "@/lib/form";
 import { cn } from "@/lib/utils";
-import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import { useFormDraft } from "@/hooks/use-form-draft";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -17,9 +16,6 @@ import { FormDraftBanner } from "@/components/shared/form-draft-banner";
 import { FormDraftStatus } from "@/components/shared/form-draft-status";
 import { TwibbonProofField } from "@/features/registration/components/twibbon-proof-field";
 import type { JoinTeamFormProps } from "@/types/registration";
-
-const TWIBBON_ACCEPT = ["image/jpeg", "image/png", "image/webp"];
-const MAX_BYTES = 5 * 1024 * 1024;
 
 const label = "text-primary font-mono text-xs tracking-[0.15em] uppercase";
 const inputGroup = "h-11 has-[>[data-align=inline-start]]:[&>input]:pl-3";
@@ -34,36 +30,33 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
   const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: "join-team", userId: user.id });
   const [state, action, pending] = useActionState(clearOnSuccess(joinTeam), initialFormState);
   const { t, fieldErrors } = useI18n();
-  const [twibbonFile, setTwibbonFile] = useState<File | null>(null);
   const [missingTwibbon, setMissingTwibbon] = useState(false);
-  const twibbon = useCloudinaryUpload({ getSignature: getTwibbonUploadSignature, maxBytes: MAX_BYTES, accept: TWIBBON_ACCEPT });
   const errors = state.fieldErrors ?? {};
-  const busy = twibbon.uploading || pending;
-  const twibbonError = missingTwibbon ? t("errors.twibbonRequired") : twibbon.error ? t(twibbon.error, twibbon.errorParams) : null;
+  const busy = pending;
+  const twibbonError = missingTwibbon
+    ? t("errors.twibbonRequired")
+    : errors.twibbonPostUrl
+      ? t(errors.twibbonPostUrl[0].message)
+      : null;
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    if (preview.twibbon_url && !twibbonFile) {
+    const data = new FormData(e.currentTarget);
+    // The link is required once the competition has a twibbon; the server checks the format.
+    if (preview.twibbon_url && !String(data.get("twibbonPostUrl") ?? "").trim()) {
       setMissingTwibbon(true);
+      document.getElementById("twibbonPostUrl")?.focus();
       return;
     }
     setMissingTwibbon(false);
-    const uploaded = twibbonFile ? await twibbon.upload(twibbonFile) : null;
-    if (twibbonFile && !uploaded) return;
-    const data = new FormData(form);
-    if (uploaded) {
-      data.set("twibbonProofPublicId", uploaded.publicId);
-      data.set("twibbonProofFormat", uploaded.format);
-    }
     startTransition(() => action(data));
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit}>
+    <form ref={formRef} onSubmit={handleSubmit} noValidate>
       <input type="hidden" name="referralCode" value={referralCode} />
       <FieldGroup>
-        {draftRestored && <FormDraftBanner hasFiles onDiscard={discardDraft} />}
+        {draftRestored && <FormDraftBanner onDiscard={discardDraft} />}
         <Field data-invalid={!!errors.fullName}>
           <FieldLabel htmlFor="fullName" className={label}>
             {t("common.fullName")} {requiredMark}
@@ -103,10 +96,19 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
           </Field>
           <Field data-invalid={!!errors.phone}>
             <FieldLabel htmlFor="phone" className={label}>
-              {t("common.phoneOptional")}
+              {t("common.phoneWhatsapp")} {requiredMark}
             </FieldLabel>
             <InputGroup className={inputGroup}>
-              <InputGroupInput id="phone" name="phone" type="tel" inputMode="tel" placeholder={t("common.phonePlaceholder")} aria-invalid={!!errors.phone} />
+              <InputGroupInput
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                placeholder={t("common.phonePlaceholder")}
+                autoComplete="tel"
+                aria-invalid={!!errors.phone}
+                required
+              />
               <InputGroupAddon className="pl-4">
                 <MessageCircleIcon />
               </InputGroupAddon>
@@ -128,13 +130,7 @@ export function JoinTeamForm({ referralCode, preview, user }: JoinTeamFormProps)
           twibbonUrl={preview.twibbon_url}
           disabled={busy}
           error={twibbonError}
-          uploading={twibbon.uploading}
-          progress={twibbon.progress}
-          reselectHint={draftRestored && !twibbonFile}
-          onFileChange={(next) => {
-            setTwibbonFile(next);
-            setMissingTwibbon(false);
-          }}
+          onValueChange={() => setMissingTwibbon(false)}
         />
 
         {state.status === "error" && state.message && (

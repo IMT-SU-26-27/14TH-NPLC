@@ -1,7 +1,9 @@
+import type { LucideIcon } from "lucide-react";
 import type { z } from "zod";
 import type { Enums, Tables } from "@/types/database";
 import type { PublicCompetition } from "@/types/competition";
 import type { CurrentUser } from "@/types/auth";
+import type { CpSessionStatus } from "@/types/cp";
 import type { LangParams, Locale } from "@/types/i18n";
 import type {
   createRegistrationSchema,
@@ -29,7 +31,7 @@ export type TeamMember = Pick<
   RegistrationMember,
   "id" | "user_id" | "full_name" | "email" | "phone" | "nisn" | "is_leader" | "created_at"
 > &
-  Partial<Pick<RegistrationMember, "twibbon_proof_public_id" | "twibbon_proof_format">>;
+  Partial<Pick<RegistrationMember, "twibbon_proof_public_id" | "twibbon_proof_format" | "twibbon_post_url">>;
 
 export type TeamEvent = Pick<RegistrationEvent, "id" | "status" | "note" | "created_at">;
 
@@ -102,11 +104,8 @@ export type TwibbonProofFieldProps = {
   twibbonUrl: string | null;
   disabled: boolean;
   error: string | null;
-  uploading: boolean;
-  progress: number;
-  // A restored draft filled the form, but files are never saved.
-  reselectHint?: boolean;
-  onFileChange: (file: File | null) => void;
+  // Called as the visitor types, to clear a "required" error.
+  onValueChange?: () => void;
 };
 
 export type JoinCodeFormProps = {
@@ -125,11 +124,33 @@ export type DashboardContentProps = {
   searchParams: Promise<{ notice?: string }>;
 };
 
+export type DashboardEmptyCardProps = {
+  lang: Locale;
+};
+
+export type DashboardEmptyOptionProps = {
+  // "A // KETUA" style label above the option.
+  label: string;
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+  icon: LucideIcon;
+  // leader: primary icon and button; member: lime icon and outline button.
+  variant: "leader" | "member";
+};
+
 export type TeamCardProps = {
   team: Team;
   userId: string;
   qrisUrl: string | null;
   lang: Locale;
+  // The CP contest state for an accepted CP team (null otherwise, or before a session exists).
+  contestStatus: CpSessionStatus | null;
+};
+
+export type CpContestRefreshProps = {
+  competitionId: string;
 };
 
 export type StepState = "done" | "current" | "upcoming" | "failed";

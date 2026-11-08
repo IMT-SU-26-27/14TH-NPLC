@@ -61,6 +61,7 @@ export async function proxy(request: NextRequest) {
     if (matches(path, ["/admin"]) && !isAdmin) return to("/dashboard");
 
     // /cp: accepted competitive programming teams only, and only while the admin has the contest live.
+    // Scheduled (not started yet): the contest pages stay closed and send participants back to the dashboard.
     // Paused: waiting room and leaderboard only, until the admin resumes.
     // Ended: waiting room only; the final standings are not shown to participants.
     if (matches(path, ["/cp"]) && !isAdmin) {
@@ -80,7 +81,7 @@ export async function proxy(request: NextRequest) {
       if (status === "live" && onWaiting) return to("/cp");
       if (status === "paused" && !onWaiting && !onLeaderboard) return to("/cp/waiting");
       if (status === "ended" && !onWaiting) return to("/cp/waiting");
-      if (status === "scheduled" && !onWaiting) return to("/cp/waiting");
+      if (status === "scheduled") return to("/dashboard");
     }
   }
 

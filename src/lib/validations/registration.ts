@@ -1,8 +1,10 @@
 import { z } from "zod";
 
+// WhatsApp number: required, the committee contacts teams on it (LINE ID is no longer asked for).
 const phone = z
   .string()
   .trim()
+  .min(1, "validation.phoneRequired")
   .transform((v) => v.replace(/[\s-]/g, ""))
   .pipe(z.string().regex(/^\+?[0-9]{8,15}$/, "validation.phone"));
 
@@ -12,26 +14,33 @@ const fullName = z.string().trim().min(2, "validation.fullName").max(100);
 
 export const schoolSchema = z.string().trim().min(2, "validation.school").max(120, "validation.school");
 
-// LINE IDs are 4-20 characters and case-insensitive. People often paste them with a leading @.
-export const lineIdSchema = z
-  .string()
-  .trim()
-  .transform((v) => v.replace(/^@/, "").toLowerCase())
-  .pipe(z.string().regex(/^[a-z0-9._-]{4,20}$/, "validation.lineId"));
-
 export const referralCodeSchema = z
   .string()
   .trim()
   .toUpperCase()
   .regex(/^[A-Z0-9]{8}$/, "validation.referralCode");
 
-export const TWIBBON_PROOF_FORMATS = ["jpg", "jpeg", "png", "webp"] as const;
+// The participant's own Instagram post with the twibbon: https, instagram.com, a post or reel path.
+export function isInstagramPostUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname === "instagram.com" || url.hostname === "www.instagram.com") &&
+      /^\/(p|reel|reels)\/[A-Za-z0-9_-]+/.test(url.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
 
 // Empty while the competition has no twibbon link yet; the database requires it once a link is set.
-const twibbonProof = {
-  twibbonProofPublicId: z.string().min(1).optional(),
-  twibbonProofFormat: z.enum(TWIBBON_PROOF_FORMATS).optional(),
-};
+const twibbonPostUrl = z
+  .union([
+    z.literal("").transform(() => undefined),
+    z.string().trim().max(500, "validation.twibbonPostUrl").refine(isInstagramPostUrl, "validation.twibbonPostUrl"),
+  ])
+  .optional();
 
 export const PAYMENT_PROOF_FORMATS_LIST = ["jpg", "jpeg", "png", "webp", "pdf"] as const;
 
@@ -41,19 +50,18 @@ export const createRegistrationSchema = z.object({
   paymentProofFormat: z.enum(PAYMENT_PROOF_FORMATS_LIST, "errors.proofRequired"),
   teamName: z.string().trim().min(2, "validation.teamNameMin").max(60, "validation.teamNameMax"),
   school: schoolSchema,
-  lineId: lineIdSchema,
   leaderName: fullName,
   leaderPhone: phone,
   leaderNisn: nisn,
-  ...twibbonProof,
+  twibbonPostUrl,
 });
 
 export const joinTeamSchema = z.object({
   referralCode: referralCodeSchema,
   fullName,
   nisn,
-  phone: z.union([z.literal("").transform(() => undefined), phone]).optional(),
-  ...twibbonProof,
+  phone,
+  twibbonPostUrl,
 });
 
 export const PAYMENT_PROOF_FORMATS = PAYMENT_PROOF_FORMATS_LIST;

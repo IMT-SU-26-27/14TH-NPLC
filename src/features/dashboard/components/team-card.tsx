@@ -14,15 +14,19 @@ import { PaymentPanel } from "@/features/dashboard/components/payment-panel";
 import { ReferralCode } from "@/features/dashboard/components/referral-code";
 import { DeleteTeamButton } from "@/features/dashboard/components/delete-team-button";
 import { RallyTeamQr } from "@/features/rally/components/rally-team-qr";
+import { CpContestRefresh } from "@/features/dashboard/components/cp-contest-refresh";
 import type { TeamCardProps } from "@/types/registration";
 
-export function TeamCard({ team, userId, qrisUrl, lang }: TeamCardProps) {
+export function TeamCard({ team, userId, qrisUrl, lang, contestStatus }: TeamCardProps) {
   const t = getT(lang);
   const isLeader = team.leader_id === userId;
   // Members join and can be removed while the competition is open; payment is only re-sent after a rejection.
   const membershipOpen = isRegistrationOpen(team.competition);
   const needsPayment = team.status === "pending_payment" || team.status === "rejected";
   const isCp = team.competition.type === "competitive_programming";
+  // Before the admin starts the contest the old contest pages are closed to participants (the proxy sends them
+  // back here), so there is no button until then.
+  const contestOpen = contestStatus !== null && contestStatus !== "scheduled";
 
   const label = "text-primary font-mono text-xs font-medium tracking-[0.14em] uppercase";
 
@@ -65,11 +69,15 @@ export function TeamCard({ team, userId, qrisUrl, lang }: TeamCardProps) {
           <CodeIcon aria-hidden className="text-primary size-[18px] shrink-0" />
           <div className="min-w-0 flex-1 basis-48 text-sm">
             <p className="font-medium">{t("dashboard.cpAcceptedTitle")}</p>
-            <p className="text-muted-foreground">{t("dashboard.cpAcceptedDescription")}</p>
+            <p className="text-muted-foreground">{t(contestOpen ? "dashboard.cpAcceptedDescription" : "dashboard.cpContestNotStarted")}</p>
           </div>
-          <Link href={localePath(lang, "/cp")} className={cn(buttonVariants(), "rounded-[8px]")}>
-            {t("dashboard.goToContest")}
-          </Link>
+          {contestOpen ? (
+            <Link href={localePath(lang, "/cp")} className={cn(buttonVariants(), "rounded-[8px]")}>
+              {t("dashboard.goToContest")}
+            </Link>
+          ) : (
+            <CpContestRefresh competitionId={team.competition.id} />
+          )}
         </div>
       )}
 
