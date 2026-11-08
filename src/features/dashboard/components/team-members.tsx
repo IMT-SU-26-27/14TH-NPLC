@@ -54,6 +54,8 @@ function MemberAction({ member, isSelf }: MemberActionProps) {
 }
 
 const chip = "h-5 rounded-[6px] px-1.5 font-mono text-[11px] tracking-[0.1em] uppercase";
+// Same small muted label as the account card's NAMA / EMAIL.
+const dataLabel = "text-muted-foreground font-mono text-[11px] font-medium tracking-[0.14em] uppercase";
 
 export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
   const { t } = useI18n();
@@ -72,9 +74,19 @@ export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
                 {member.is_leader && <Badge variant="secondary" className={chip}>{t("common.leader")}</Badge>}
                 {isSelf && <Badge variant="secondary" className={chip}>{t("common.you")}</Badge>}
               </p>
-              <p className="text-muted-foreground break-words">
-                {[member.email, t("dashboard.memberNisn", { nisn: member.nisn }), member.phone && t("dashboard.memberWhatsapp", { phone: member.phone })].filter(Boolean).join(" · ")}
-              </p>
+              {/* One fact per line: label on the left, value beside it. Numbers in mono. */}
+              <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-3 gap-y-0.5">
+                <dt className={dataLabel}>{t("common.email")}</dt>
+                <dd className="break-all">{member.email}</dd>
+                <dt className={dataLabel}>{t("common.nisn")}</dt>
+                <dd className="font-mono">{member.nisn}</dd>
+                {member.phone && (
+                  <>
+                    <dt className={dataLabel}>{t("dashboard.memberWhatsapp")}</dt>
+                    <dd className="font-mono">{member.phone}</dd>
+                  </>
+                )}
+              </dl>
               {member.twibbon_post_url && (
                 <a
                   href={member.twibbon_post_url}
