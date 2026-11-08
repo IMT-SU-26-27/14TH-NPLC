@@ -106,6 +106,15 @@ export function Hero({ status }: HeroProps) {
               </SectionLink>
             </div>
 
+            {/* Members join with the leader's code: a quiet text link, not a third button. */}
+            <p data-hero-item className="text-muted-foreground -mt-3 text-sm">
+              {t("landing.hero.haveCode")}{" "}
+              <Link href={href("/join")} className="text-primary focus-visible:ring-ring/50 inline-flex items-center gap-1 rounded-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-3">
+                {t("landing.hero.joinTeam")}
+                <ArrowRightIcon aria-hidden className="size-3.5" />
+              </Link>
+            </p>
+
             {status.open && (
               <p data-hero-item className="text-muted-foreground flex items-start gap-2 font-mono text-xs tracking-[0.15em] uppercase">
                 <span aria-hidden className="bg-highlight ring-highlight-foreground/30 mt-0.5 size-2.5 shrink-0 rounded-full ring-1" />
