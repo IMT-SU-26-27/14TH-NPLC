@@ -48,12 +48,17 @@ export async function getTeamCounts(): Promise<Record<string, number>> {
   return Object.fromEntries(data.map((row) => [row.competition_id, row.team_count]));
 }
 
+// The WhatsApp group link is not readable through the table (column privileges); admin_competition_wa_group_url()
+// returns it after checking is_admin(). If that call fails the page fails too, rather than showing an empty link
+// field that would erase the saved link on the next save.
 export async function getCompetition(id: string): Promise<Competition | null> {
   const supabase = await createSupabaseServerClient();
-  const [{ data }, { data: waGroupUrl }] = await Promise.all([
+  const [{ data, error }, { data: waGroupUrl, error: waError }] = await Promise.all([
     supabase.from("competitions").select(ADMIN_COMPETITION_COLUMNS).eq("id", id).maybeSingle(),
     supabase.rpc("admin_competition_wa_group_url", { p_competition_id: id }),
   ]);
+  if (error) throw new Error(`Could not load the competition: ${error.message}`);
+  if (waError) throw new Error(`Could not load the WhatsApp group link: ${waError.message}`);
   return data ? { ...data, wa_group_url: waGroupUrl ?? null } : null;
 }
 
