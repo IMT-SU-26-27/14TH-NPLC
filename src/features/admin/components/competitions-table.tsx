@@ -33,7 +33,7 @@ export function CompetitionsTable({ competitions, lang }: CompetitionsTableProps
             <TableHead>{t("admin.competitions.name")}</TableHead>
             <TableHead>{t("admin.competitions.type")}</TableHead>
             <TableHead>{t("admin.registrations.members")}</TableHead>
-            <TableHead className="text-right">{t("admin.competitions.fee")}</TableHead>
+            <TableHead className="text-right">{t("competition.normalPrice")}</TableHead>
             <TableHead>{t("admin.competitions.registration")}</TableHead>
             <TableHead>{t("admin.competitions.qris")}</TableHead>
             <TableHead>{t("admin.registrations.status")}</TableHead>
