@@ -63,6 +63,12 @@ export function CompetitionForm({ competition }: CompetitionFormProps) {
           <Textarea id="description" name="description" defaultValue={competition?.description} rows={3} />
           <FieldError errors={fieldErrors(errors.description)} />
         </Field>
+        <Field data-invalid={!!errors.descriptionEn}>
+          <FieldLabel htmlFor="descriptionEn">{t("admin.competitions.descriptionEn")}</FieldLabel>
+          <Textarea id="descriptionEn" name="descriptionEn" defaultValue={competition?.description_en ?? ""} rows={3} />
+          <FieldDescription>{t("admin.competitions.descriptionEnHint")}</FieldDescription>
+          <FieldError errors={fieldErrors(errors.descriptionEn)} />
+        </Field>
         <div className="grid gap-6 sm:grid-cols-3">
           <Field data-invalid={!!errors.minMembers}>
             <FieldLabel htmlFor="minMembers">{t("admin.competitions.minMembers")}</FieldLabel>

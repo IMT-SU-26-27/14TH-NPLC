@@ -11,6 +11,7 @@ export type PublicCompetition = Pick<
   | "name"
   | "type"
   | "description"
+  | "description_en"
   | "min_members"
   | "max_members"
   | "fee"

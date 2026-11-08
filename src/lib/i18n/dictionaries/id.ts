@@ -777,6 +777,8 @@ export const id = {
       slugHint: "Huruf kecil, angka, dan tanda hubung, mis. competitive-programming.",
       type: "Jenis",
       description: "Deskripsi",
+      descriptionEn: "Deskripsi (EN)",
+      descriptionEnHint: "Dipakai di halaman bahasa Inggris. Kosongkan untuk memakai deskripsi bahasa Indonesia.",
       minMembers: "Anggota minimal",
       maxMembers: "Anggota maksimal",
       teamSizeHint: "Termasuk ketua.",

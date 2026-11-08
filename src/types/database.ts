@@ -103,6 +103,7 @@ export type Database = {
           bank_account_number: string | null
           created_at: string
           description: string
+          description_en: string | null
           fee: number
           id: string
           is_active: boolean
@@ -124,6 +125,7 @@ export type Database = {
           bank_account_number?: string | null
           created_at?: string
           description?: string
+          description_en?: string | null
           fee?: number
           id?: string
           is_active?: boolean
@@ -145,6 +147,7 @@ export type Database = {
           bank_account_number?: string | null
           created_at?: string
           description?: string
+          description_en?: string | null
           fee?: number
           id?: string
           is_active?: boolean

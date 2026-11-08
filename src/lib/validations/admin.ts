@@ -64,6 +64,11 @@ export const competitionSchema = z
       .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "validation.slug"),
     type: z.enum(["competitive_programming", "logic"]),
     description: z.string().trim().max(2000),
+    descriptionEn: z
+      .string()
+      .trim()
+      .max(2000)
+      .transform((v) => v || null),
     minMembers: z.coerce.number().int().min(1, "validation.atLeastOne").max(10, "validation.atMostTen"),
     maxMembers: z.coerce.number().int().min(1, "validation.atLeastOne").max(10, "validation.atMostTen"),
     fee: z.coerce.number().int().min(0, "validation.nonNegative"),

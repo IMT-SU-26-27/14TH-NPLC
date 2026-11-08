@@ -778,6 +778,8 @@ export const en: Dictionary = {
       slugHint: "Lowercase letters, numbers and dashes, e.g. competitive-programming.",
       type: "Type",
       description: "Description",
+      descriptionEn: "Description (EN)",
+      descriptionEnHint: "Used on the English pages. Leave it empty to show the Indonesian description.",
       minMembers: "Minimum members",
       maxMembers: "Maximum members",
       teamSizeHint: "Including the leader.",
