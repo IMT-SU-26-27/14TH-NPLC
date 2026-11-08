@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
+import { HeroCube } from "@/features/landing/components/hero-cube";
+import { HeroCubeFragments } from "@/features/landing/components/hero-cube-fragments";
 import { useHeroAnimation } from "@/hooks/use-hero-animation";
 import { useI18n } from "@/hooks/use-i18n";
 import { sectionHref } from "@/lib/home-sections";
@@ -115,25 +117,20 @@ export function Hero({ status }: HeroProps) {
             )}
           </div>
 
-          {/* The cube and its two fragments move as one group. */}
+          {/* The cube, its orbit ring and the two fragments, each animated on its own (see useHeroAnimation). */}
           <div aria-hidden className="relative order-first mx-auto w-full max-w-[300px] sm:max-w-[420px] lg:order-none lg:max-w-[540px]">
             <div className="bg-brand-purple/20 absolute inset-[22%] rounded-full blur-3xl" />
-            <div data-hero-float className="relative aspect-[540/520]">
-              <Image
-                src="/shared/cube-isometric.webp"
-                alt=""
-                fill
-                preload
-                sizes="(min-width: 1024px) 540px, (min-width: 640px) 420px, 300px"
-                className="object-contain"
-              />
-              <Image
-                src="/landing/hero-cube-fragments.webp"
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 540px, (min-width: 640px) 420px, 300px"
-                className="object-contain"
-              />
+            <div
+              data-hero-art
+              className="relative aspect-[540/520] motion-safe:sm:animate-[hero-art-failsafe_0s_linear_2s_forwards] motion-safe:sm:[&:not([data-hero-ready])]:invisible"
+            >
+              {/* From 640px up with motion, hidden until the hero script marks it ready (every layer at its start), so
+                  nothing shows twice; the CSS failsafe shows it as it is if the script is over 2 s late. Phones show it
+                  at once and only get the idle motion. */}
+              <div data-hero-float className="absolute inset-0">
+                <HeroCube className="size-full" />
+              </div>
+              <HeroCubeFragments className="absolute inset-0 size-full" />
             </div>
           </div>
         </div>
