@@ -35,7 +35,7 @@ const RAISED: [string, string][] = [
   ["Admins only", "errors.adminOnly"],
   ["Upload the payment proof before submitting", "errors.proofRequired"],
   ["School is required", "validation.fixFields"],
-  ["Upload the twibbon proof before submitting", "errors.twibbonRequired"],
+  ["Add the twibbon post link before submitting", "errors.twibbonRequired"],
   ["LO accounts cannot join a team", "errors.loCannotJoin"],
   ["You are not assigned to this post", "rally.errors.notAssigned"],
   ["The Rally session is not open", "rally.errors.sessionNotOpen"],

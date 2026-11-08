@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOutIcon, UserMinusIcon } from "lucide-react";
+import { ExternalLinkIcon, LogOutIcon, UserMinusIcon } from "lucide-react";
 import { removeMember } from "@/lib/actions/registration";
 import { useConfirmAction } from "@/hooks/use-confirm-action";
 import { useI18n } from "@/hooks/use-i18n";
@@ -75,6 +75,17 @@ export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
               <p className="text-muted-foreground break-words">
                 {[member.email, t("dashboard.memberNisn", { nisn: member.nisn }), member.phone && t("dashboard.memberWhatsapp", { phone: member.phone })].filter(Boolean).join(" · ")}
               </p>
+              {member.twibbon_post_url && (
+                <a
+                  href={member.twibbon_post_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary focus-visible:ring-ring/50 inline-flex items-center gap-1 rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3"
+                >
+                  {t("twibbon.postLink")}
+                  <ExternalLinkIcon aria-hidden className="size-3.5" />
+                </a>
+              )}
             </div>
             {canAct && <MemberAction member={member} isSelf={isSelf} />}
           </li>

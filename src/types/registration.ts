@@ -29,7 +29,7 @@ export type TeamMember = Pick<
   RegistrationMember,
   "id" | "user_id" | "full_name" | "email" | "phone" | "nisn" | "is_leader" | "created_at"
 > &
-  Partial<Pick<RegistrationMember, "twibbon_proof_public_id" | "twibbon_proof_format">>;
+  Partial<Pick<RegistrationMember, "twibbon_proof_public_id" | "twibbon_proof_format" | "twibbon_post_url">>;
 
 export type TeamEvent = Pick<RegistrationEvent, "id" | "status" | "note" | "created_at">;
 
@@ -102,11 +102,8 @@ export type TwibbonProofFieldProps = {
   twibbonUrl: string | null;
   disabled: boolean;
   error: string | null;
-  uploading: boolean;
-  progress: number;
-  // A restored draft filled the form, but files are never saved.
-  reselectHint?: boolean;
-  onFileChange: (file: File | null) => void;
+  // Called as the visitor types, to clear a "required" error.
+  onValueChange?: () => void;
 };
 
 export type JoinCodeFormProps = {

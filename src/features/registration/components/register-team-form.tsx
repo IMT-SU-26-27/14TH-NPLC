@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { ArrowRightIcon, IdCardIcon, MailIcon, MessageCircleIcon, OctagonXIcon, SchoolIcon, TriangleAlertIcon, UserIcon, UsersIcon } from "lucide-react";
-import { createRegistration, getNewRegistrationUploadSignature, getTwibbonUploadSignature } from "@/lib/actions/registration";
+import { createRegistration, getNewRegistrationUploadSignature } from "@/lib/actions/registration";
 import { fieldErrorState, initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
 import { createRegistrationSchema } from "@/lib/validations/registration";
@@ -25,7 +25,6 @@ import type { FieldErrors } from "@/types";
 import type { RegisterTeamFormProps } from "@/types/registration";
 
 const ACCEPT = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-const TWIBBON_ACCEPT = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
 
 // The typed fields, checked in the browser before anything is uploaded. The Server Action checks them again.
@@ -35,6 +34,7 @@ const typedFieldsSchema = createRegistrationSchema.pick({
   leaderName: true,
   leaderPhone: true,
   leaderNisn: true,
+  twibbonPostUrl: true,
 });
 
 const FIELD_ORDER = ["teamName", "school", "leaderName", "leaderPhone", "leaderNisn"];
@@ -61,11 +61,9 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
     maxBytes: MAX_BYTES,
     accept: ACCEPT,
   });
-  const [twibbonFile, setTwibbonFile] = useState<File | null>(null);
   const [missingTwibbon, setMissingTwibbon] = useState(false);
-  const twibbon = useCloudinaryUpload({ getSignature: getTwibbonUploadSignature, maxBytes: MAX_BYTES, accept: TWIBBON_ACCEPT });
   const errors: FieldErrors = { ...(state.fieldErrors ?? {}), ...clientErrors };
-  const busy = uploading || twibbon.uploading || pending;
+  const busy = uploading || pending;
   const hasClientErrors = Object.values(clientErrors).some(Boolean);
 
   // The draft hook fills the inputs without firing events, so read the restored team name for the transfer note.
@@ -83,25 +81,19 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
     const typed = typedFieldsSchema.safeParse(Object.fromEntries(data));
     const nextErrors = typed.success ? {} : (fieldErrorState(typed.error).fieldErrors ?? {});
     const proofMissing = !file;
-    const twibbonMissing = !!competition.twibbon_url && !twibbonFile;
+    const twibbonMissing = !!competition.twibbon_url && !String(data.get("twibbonPostUrl") ?? "").trim();
     setClientErrors(nextErrors);
     setMissingProof(proofMissing);
     setMissingTwibbon(twibbonMissing);
     if (!typed.success || proofMissing || twibbonMissing) {
       // Field ids match their names, so the first problem in form order gets the focus.
-      const first = FIELD_ORDER.find((name) => nextErrors[name]) ?? (proofMissing ? "paymentProof" : "twibbonProof");
+      const first = FIELD_ORDER.find((name) => nextErrors[name]) ?? (proofMissing ? "paymentProof" : "twibbonPostUrl");
       document.getElementById(first)?.focus();
       return;
     }
 
-    const uploadedTwibbon = twibbonFile ? await twibbon.upload(twibbonFile) : null;
-    if (twibbonFile && !uploadedTwibbon) return;
     const uploaded = await upload(file);
     if (!uploaded) return;
-    if (uploadedTwibbon) {
-      data.set("twibbonProofPublicId", uploadedTwibbon.publicId);
-      data.set("twibbonProofFormat", uploadedTwibbon.format);
-    }
     data.set("paymentProofPublicId", uploaded.publicId);
     data.set("paymentProofFormat", uploaded.format);
     startTransition(() => action(data));
@@ -114,7 +106,11 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
       : errors.paymentProofPublicId
         ? t(errors.paymentProofPublicId[0].message)
         : null;
-  const twibbonError = missingTwibbon ? t("errors.twibbonRequired") : twibbon.error ? t(twibbon.error, twibbon.errorParams) : null;
+  const twibbonError = missingTwibbon
+    ? t("errors.twibbonRequired")
+    : errors.twibbonPostUrl
+      ? t(errors.twibbonPostUrl[0].message)
+      : null;
   const formMessage = hasClientErrors || missingProof || missingTwibbon ? "validation.fixFields" : state.status === "error" ? state.message : null;
 
   return (
@@ -271,13 +267,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
           twibbonUrl={competition.twibbon_url}
           disabled={busy}
           error={twibbonError}
-          uploading={twibbon.uploading}
-          progress={twibbon.progress}
-          reselectHint={draftRestored && !twibbonFile}
-          onFileChange={(next) => {
-            setTwibbonFile(next);
-            setMissingTwibbon(false);
-          }}
+          onValueChange={() => setMissingTwibbon(false)}
         />
 
         {formMessage && (

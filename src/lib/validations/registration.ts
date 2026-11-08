@@ -20,13 +20,27 @@ export const referralCodeSchema = z
   .toUpperCase()
   .regex(/^[A-Z0-9]{8}$/, "validation.referralCode");
 
-export const TWIBBON_PROOF_FORMATS = ["jpg", "jpeg", "png", "webp"] as const;
+// The participant's own Instagram post with the twibbon: https, instagram.com, a post or reel path.
+export function isInstagramPostUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname === "instagram.com" || url.hostname === "www.instagram.com") &&
+      /^\/(p|reel|reels)\/[A-Za-z0-9_-]+/.test(url.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
 
 // Empty while the competition has no twibbon link yet; the database requires it once a link is set.
-const twibbonProof = {
-  twibbonProofPublicId: z.string().min(1).optional(),
-  twibbonProofFormat: z.enum(TWIBBON_PROOF_FORMATS).optional(),
-};
+const twibbonPostUrl = z
+  .union([
+    z.literal("").transform(() => undefined),
+    z.string().trim().max(500, "validation.twibbonPostUrl").refine(isInstagramPostUrl, "validation.twibbonPostUrl"),
+  ])
+  .optional();
 
 export const PAYMENT_PROOF_FORMATS_LIST = ["jpg", "jpeg", "png", "webp", "pdf"] as const;
 
@@ -39,7 +53,7 @@ export const createRegistrationSchema = z.object({
   leaderName: fullName,
   leaderPhone: phone,
   leaderNisn: nisn,
-  ...twibbonProof,
+  twibbonPostUrl,
 });
 
 export const joinTeamSchema = z.object({
@@ -47,7 +61,7 @@ export const joinTeamSchema = z.object({
   fullName,
   nisn,
   phone,
-  ...twibbonProof,
+  twibbonPostUrl,
 });
 
 export const PAYMENT_PROOF_FORMATS = PAYMENT_PROOF_FORMATS_LIST;

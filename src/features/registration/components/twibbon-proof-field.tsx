@@ -1,20 +1,23 @@
 "use client";
 
-import { ExternalLinkIcon, ImageIcon } from "lucide-react";
+import { ExternalLinkIcon, ImageIcon, Link2Icon } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
-import { Progress } from "@/components/ui/progress";
-import { FilePicker } from "@/components/shared/file-picker";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import type { TwibbonProofFieldProps } from "@/types/registration";
 
-export function TwibbonProofField({ twibbonUrl, disabled, error, uploading, progress, reselectHint = false, onFileChange }: TwibbonProofFieldProps) {
+// The twibbon proof is the link to the visitor's Instagram post (design v86 09/11). A plain text input, so the
+// form draft keeps it, unlike a file.
+export function TwibbonProofField({ twibbonUrl, disabled, error, onValueChange }: TwibbonProofFieldProps) {
   const { t } = useI18n();
 
   return (
     <Field data-invalid={!!error}>
-      <FieldLabel htmlFor="twibbonProof" className="text-primary font-mono text-xs tracking-[0.15em] uppercase">{t(twibbonUrl ? "twibbon.proof" : "twibbon.proofOptional")}</FieldLabel>
+      <FieldLabel htmlFor="twibbonPostUrl" className="text-primary font-mono text-xs tracking-[0.15em] uppercase">
+        {t(twibbonUrl ? "twibbon.proof" : "twibbon.proofOptional")}
+      </FieldLabel>
       {twibbonUrl ? (
         <a href={twibbonUrl} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-primary text-foreground h-10 w-fit! px-4")}>
           <ImageIcon />
@@ -24,11 +27,26 @@ export function TwibbonProofField({ twibbonUrl, disabled, error, uploading, prog
       ) : (
         <FieldDescription>{t("twibbon.noLink")}</FieldDescription>
       )}
-      <FilePicker id="twibbonProof" accept="image/jpeg,image/png,image/webp" disabled={disabled} invalid={!!error} onFileChange={onFileChange} />
+      <InputGroup className="h-12">
+        <InputGroupAddon>
+          <Link2Icon />
+        </InputGroupAddon>
+        <InputGroupInput
+          id="twibbonPostUrl"
+          name="twibbonPostUrl"
+          type="url"
+          inputMode="url"
+          autoCapitalize="none"
+          spellCheck={false}
+          maxLength={500}
+          placeholder={t("twibbon.placeholder")}
+          disabled={disabled}
+          aria-invalid={!!error}
+          onInput={onValueChange}
+        />
+      </InputGroup>
       <FieldDescription>{t("twibbon.hint")}</FieldDescription>
-      {reselectHint && <FieldDescription className="text-warning">{t("draft.reselectFile")}</FieldDescription>}
       <FieldError errors={error ? [{ message: error }] : undefined} />
-      {uploading && <Progress value={progress} />}
     </Field>
   );
 }
