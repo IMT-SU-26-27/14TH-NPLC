@@ -13,6 +13,13 @@ const nextConfig: NextConfig = {
     ],
   },
   partialPrefetching: true,
+  // The Rally slug changed from "category-2" (its placeholder) to "logic-rally-games"; old links keep working.
+  async redirects() {
+    return [
+      { source: "/:lang(id|en)/register/category-2", destination: "/:lang/register/logic-rally-games", permanent: true },
+      { source: "/register/category-2", destination: "/register/logic-rally-games", permanent: true },
+    ];
+  },
   // The push service worker must never be served stale.
   async headers() {
     return [
