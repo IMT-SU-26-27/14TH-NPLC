@@ -31,7 +31,9 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
     {
       key: "registered",
       title: t("timeline.registered"),
-      description: paymentPending ? t("timeline.paidPending") : formatDateTime(team.payment_submitted_at ?? team.created_at, lang),
+      description: paymentPending
+        ? t(team.competition.payment_method === "bank_transfer" ? "timeline.paidPendingBank" : "timeline.paidPendingQris")
+        : formatDateTime(team.payment_submitted_at ?? team.created_at, lang),
       state: paymentPending ? "current" : "done",
     },
     {
@@ -49,9 +51,10 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
     {
       key: "final",
       title: status === "rejected" ? t("timeline.rejected") : t("timeline.accepted"),
+      // The reason itself is shown once, in the alert under the team name.
       description:
         status === "rejected"
-          ? (team.rejection_reason ?? "")
+          ? t("timeline.rejectedDescription")
           : status === "accepted"
             ? t("timeline.acceptedDescription")
             : t("timeline.final"),

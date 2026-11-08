@@ -17,7 +17,7 @@ import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { FormDraftBanner } from "@/components/shared/form-draft-banner";
 import { FormDraftStatus } from "@/components/shared/form-draft-status";
-import { FilePicker } from "@/features/registration/components/file-picker";
+import { FilePicker } from "@/components/shared/file-picker";
 import { FormStepHeading } from "@/features/registration/components/form-step-heading";
 import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
 import { TwibbonProofField } from "@/features/registration/components/twibbon-proof-field";
