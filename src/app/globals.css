@@ -57,6 +57,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-card-muted: var(--card-muted);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -71,6 +72,8 @@
   --background: #F4F7FD;
   --foreground: #1D3451;
   --card: #FFFFFF;
+  /* Raised panels inside a card (design token --card-muted). */
+  --card-muted: #F8FAFE;
   --card-foreground: #1D3451;
   --popover: #FFFFFF;
   --popover-foreground: #1D3451;
@@ -139,6 +142,7 @@
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
+  --card-muted: oklch(0.235 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
