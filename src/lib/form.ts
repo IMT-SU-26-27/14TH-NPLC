@@ -52,6 +52,7 @@ const RAISED: [string, string][] = [
   ["The new result is the same as the old one", "rally.errors.sameOutcome"],
   ["Only LO accounts can be assigned to a post", "errors.invalidRequest"],
   ["This competition needs", "errors.teamSize"],
+  ["The team quota for this competition is full", "errors.quotaFull"],
   ["A team needs exactly one leader", "errors.teamSize"],
   ["The team leader cannot be removed", "errors.leaderProtected"],
   ["Sign in to", "errors.signInAgain"],

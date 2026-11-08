@@ -124,6 +124,16 @@ export type DashboardContentProps = {
   searchParams: Promise<{ notice?: string }>;
 };
 
+export type WaGroup = {
+  competition_name: string;
+  wa_group_url: string;
+};
+
+export type WaGroupCardProps = {
+  group: WaGroup;
+  lang: Locale;
+};
+
 export type DashboardEmptyCardProps = {
   lang: Locale;
 };

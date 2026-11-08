@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { refresh, updateTag } from "next/cache";
+import { COMPETITIONS_TAG } from "@/lib/data/competitions";
 import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -43,6 +44,7 @@ export async function reviewRegistration(_prev: FormState, formData: FormData): 
   if (error) return errorState(databaseErrorMessage(error));
 
   if (status === "accepted" || status === "rejected") after(() => notifyRegistrationReviewed(registrationId));
+  updateTag(COMPETITIONS_TAG);
   refresh();
   return successState(
     status === "accepted" ? "admin.detail.accepted" : status === "rejected" ? "admin.detail.rejected" : "admin.detail.statusUpdated",
@@ -105,6 +107,7 @@ export async function adminCreateRegistration(_prev: FormState, formData: FormDa
     return errorState(databaseErrorMessage(memberError));
   }
 
+  updateTag(COMPETITIONS_TAG);
   redirect(localePath(await getRequestLocale(), `/admin/registrations/${registration.id}`));
 }
 
@@ -137,6 +140,7 @@ export async function adminDeleteRegistration(registrationId: string): Promise<A
     if (member.twibbon_proof_public_id) await deleteAsset(member.twibbon_proof_public_id, "authenticated");
   }
 
+  updateTag(COMPETITIONS_TAG);
   redirect(localePath(await getRequestLocale(), "/admin/registrations"));
 }
 

@@ -1,6 +1,6 @@
 import { InfoIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
-import { getMyTeams } from "@/lib/data/registrations";
+import { getMyTeams, getMyWaGroup } from "@/lib/data/registrations";
 import { getCpSessionStatus } from "@/lib/data/cp";
 import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -8,6 +8,7 @@ import { pushEnabledFor } from "@/lib/push/config";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AccountCard } from "@/features/dashboard/components/account-card";
 import { AccountNote } from "@/features/dashboard/components/account-note";
+import { WaGroupCard } from "@/features/dashboard/components/wa-group-card";
 import { DashboardEmptyCard } from "@/features/dashboard/components/dashboard-empty-card";
 import { TeamCard } from "@/features/dashboard/components/team-card";
 import { RegistrationRealtime } from "@/features/dashboard/components/registration-realtime";
@@ -16,7 +17,7 @@ import type { DashboardContentProps } from "@/types/registration";
 
 export async function DashboardContent({ lang, searchParams }: DashboardContentProps) {
   const t = getT(lang);
-  const [{ notice }, user, teams] = await Promise.all([searchParams, requireUser("/dashboard"), getMyTeams()]);
+  const [{ notice }, user, teams, waGroup] = await Promise.all([searchParams, requireUser("/dashboard"), getMyTeams(), getMyWaGroup()]);
 
   const team = teams[0];
   // An accepted CP team sees the contest button only once the contest has started.
@@ -65,6 +66,7 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
         <div className="space-y-5">
           <AccountCard user={user} lang={lang} />
           {team && <AccountNote teamName={team.team_name} lang={lang} />}
+          {waGroup && <WaGroupCard group={waGroup} lang={lang} />}
         </div>
       </div>
 

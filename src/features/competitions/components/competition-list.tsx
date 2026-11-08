@@ -1,6 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { TrophyIcon } from "lucide-react";
-import { COMPETITIONS_TAG, getActiveCompetitions } from "@/lib/data/competitions";
+import { COMPETITIONS_TAG, getActiveCompetitions, getCompetitionTeamCounts, isQuotaFull } from "@/lib/data/competitions";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { CompetitionCard } from "@/features/competitions/components/competition-card";
@@ -13,7 +13,7 @@ export async function CompetitionList({ lang }: LangProps) {
   cacheTag(COMPETITIONS_TAG);
 
   const t = getT(lang);
-  const competitions = await getActiveCompetitions();
+  const [competitions, counts] = await Promise.all([getActiveCompetitions(), getCompetitionTeamCounts()]);
 
   if (competitions.length === 0) {
     return (
@@ -32,7 +32,7 @@ export async function CompetitionList({ lang }: LangProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {competitions.map((competition, i) => (
-        <CompetitionCard key={competition.id} competition={competition} lang={lang} index={i} />
+        <CompetitionCard key={competition.id} competition={competition} lang={lang} index={i} full={isQuotaFull(competition, counts)} />
       ))}
     </div>
   );

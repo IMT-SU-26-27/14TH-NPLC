@@ -17,6 +17,13 @@ export type SectionHeadingProps = {
 };
 
 // One competition with every label already formatted on the server, so the picker stays a thin client leaf.
+export type ContactPersonLinkProps = {
+  competitionType: string;
+  // "opens WhatsApp in a new tab", for screen readers.
+  opensLabel: string;
+  className?: string;
+};
+
 export type CompetitionPickerItem = {
   id: string;
   type: Competition["type"];
@@ -28,6 +35,8 @@ export type CompetitionPickerItem = {
   earlyFee: string | null;
   earlyRange: string | null;
   open: boolean;
+  // Registration is open but the team quota is reached.
+  full: boolean;
   closesLabel: string | null;
   href: string;
   ctaLabel: string;
@@ -44,6 +53,8 @@ export type CompetitionPickerProps = {
     open: string;
     closed: string;
     registrationClosed: string;
+    full: string;
+    quotaFull: string;
   };
 };
 

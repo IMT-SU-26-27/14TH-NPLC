@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { InfoIcon, UploadIcon } from "lucide-react";
+import { InfoIcon, OctagonXIcon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 import { getPaymentUploadSignature, submitPayment } from "@/lib/actions/registration";
 import { memberRange } from "@/lib/format";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { ContactPersonLink } from "@/components/shared/contact-person-link";
 import { FilePicker } from "@/components/shared/file-picker";
 import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
 import type { PaymentPanelProps, PaymentProofFormat } from "@/types/registration";
@@ -34,6 +35,7 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
   const memberCount = team.members.length;
   const teamReady = memberCount >= min_members && memberCount <= max_members;
   const busy = uploading || submitting;
+  const [quotaFull, setQuotaFull] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -47,6 +49,7 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
         format: uploaded.format as PaymentProofFormat,
       });
       if (result.ok) toast.success(t(result.message ?? "payment.submitted"));
+      else if (result.message === "errors.quotaFull") setQuotaFull(true);
       else toast.error(t(result.message));
     });
   }
@@ -58,6 +61,16 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
 
       <form onSubmit={handleSubmit}>
         <FieldGroup>
+          {quotaFull && (
+            <Alert variant="destructive">
+              <OctagonXIcon />
+              <AlertTitle>{t("register.quotaFullTitle")}</AlertTitle>
+              <AlertDescription>
+                <p>{t("errors.quotaFull")}</p>
+                <ContactPersonLink competitionType={team.competition.type} opensLabel={t("landing.contact.opensWhatsapp")} className="mt-2" />
+              </AlertDescription>
+            </Alert>
+          )}
           {!teamReady && (
             <Alert>
               <InfoIcon />

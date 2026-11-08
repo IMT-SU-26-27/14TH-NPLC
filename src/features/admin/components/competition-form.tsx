@@ -93,6 +93,20 @@ export function CompetitionForm({ competition }: CompetitionFormProps) {
           <FieldDescription>{t("admin.competitions.twibbonUrlHint")}</FieldDescription>
           <FieldError errors={fieldErrors(errors.twibbonUrl)} />
         </Field>
+        <div className="grid gap-6 sm:grid-cols-[minmax(0,14rem)_1fr]">
+          <Field data-invalid={!!errors.maxTeams}>
+            <FieldLabel htmlFor="maxTeams">{t("admin.competitions.maxTeams")}</FieldLabel>
+            <Input id="maxTeams" name="maxTeams" type="number" min={1} step={1} defaultValue={competition?.max_teams ?? ""} aria-invalid={!!errors.maxTeams} />
+            <FieldDescription>{t("admin.competitions.maxTeamsHint")}</FieldDescription>
+            <FieldError errors={fieldErrors(errors.maxTeams)} />
+          </Field>
+          <Field data-invalid={!!errors.waGroupUrl}>
+            <FieldLabel htmlFor="waGroupUrl">{t("admin.competitions.waGroupUrl")}</FieldLabel>
+            <Input id="waGroupUrl" name="waGroupUrl" type="url" placeholder="https://chat.whatsapp.com/…" defaultValue={competition?.wa_group_url ?? ""} aria-invalid={!!errors.waGroupUrl} />
+            <FieldDescription>{t("admin.competitions.waGroupUrlHint")}</FieldDescription>
+            <FieldError errors={fieldErrors(errors.waGroupUrl)} />
+          </Field>
+        </div>
         <div className="grid gap-6 sm:grid-cols-2">
           <Field data-invalid={!!errors.registrationOpensAt}>
             <FieldLabel htmlFor="registrationOpensAt">{t("admin.competitions.opensAt")}</FieldLabel>

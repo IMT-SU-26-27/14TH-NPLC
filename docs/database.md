@@ -15,6 +15,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261108120000_line_id_optional.sql` | `create_registration` no longer requires a LINE ID (only the school); the `line_id` column and older values stay, new teams store none |
 | `20261108130000_twibbon_post_url.sql` | `registration_members.twibbon_post_url` (link to the Instagram post, checked format); `create_registration` and `join_team` take `p_twibbon_post_url` and accept that link (or an older screenshot) as the twibbon proof |
 | `20261109100000_competition_description_en.sql` | `competitions.description_en`: the English description for the `/en` pages; empty means the Indonesian `description` is shown |
+| `20261109120000_team_quota_and_wa_group.sql` | `competitions.max_teams` (team quota, null = no limit; every team that is not rejected counts) enforced in `create_registration` and when a rejected team comes back, with the competition row locked; `competitions.wa_group_url` (participants' WhatsApp group), hidden from the API by column privileges; `competition_team_counts()`, `my_wa_group()`, `admin_competition_wa_group_url()` |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -42,7 +43,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | Table | What it holds |
 |---|---|
 | `profiles` | One row per account, created automatically on sign-up. `role` is `participant`, `admin` or `lo`. Users can edit their name and avatar but not their role or email. |
-| `competitions` | Each competition: `type` (`competitive_programming` or `logic`), `sort_order` (display order, lowest first), `description` and `description_en` (English, optional; the `/en` pages fall back to `description`), team size (`min_members` to `max_members`, leader included; a fixed size such as Logic Rally Games 3 to 3 sets both to the same number; joining is refused at `max_members`, and accepting a team is refused below `min_members`), `fee` in rupiah, `twibbon_url` (optional), `qris_public_id` (Cloudinary), registration window, `is_active`. |
+| `competitions` | Each competition: `type` (`competitive_programming` or `logic`), `sort_order` (display order, lowest first), `description` and `description_en` (English, optional; the `/en` pages fall back to `description`), team size (`min_members` to `max_members`, leader included; a fixed size such as Logic Rally Games 3 to 3 sets both to the same number; joining is refused at `max_members`, and accepting a team is refused below `min_members`), `max_teams` (team quota, null = no limit), `wa_group_url` (participants' WhatsApp group invite, `https://chat.whatsapp.com/…`; not readable through the API, see below), `fee` in rupiah, `twibbon_url` (optional), `qris_public_id` (Cloudinary), registration window, `is_active`. |
 | `registrations` | One team in one competition: `team_name`, `school`, `line_id` (the contact person's LINE ID; no longer asked for since 2026-11-08, so only some teams from before then have one; fixed for participants; `school` is required for new teams), `leader_id`, `referral_code` (unique 8-character code members join with), `status`, payment proof (Cloudinary `public_id` + format), `rejection_reason`, reviewer. Team names are unique per competition (case-insensitive) and can't be changed by participants. |
 | `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (WhatsApp, required for every member since 2026-11-08; older members may have none), 10-digit NISN, twibbon post proof: `twibbon_post_url`, the link to the Instagram post (since 2026-11-08), or for older members an uploaded screenshot (Cloudinary `public_id` + format); required on join and register once the competition has a `twibbon_url`. A person (account, NISN or email) can be on only one team across all competitions, enforced by unique indexes. |
 | `registration_events` | The timeline on the participant dashboard. Written automatically on every status change; the rejection reason is stored as the event's `note`. |
@@ -105,7 +106,10 @@ All changes to results go through these functions, and direct writes are refused
 |---|---|
 | `registration_overview` (view) | Admin registrations table: one row per team with competition name, referral code, leader details and member count. Search and filter on it. |
 | `competition_stats` (view) | Admin dashboard counts per competition: `accepted_teams`, `accepted_people`, `under_review_teams`, `total_teams`. Add the rows together for the overall total. |
-| `create_registration(competition_id, team_name, leader_name, leader_phone, leader_nisn, payment_proof_public_id, payment_proof_format)` | Registration form. Creates the team already paid (status `under_review`) with the leader's member row and the referral code. The server action first checks the proof exists in Cloudinary. |
+| `create_registration(competition_id, team_name, leader_name, leader_phone, leader_nisn, payment_proof_public_id, payment_proof_format)` | Registration form. Creates the team already paid (status `under_review`) with the leader's member row and the referral code. Refused with "The team quota for this competition is full" once `max_teams` is reached; the competition row is locked first, so two registrations at once cannot both take the last place. The server action first checks the proof exists in Cloudinary. |
+| `competition_team_counts()` | Home and register pages, Admin competitions. Teams that are not rejected, per competition (active ones; admins get all). Only numbers. |
+| `my_wa_group()` | Dashboard. The WhatsApp group (competition name and link) of the caller's team, **only once the team is accepted** and only if the competition has a link. The one place that decides who sees the link. |
+| `admin_competition_wa_group_url(competition_id)` | Admin competition form. The current link; admins only. |
 | `preview_team(referral_code)` | Join page. Shows team name, competition, leader, member count and whether it can still be joined, before the user confirms. |
 | `join_team(referral_code, full_name, nisn, phone?)` | Join page. Adds the signed-in user to the team. |
 | `cp_access()` | `src/proxy.ts`. Returns the caller's accepted CP teams and each contest's status. |
@@ -138,7 +142,8 @@ members join with the referral code at any point while the competition's registr
 
 | Data | Participants | Admins |
 |---|---|---|
-| Active competitions | Everyone, including logged-out visitors | All |
+| Active competitions | Everyone, including logged-out visitors, every column except `wa_group_url` | All columns except `wa_group_url` (read it with `admin_competition_wa_group_url`) |
+| Competition WhatsApp group link | Members of an accepted team of that competition, through `my_wa_group()` | Through `admin_competition_wa_group_url()`; edited in the competition form |
 | Registrations, members, timeline | Only their own team | All, full edit |
 | CP session status | Members of accepted CP teams | All, start/end |
 | CP problems | Members of accepted CP teams, **only while the contest is live** | All |
@@ -146,6 +151,8 @@ members join with the referral code at any point while the competition's registr
 | Submissions and results | Their own team's | All |
 | Leaderboard (`cp_scores`) | Members of accepted CP teams, **only while the contest hasn't ended and the leaderboard isn't frozen** | All, always live |
 | Frozen leaderboard (`cp_leaderboard_snapshots`) | Members of accepted CP teams, only while frozen and the contest hasn't ended | All |
+
+`competitions` is read through column privileges (since `20261109120000`): `anon` and `authenticated` may select every column except `wa_group_url`. A new column on `competitions` needs its own `grant select (…)`, and `select *` on it fails from the browser and the server client; list the columns.
 
 Submissions can't be written from the browser at all. The server judges the code with Judge0 and records the result using the service role. The database also rejects submissions when the contest isn't live, the team isn't accepted, or the cooldown hasn't passed.
 

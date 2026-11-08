@@ -1,6 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { TrophyIcon } from "lucide-react";
-import { COMPETITIONS_TAG, getActiveCompetitions, isRegistrationOpen } from "@/lib/data/competitions";
+import { COMPETITIONS_TAG, getActiveCompetitions, getCompetitionTeamCounts, isQuotaFull, isRegistrationOpen } from "@/lib/data/competitions";
 import { EARLY_BIRD } from "@/lib/event-info";
 import { competitionDescription, formatDateRange, formatDateTime, formatRupiah, formatTeamSize } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
@@ -19,7 +19,7 @@ export async function CompetitionSection({ lang }: LangProps) {
 
   const t = getT(lang);
   const now = new Date();
-  const competitions = await getActiveCompetitions();
+  const [competitions, counts] = await Promise.all([getActiveCompetitions(), getCompetitionTeamCounts()]);
 
   if (competitions.length === 0) {
     return (
@@ -56,6 +56,7 @@ export async function CompetitionSection({ lang }: LangProps) {
       earlyFee: discounted ? formatRupiah(fee, lang) : null,
       earlyRange: discounted ? t("landing.competitions.earlyBirdRange", { range: earlyRange }) : null,
       open: isRegistrationOpen(c, now),
+      full: isQuotaFull(c, counts),
       closesLabel: c.registration_closes_at ? t("landing.competitions.closes", { date: formatDateTime(c.registration_closes_at, lang) }) : null,
       href: localePath(lang, `/register/${c.slug}`),
       ctaLabel: t("landing.competitions.registerCta", { short: t(`landing.competitions.short.${c.type}`) }),
@@ -74,6 +75,8 @@ export async function CompetitionSection({ lang }: LangProps) {
         open: t("competition.open"),
         closed: t("competition.closed"),
         registrationClosed: t("competition.registrationClosed"),
+        full: t("competition.quotaFullBadge"),
+        quotaFull: t("competition.quotaFull"),
       }}
     />
   );
