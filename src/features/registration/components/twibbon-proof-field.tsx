@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Progress } from "@/components/ui/progress";
-import { FilePicker } from "@/features/registration/components/file-picker";
+import { FilePicker } from "@/components/shared/file-picker";
 import type { TwibbonProofFieldProps } from "@/types/registration";
 
 export function TwibbonProofField({ twibbonUrl, disabled, error, uploading, progress, reselectHint = false, onFileChange }: TwibbonProofFieldProps) {

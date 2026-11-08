@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { InfoIcon, OctagonXIcon, UploadIcon } from "lucide-react";
+import { InfoIcon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 import { getPaymentUploadSignature, submitPayment } from "@/lib/actions/registration";
 import { currentFee } from "@/lib/pricing";
@@ -10,9 +10,9 @@ import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { FilePicker } from "@/components/shared/file-picker";
 import { PaymentInstructions } from "@/features/registration/components/payment-instructions";
 import type { PaymentPanelProps, PaymentProofFormat } from "@/types/registration";
 
@@ -64,23 +64,9 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
               <AlertDescription>{t("payment.teamIncomplete", { min: min_members, max: max_members, count: memberCount })}</AlertDescription>
             </Alert>
           )}
-          {team.status === "rejected" && (
-            <Alert variant="destructive">
-              <OctagonXIcon />
-              <AlertTitle>{t("payment.fixAndResubmit")}</AlertTitle>
-              <AlertDescription>{team.rejection_reason}</AlertDescription>
-            </Alert>
-          )}
           <Field data-invalid={!!error}>
             <FieldLabel htmlFor={`proof-${team.id}`}>{t("payment.proof")}</FieldLabel>
-            <Input
-              id={`proof-${team.id}`}
-              type="file"
-              accept={ACCEPT.join(",")}
-              disabled={busy}
-              aria-invalid={!!error}
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            />
+            <FilePicker id={`proof-${team.id}`} accept={ACCEPT.join(",")} disabled={busy} invalid={!!error} onFileChange={setFile} />
             <FieldDescription>{t("payment.proofHint")}</FieldDescription>
             <FieldError errors={error ? [{ message: t(error, errorParams) }] : undefined} />
           </Field>
