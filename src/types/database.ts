@@ -108,6 +108,7 @@ export type Database = {
           id: string
           is_active: boolean
           max_members: number
+          max_teams: number | null
           min_members: number
           name: string
           payment_method: Database["public"]["Enums"]["payment_method"]
@@ -119,6 +120,7 @@ export type Database = {
           twibbon_url: string | null
           type: Database["public"]["Enums"]["competition_type"]
           updated_at: string
+          wa_group_url: string | null
         }
         Insert: {
           bank_account_holder?: string | null
@@ -130,6 +132,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           max_members?: number
+          max_teams?: number | null
           min_members?: number
           name: string
           payment_method?: Database["public"]["Enums"]["payment_method"]
@@ -141,6 +144,7 @@ export type Database = {
           twibbon_url?: string | null
           type: Database["public"]["Enums"]["competition_type"]
           updated_at?: string
+          wa_group_url?: string | null
         }
         Update: {
           bank_account_holder?: string | null
@@ -152,6 +156,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           max_members?: number
+          max_teams?: number | null
           min_members?: number
           name?: string
           payment_method?: Database["public"]["Enums"]["payment_method"]
@@ -163,6 +168,7 @@ export type Database = {
           twibbon_url?: string | null
           type?: Database["public"]["Enums"]["competition_type"]
           updated_at?: string
+          wa_group_url?: string | null
         }
         Relationships: []
       }
@@ -1367,9 +1373,20 @@ export type Database = {
       }
     }
     Functions: {
+      admin_competition_wa_group_url: {
+        Args: { p_competition_id: string }
+        Returns: string
+      }
       admin_save_problem: {
         Args: { p_problem: Json; p_test_cases: Json }
         Returns: string
+      }
+      competition_team_counts: {
+        Args: never
+        Returns: {
+          competition_id: string
+          team_count: number
+        }[]
       }
       cp_access: {
         Args: never
@@ -1411,6 +1428,13 @@ export type Database = {
           p_twibbon_post_url?: string
         }
         Returns: string
+      }
+      my_wa_group: {
+        Args: never
+        Returns: {
+          competition_name: string
+          wa_group_url: string
+        }[]
       }
       rally_admin_correct_result: {
         Args: { p_outcome: Database["public"]["Enums"]["rally_outcome"]; p_reason: string; p_result_id: string }

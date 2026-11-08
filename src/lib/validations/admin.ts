@@ -78,6 +78,19 @@ export const competitionSchema = z
       .max(500, "validation.twibbonUrl")
       .regex(/^(https:\/\/\S+)?$/, "validation.twibbonUrl")
       .transform((v) => v || null),
+    // Empty means no limit.
+    maxTeams: z
+      .string()
+      .trim()
+      .regex(/^\d{0,5}$/, "validation.maxTeams")
+      .transform((v) => (v ? Number(v) : null))
+      .refine((v) => v === null || v > 0, "validation.maxTeams"),
+    waGroupUrl: z
+      .string()
+      .trim()
+      .max(200, "validation.waGroupUrl")
+      .regex(/^(https:\/\/chat\.whatsapp\.com\/\S+)?$/, "validation.waGroupUrl")
+      .transform((v) => v || null),
     registrationOpensAt: wibDateTime,
     registrationClosesAt: wibDateTime,
     isActive: z.boolean(),

@@ -2,6 +2,7 @@ import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Competition } from "@/types/competition";
 import type {
+  AdminCompetition,
   AdminTeam,
   CompetitionOption,
   CompetitionStats,
@@ -28,17 +29,32 @@ export async function listCompetitionOptions(): Promise<CompetitionOption[]> {
   return data;
 }
 
-export async function listCompetitions(): Promise<Competition[]> {
+// Every column the API can read: wa_group_url is left out on purpose (see migration 20261109120000).
+const ADMIN_COMPETITION_COLUMNS =
+  "id, slug, name, type, description, description_en, min_members, max_members, max_teams, fee, qris_public_id, twibbon_url, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at, is_active, sort_order, created_at, updated_at";
+
+export async function listCompetitions(): Promise<AdminCompetition[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.from("competitions").select("*").order("created_at");
+  const { data, error } = await supabase.from("competitions").select(ADMIN_COMPETITION_COLUMNS).order("created_at");
   if (error) throw new Error(`Could not load competitions: ${error.message}`);
   return data;
 }
 
+// Teams that take a place (not rejected), by competition id, inactive competitions included.
+export async function getTeamCounts(): Promise<Record<string, number>> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("competition_team_counts");
+  if (error) throw new Error(`Could not load team counts: ${error.message}`);
+  return Object.fromEntries(data.map((row) => [row.competition_id, row.team_count]));
+}
+
 export async function getCompetition(id: string): Promise<Competition | null> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.from("competitions").select("*").eq("id", id).maybeSingle();
-  return data;
+  const [{ data }, { data: waGroupUrl }] = await Promise.all([
+    supabase.from("competitions").select(ADMIN_COMPETITION_COLUMNS).eq("id", id).maybeSingle(),
+    supabase.rpc("admin_competition_wa_group_url", { p_competition_id: id }),
+  ]);
+  return data ? { ...data, wa_group_url: waGroupUrl ?? null } : null;
 }
 
 export async function listRegistrations(filters: RegistrationFilters): Promise<RegistrationList> {
