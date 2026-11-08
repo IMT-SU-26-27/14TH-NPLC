@@ -4,6 +4,7 @@ import type { Enums, Tables } from "@/types/database";
 import type { PublicCompetition } from "@/types/competition";
 import type { CurrentUser } from "@/types/auth";
 import type { CpSessionStatus } from "@/types/cp";
+import type { RallySessionStatus } from "@/types/rally";
 import type { LangParams, Locale } from "@/types/i18n";
 import type {
   createRegistrationSchema,
@@ -157,6 +158,13 @@ export type TeamCardProps = {
   lang: Locale;
   // The CP contest state for an accepted CP team (null otherwise, or before a session exists).
   contestStatus: CpSessionStatus | null;
+  // The Rally session state for an accepted Rally team (null otherwise).
+  rallyStatus: RallySessionStatus | null;
+};
+
+export type RallySessionRefreshProps = {
+  competitionId: string;
+  status: RallySessionStatus;
 };
 
 export type CpContestRefreshProps = {

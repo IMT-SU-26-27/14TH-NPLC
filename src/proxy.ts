@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { redirectWithCookies, updateSession } from "@/lib/supabase/proxy";
 import { DEFAULT_LOCALE, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
+import { rallyLeaderboardOpen } from "@/lib/rally/session-visibility";
 
 const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/lo", "/rally", "/reset-password", "/profile"];
 // LO accounts run posts only: they never register, compete or administer.
@@ -82,6 +83,13 @@ export async function proxy(request: NextRequest) {
       if (status === "paused" && !onWaiting && !onLeaderboard) return to("/cp/waiting");
       if (status === "ended" && !onWaiting) return to("/cp/waiting");
       if (status === "scheduled") return to("/dashboard");
+    }
+
+    // /rally (the participant leaderboard): closed until the admin starts the Rally session. LOs never get here
+    // (NOT_FOR_LO), admins are not affected.
+    if (matches(path, ["/rally"]) && !isAdmin) {
+      const { data: sessions } = await supabase.from("rally_sessions").select("status");
+      if (!sessions?.some((session) => rallyLeaderboardOpen(session.status))) return to("/dashboard");
     }
   }
 

@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { CodeIcon, InfoIcon, OctagonXIcon, UsersIcon } from "lucide-react";
+import { CodeIcon, InfoIcon, OctagonXIcon, TrophyIcon, UsersIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { isRegistrationOpen } from "@/lib/data/competitions";
+import { rallyLeaderboardOpen, rallyQrVisible } from "@/lib/rally/session-visibility";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -15,9 +16,10 @@ import { ReferralCode } from "@/features/dashboard/components/referral-code";
 import { DeleteTeamButton } from "@/features/dashboard/components/delete-team-button";
 import { RallyTeamQr } from "@/features/rally/components/rally-team-qr";
 import { CpContestRefresh } from "@/features/dashboard/components/cp-contest-refresh";
+import { RallySessionRefresh } from "@/features/dashboard/components/rally-session-refresh";
 import type { TeamCardProps } from "@/types/registration";
 
-export function TeamCard({ team, userId, qrisUrl, lang, contestStatus }: TeamCardProps) {
+export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStatus }: TeamCardProps) {
   const t = getT(lang);
   const isLeader = team.leader_id === userId;
   // Members join and can be removed while the competition is open; payment is only re-sent after a rejection.
@@ -93,8 +95,19 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus }: TeamCar
         </div>
       )}
 
-      {team.status === "accepted" && team.competition.type === "logic" && (
-        <RallyTeamQr token={team.rally_qr_token} referralCode={team.referral_code} lang={lang} />
+      {team.status === "accepted" && rallyStatus !== null && (
+        <>
+          {rallyQrVisible(rallyStatus) && <RallyTeamQr token={team.rally_qr_token} referralCode={team.referral_code} lang={lang} />}
+          {rallyLeaderboardOpen(rallyStatus) && (
+            <div className="flex justify-center">
+              <Link href={localePath(lang, "/rally/leaderboard")} className={buttonVariants({ variant: "outline" })}>
+                <TrophyIcon />
+                {t("rally.leaderboard.title")}
+              </Link>
+            </div>
+          )}
+          <RallySessionRefresh competitionId={team.competition.id} status={rallyStatus} />
+        </>
       )}
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[5fr_7fr]">

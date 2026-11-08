@@ -1,9 +1,6 @@
-import Link from "next/link";
-import { QrCodeIcon, TrophyIcon } from "lucide-react";
-import { localePath } from "@/lib/i18n/config";
+import { QrCodeIcon } from "lucide-react";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { qrSvg, rallyQrPayload } from "@/lib/rally/qr";
-import { buttonVariants } from "@/components/ui/button";
 import type { RallyTeamQrProps } from "@/types/rally";
 
 export async function RallyTeamQr({ token, referralCode, lang }: RallyTeamQrProps) {
@@ -27,12 +24,6 @@ export async function RallyTeamQr({ token, referralCode, lang }: RallyTeamQrProp
       <p className="text-muted-foreground text-center text-sm">
         {t("rally.team.backupCode")} <span className="text-foreground font-mono font-medium tracking-widest">{referralCode}</span>
       </p>
-      <div className="flex justify-center">
-        <Link href={localePath(lang, "/rally/leaderboard")} className={buttonVariants({ variant: "outline" })}>
-          <TrophyIcon />
-          {t("rally.leaderboard.title")}
-        </Link>
-      </div>
     </section>
   );
 }

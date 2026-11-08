@@ -2,6 +2,7 @@ import { InfoIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
 import { getMyTeams, getMyWaGroup } from "@/lib/data/registrations";
 import { getCpSessionStatus } from "@/lib/data/cp";
+import { getRallySession } from "@/lib/data/rally";
 import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { pushEnabledFor } from "@/lib/push/config";
@@ -23,6 +24,9 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
   // An accepted CP team sees the contest button only once the contest has started.
   const cpTeam = teams.find((item) => item.status === "accepted" && item.competition.type === "competitive_programming");
   const contestStatus = cpTeam ? await getCpSessionStatus(cpTeam.competition.id) : null;
+  // An accepted Rally team sees its QR and the leaderboard only once the admin has started the session.
+  const rallyTeam = teams.find((item) => item.status === "accepted" && item.competition.type === "logic");
+  const rallyStatus = rallyTeam ? (await getRallySession(rallyTeam.competition.id)).status : null;
 
   return (
     <div className="space-y-5">
@@ -57,6 +61,7 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
                 userId={user.id}
                 lang={lang}
                 contestStatus={item.id === cpTeam?.id ? contestStatus : null}
+                rallyStatus={item.id === rallyTeam?.id ? rallyStatus : null}
                 qrisUrl={item.competition.qris_public_id ? publicImageUrl(item.competition.qris_public_id) : null}
               />
             ))
