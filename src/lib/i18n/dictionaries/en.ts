@@ -579,6 +579,7 @@ export const en: Dictionary = {
     rejectedTitle: "Registration rejected",
     cpAcceptedTitle: "You're in the competitive programming contest",
     cpAcceptedDescription: "The contest page opens when the admin starts the competition.",
+    cpContestNotStarted: "The contest page opens for the preliminary round, 18 Jan 2027.",
     goToContest: "Go to contest",
     progress: "Registration progress",
     members: "Members ({count}/{max})",

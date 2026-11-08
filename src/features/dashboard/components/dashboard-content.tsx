@@ -1,6 +1,7 @@
 import { InfoIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
 import { getMyTeams } from "@/lib/data/registrations";
+import { getCpSessionStatus } from "@/lib/data/cp";
 import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { pushEnabledFor } from "@/lib/push/config";
@@ -18,6 +19,9 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
   const [{ notice }, user, teams] = await Promise.all([searchParams, requireUser("/dashboard"), getMyTeams()]);
 
   const team = teams[0];
+  // An accepted CP team sees the contest button only once the contest has started.
+  const cpTeam = teams.find((item) => item.status === "accepted" && item.competition.type === "competitive_programming");
+  const contestStatus = cpTeam ? await getCpSessionStatus(cpTeam.competition.id) : null;
 
   return (
     <div className="space-y-5">
@@ -51,6 +55,7 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
                 team={item}
                 userId={user.id}
                 lang={lang}
+                contestStatus={item.id === cpTeam?.id ? contestStatus : null}
                 qrisUrl={item.competition.qris_public_id ? publicImageUrl(item.competition.qris_public_id) : null}
               />
             ))

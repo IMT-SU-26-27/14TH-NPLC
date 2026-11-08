@@ -578,6 +578,7 @@ export const id = {
     rejectedTitle: "Pendaftaran ditolak",
     cpAcceptedTitle: "Kamu terdaftar di kontes competitive programming",
     cpAcceptedDescription: "Halaman kontes dibuka saat admin memulai lomba.",
+    cpContestNotStarted: "Halaman kontes dibuka saat penyisihan, 18 Jan 2027.",
     goToContest: "Ke kontes",
     progress: "Progres pendaftaran",
     members: "Anggota ({count}/{max})",
