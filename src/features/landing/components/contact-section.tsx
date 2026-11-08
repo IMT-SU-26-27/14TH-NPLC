@@ -1,10 +1,10 @@
 import Image from "next/image";
-import { MessageCircleIcon } from "lucide-react";
 import { COMMITTEE_CONTACTS, whatsappUrl } from "@/lib/event-info";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { sectionId } from "@/lib/home-sections";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { WhatsappIcon } from "@/components/shared/whatsapp-icon";
 import type { LangProps } from "@/types/i18n";
 
 // "07 // Kontak": blue band with the waving mascot and one WhatsApp button per competition's contact person.
@@ -28,11 +28,11 @@ export function ContactSection({ lang }: LangProps) {
                 key={contact.whatsapp}
                 href={whatsappUrl(contact.whatsapp)}
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
                 className={cn(buttonVariants({ size: "lg" }), "bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 w-full px-5 sm:w-auto")}
               >
-                <MessageCircleIcon data-icon="inline-start" />
-                {`${contact.competition} · ${contact.name}`}
+                <WhatsappIcon data-icon="inline-start" />
+                {`${contact.label} · ${contact.name}`}
                 <span className="sr-only">{` (${t("landing.contact.opensWhatsapp")})`}</span>
               </a>
             ))}

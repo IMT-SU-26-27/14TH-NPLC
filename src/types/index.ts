@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, SVGProps } from "react";
 
 // Shared types. Domain types live in their own files (auth.ts, registration.ts, cp.ts, ...).
 
@@ -46,3 +46,6 @@ export type PageBandProps = {
   // Extra content under the lead.
   children?: ReactNode;
 };
+
+// Brand icons drawn inline (lucide has no brand marks). Same props as a lucide icon's <svg>.
+export type BrandIconProps = SVGProps<SVGSVGElement>;

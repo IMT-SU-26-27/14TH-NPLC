@@ -1,11 +1,12 @@
 import { cacheLife } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
-import { CameraIcon, MessageCircleIcon } from "lucide-react";
 import { COMMITTEE_CONTACTS, INSTAGRAM, whatsappUrl } from "@/lib/event-info";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Separator } from "@/components/ui/separator";
+import { InstagramIcon } from "@/components/shared/instagram-icon";
+import { WhatsappIcon } from "@/components/shared/whatsapp-icon";
 import type { LangProps } from "@/types/i18n";
 
 const columnLabel = "text-primary font-mono text-xs tracking-[0.2em] uppercase";
@@ -33,11 +34,12 @@ export async function SiteFooter({ lang }: LangProps) {
           <ul className="space-y-2">
             {COMMITTEE_CONTACTS.map((contact) => (
               <li key={contact.whatsapp}>
-                <a href={whatsappUrl(contact.whatsapp)} target="_blank" rel="noopener" className={footerLink}>
-                  <MessageCircleIcon aria-hidden className="mt-0.5 size-4 shrink-0" />
+                <a href={whatsappUrl(contact.whatsapp)} target="_blank" rel="noopener noreferrer" className={footerLink}>
+                  <WhatsappIcon aria-hidden className="mt-0.5 size-4 shrink-0" />
                   <span>
-                    {t("footer.contactLine", { competition: contact.competition, name: contact.name })}{" "}
+                    {`${contact.label} · `}
                     <span className="whitespace-nowrap tabular-nums">{contact.display}</span>
+                    {` · ${contact.name}`}
                   </span>
                 </a>
               </li>
@@ -46,8 +48,8 @@ export async function SiteFooter({ lang }: LangProps) {
         </div>
         <div className="space-y-3">
           <p className={columnLabel}>{`// ${t("footer.social")}`}</p>
-          <a href={INSTAGRAM.url} target="_blank" rel="noopener" className={footerLink}>
-            <CameraIcon aria-hidden className="mt-0.5 size-4 shrink-0" />
+          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" className={footerLink}>
+            <InstagramIcon aria-hidden className="mt-0.5 size-4 shrink-0" />
             <span>
               <span className="sr-only">{`${t("footer.instagram")} `}</span>
               {INSTAGRAM.handle}

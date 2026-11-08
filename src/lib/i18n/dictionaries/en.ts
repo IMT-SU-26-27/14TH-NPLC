@@ -1179,8 +1179,7 @@ export const en: Dictionary = {
     },
   },
   footer: {
-    contact: "Committee contact",
-    contactLine: "{competition} contact · {name} ·",
+    contact: "Contact person",
     social: "Social media",
     instagram: "Instagram",
     tagline: "The 14th National Programming & Logic Competition, Universitas Ciputra.",

@@ -1178,8 +1178,7 @@ export const id = {
     },
   },
   footer: {
-    contact: "Kontak panitia",
-    contactLine: "CP {competition} · {name} ·",
+    contact: "Contact person",
     social: "Sosial media",
     instagram: "Instagram",
     tagline: "National Programming & Logic Competition ke-14, Universitas Ciputra.",
