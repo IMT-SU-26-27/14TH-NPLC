@@ -134,6 +134,11 @@ export type TeamCardProps = {
 
 export type StepState = "done" | "current" | "upcoming" | "failed";
 
+export type StepMarkerProps = {
+  state: StepState;
+  final?: boolean;
+};
+
 export type TimelineStep = {
   key: string;
   title: string;
@@ -172,6 +177,16 @@ export type RegistrationStatusBadgeProps = {
 
 export type AccountCardProps = {
   user: CurrentUser;
+  lang: Locale;
+};
+
+export type AccountNoteProps = {
+  teamName: string;
+  lang: Locale;
+};
+
+export type TeamStatusPillProps = {
+  status: RegistrationStatus;
   lang: Locale;
 };
 
