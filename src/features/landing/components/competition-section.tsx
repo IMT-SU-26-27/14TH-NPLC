@@ -2,7 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { TrophyIcon } from "lucide-react";
 import { COMPETITIONS_TAG, getActiveCompetitions, isRegistrationOpen } from "@/lib/data/competitions";
 import { EARLY_BIRD } from "@/lib/event-info";
-import { formatDateRange, formatDateTime, formatRupiah, formatTeamSize } from "@/lib/format";
+import { competitionDescription, formatDateRange, formatDateTime, formatRupiah, formatTeamSize } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { currentFee } from "@/lib/pricing";
@@ -49,7 +49,7 @@ export async function CompetitionSection({ lang }: LangProps) {
       id: c.id,
       type: c.type,
       name: c.name,
-      description: c.description,
+      description: competitionDescription(c, lang),
       membersLabel: formatTeamSize(c.min_members, c.max_members, lang),
       membersHint: extraMax === 0 ? t("landing.competitions.leaderOnly") : t("landing.competitions.leaderPlus", { range }),
       normalFee: formatRupiah(c.fee, lang),

@@ -33,6 +33,16 @@ export function formatTimestamp(value: string, lang: Locale): string {
   return `${formatted} WIB`;
 }
 
+// The competition description in the page's language: English when it is filled in, otherwise the Indonesian one.
+export function competitionDescription(competition: { description: string; description_en: string | null }, lang: Locale): string {
+  return (lang === "en" && competition.description_en?.trim()) || competition.description;
+}
+
+// Team size as a number of people: "3" for a fixed size, "1–3" for a range.
+export function memberRange(min: number, max: number): string {
+  return min === max ? `${max}` : `${min}–${max}`;
+}
+
 export function formatTeamSize(min: number, max: number, lang: Locale): string {
   const t = getT(lang);
   if (min !== max) return t("competition.people", { min, max });

@@ -86,6 +86,9 @@ export type ReviewFormProps = {
   registrationId: string;
   status: RegistrationStatus;
   rejectionReason: string | null;
+  memberCount: number;
+  minMembers: number;
+  maxMembers: number;
 };
 
 export type TeamNameFormProps = {

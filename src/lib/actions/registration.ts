@@ -7,7 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { hasRegistration } from "@/lib/data/registrations";
 import { assetExists, deleteAsset, newRegistrationProofFolder, paymentProofFolder, signUpload } from "@/lib/cloudinary/server";
-import { databaseErrorMessage, errorState, fieldErrorState } from "@/lib/form";
+import { databaseErrorMessage, databaseErrorState, errorState, fieldErrorState } from "@/lib/form";
 import { notifyAdminsPaymentToReview, notifyLeaderMemberJoined } from "@/lib/push/notify";
 import { localePath } from "@/lib/i18n/config";
 import { getRequestLocale } from "@/lib/i18n/server";
@@ -64,7 +64,7 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
   });
   if (error) {
     await deleteAsset(publicId, "authenticated");
-    return errorState(databaseErrorMessage(error));
+    return databaseErrorState(error, { "errors.duplicateNisn": "leaderNisn" });
   }
 
   after(() => notifyAdminsPaymentToReview(registrationId, false));
@@ -93,7 +93,7 @@ export async function joinTeam(_prev: FormState, formData: FormData): Promise<Fo
     p_phone: parsed.data.phone,
     p_twibbon_post_url: parsed.data.twibbonPostUrl,
   });
-  if (error) return errorState(databaseErrorMessage(error));
+  if (error) return databaseErrorState(error, { "errors.duplicateNisn": "nisn" });
 
   after(() => notifyLeaderMemberJoined(registrationId, parsed.data.fullName));
   redirect(localePath(await getRequestLocale(), "/dashboard"));

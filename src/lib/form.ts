@@ -59,6 +59,14 @@ const RAISED: [string, string][] = [
 
 // Maps Postgres errors (RAISE EXCEPTION, constraints) to a dictionary key.
 // Unknown messages pass through unchanged and are shown as-is.
+// A database error as form state. A message that belongs to one field (a NISN already used, ...) is shown on that
+// field, with the usual "fix the marked fields" alert under the form.
+export function databaseErrorState(error: { code?: string; message: string }, fieldFor: Record<string, string> = {}): FormState {
+  const message = databaseErrorMessage(error);
+  const field = fieldFor[message];
+  return field ? { status: "error", message: "validation.fixFields", fieldErrors: { [field]: [{ message }] } } : errorState(message);
+}
+
 export function databaseErrorMessage(error: { code?: string; message: string }): string {
   const raised = RAISED.find(([prefix]) => error.message.startsWith(prefix));
   if (raised) return raised[1];
