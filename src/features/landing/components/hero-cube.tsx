@@ -3,6 +3,8 @@ import type { HeroArtProps } from "@/types/hero";
 // The hero cube from the design handoff (public/shared/cube-isometric.svg), inline so each layer can animate:
 // the back half of the orbit ring, 19 pieces in paint order, then the front half. Gradient ids carry an "hc-"
 // prefix so they never collide with the fragments' copies. At rest it is identical to the original file.
+// Each ring half sits in a tilt group (the seesaw) holding the ring line plus a hidden sheen and orbit dots. Both
+// halves carry identical copies; the clip shows each copy only on its own side, behind or in front of the cube.
 export function HeroCube({ className }: HeroArtProps) {
   return (
     <svg viewBox="0 0 540 520" aria-hidden focusable="false" className={className}>
@@ -75,12 +77,33 @@ export function HeroCube({ className }: HeroArtProps) {
         <clipPath id="hc-front">
           <rect x="0" y="282" width="540" height="300" />
         </clipPath>
+        {/* Animated ring only: the same front/back split, but along the ring's own axis, so it tilts with the ring. */}
+        <clipPath id="hc-back-axis">
+          <rect x="0" y="0" width="540" height="282" />
+        </clipPath>
+        <clipPath id="hc-front-axis">
+          <rect x="0" y="282" width="540" height="300" />
+        </clipPath>
         <clipPath id="hc-back">
           <rect x="0" y="0" width="540" height="282" />
         </clipPath>
       </defs>
       <g clipPath="url(#hc-back)" data-hero-ring="back">
-        <ellipse cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="1.5" transform="rotate(-14 272 282)" opacity="0.55" pathLength="1000" />
+        <g data-hero-ring-tilt transform="rotate(-14 272 282)">
+          <g data-hero-ring-clip="back">
+            <ellipse data-hero-ring-line cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="1.5" opacity="0.55" pathLength="1000" />
+            <g data-hero-ring-extra visibility="hidden">
+              <ellipse data-hero-sheen cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="2.4" strokeLinecap="round" opacity="0.22" pathLength="1000" strokeDasharray="180 820" />
+              <ellipse data-hero-sheen cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="2.4" strokeLinecap="round" opacity="0.5" pathLength="1000" strokeDasharray="110 890" />
+              <ellipse data-hero-sheen cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="2.4" strokeLinecap="round" opacity="0.95" pathLength="1000" strokeDasharray="50 950" />
+              <g data-hero-dots>
+                <circle data-hero-dot r="2.5" fill="#4A6BFF" />
+                <circle data-hero-dot r="2.5" fill="#A78BFA" />
+                <circle data-hero-dot r="2.5" fill="#D8F939" />
+              </g>
+            </g>
+          </g>
+        </g>
       </g>
       <g data-hero-pieces>
         <g data-hero-piece data-index="0">
@@ -199,7 +222,21 @@ export function HeroCube({ className }: HeroArtProps) {
         </g>
       </g>
       <g clipPath="url(#hc-front)" data-hero-ring="front">
-        <ellipse cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="2.2" transform="rotate(-14 272 282)" opacity="0.9" pathLength="1000" />
+        <g data-hero-ring-tilt transform="rotate(-14 272 282)">
+          <g data-hero-ring-clip="front">
+            <ellipse data-hero-ring-line cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="2.2" opacity="0.9" pathLength="1000" />
+            <g data-hero-ring-extra visibility="hidden">
+              <ellipse data-hero-sheen cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="3.2" strokeLinecap="round" opacity="0.22" pathLength="1000" strokeDasharray="180 820" />
+              <ellipse data-hero-sheen cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="3.2" strokeLinecap="round" opacity="0.5" pathLength="1000" strokeDasharray="110 890" />
+              <ellipse data-hero-sheen cx="272" cy="282" rx="255" ry="66" fill="none" stroke="url(#hc-orb)" strokeWidth="3.2" strokeLinecap="round" opacity="0.95" pathLength="1000" strokeDasharray="50 950" />
+              <g data-hero-dots>
+                <circle data-hero-dot r="2.5" fill="#4A6BFF" />
+                <circle data-hero-dot r="2.5" fill="#A78BFA" />
+                <circle data-hero-dot r="2.5" fill="#D8F939" />
+              </g>
+            </g>
+          </g>
+        </g>
       </g>
     </svg>
   );

@@ -23,14 +23,43 @@ const PIECE_CENTER: readonly (readonly [number, number])[] = [
   [312.2, 349], [262, 204], [211.8, 291], [312.2, 291], [262, 378], [126.4, 186.6], [402.6, 180.8], [211.8, 233],
   [262, 320], [324.8, 222.9], [272.1, 250.4],
 ];
-const FRAGMENT_CENTER = ["70 90", "470 60"] as const;
+const FRAGMENT_CENTER = { left: [70, 90], right: [470, 60] } as const;
 
 const PIECE_EASE = CustomEase.create("hero-piece", "0.2,0.8,0.2,1");
 
-// Fades in every [data-hero-item], then assembles the cube in [data-hero-art]: back ring, pieces from the bottom
-// up, front ring, then the two fragments. Afterwards the cube floats as before and each fragment drifts on its
-// own; that idle loop pauses while the hero is off screen. With reduced motion nothing runs and the art shows
-// exactly as it is in the markup.
+// The orbit ring (SVG units). Its lines use pathLength 1000, so dash values are in thousandths of the ring.
+const RING = { cx: 272, cy: 282, rx: 255, ry: 66, rest: -14 } as const;
+const PATH = 1000;
+const RING_DRAW = { start: 0.2, duration: 1, phoneFade: 0.6 } as const;
+// Idle: the ring rocks from -14° to +14° and back; a sheen runs round it and three dots orbit it. Along the
+// front (lower) half both move left to right.
+const SEESAW = { swing: 14, period: 6 } as const;
+const SHEEN_PERIOD = 7;
+const DOT_PERIOD = 9;
+const DOT_START = Math.PI / 2;
+// Idle motion eases in from rest over this many seconds, so nothing jerks when the entrance hands over.
+const RAMP = 2;
+
+// The three floating "islands": [amplitude, period s, phase 0–1] for y (px), x (px) and rotation (°). Amplitudes
+// are half of the total travel. Periods share no common multiple, so the islands never move in step.
+const ISLANDS = {
+  cube: { y: [5, 7.0, 0], x: [1.5, 9.4, 0.31], r: [2, 8.3, 0.62] },
+  left: { y: [6, 6.2, 0.17], x: [2.5, 8.9, 0.53], r: [4, 7.3, 0.86] },
+  right: { y: [5, 7.6, 0.41], x: [2, 10.1, 0.74], r: [5, 6.7, 0.08] },
+} as const;
+
+const wave = ([amplitude, period, phase]: readonly [number, number, number], t: number) =>
+  amplitude * Math.sin(2 * Math.PI * (t / period + phase));
+const smooth = (x: number) => {
+  const k = Math.min(Math.max(x, 0), 1);
+  return k * k * (3 - 2 * k);
+};
+
+// Fades in every [data-hero-item], then assembles the cube in [data-hero-art]: the pieces fly in from the bottom
+// up while the ring is drawn as one stroke (behind the cube, then in front), then the two fragments pop in.
+// Afterwards the ring rocks and orbits and the cube and both fragments float as three separate islands. Idle
+// motion stops while the hero is off screen or the tab is hidden. With reduced motion nothing runs and the art
+// shows exactly as it is in the markup.
 export function useHeroAnimation<T extends HTMLElement>() {
   const scope = useRef<T>(null);
 
@@ -51,16 +80,16 @@ export function useHeroAnimation<T extends HTMLElement>() {
         if (!root || !art) return;
         // Read once, so turning a phone does not replay the entrance.
         const phone = window.matchMedia("(max-width: 639px)").matches;
-        let observer: IntersectionObserver | null = null;
+        let stop = () => {};
 
         // Built in its own task after the hydrated frame has painted, so reading the SVG never adds to React's
-        // hydration work; the art stays hidden until then. context.add keeps these tweens in the matchMedia
-        // context for cleanup.
+        // hydration work; the art stays hidden until then (CSS). context.add keeps the tweens in this
+        // matchMedia context for cleanup.
         let timer = 0;
         const frame = requestAnimationFrame(() => {
           timer = window.setTimeout(() =>
             context.add(() => {
-              observer = assembleCube(root, art, phone);
+              stop = animateCube(root, art, phone);
             }),
           );
         });
@@ -68,7 +97,7 @@ export function useHeroAnimation<T extends HTMLElement>() {
         return () => {
           cancelAnimationFrame(frame);
           window.clearTimeout(timer);
-          observer?.disconnect();
+          stop();
         };
       });
     },
@@ -78,87 +107,225 @@ export function useHeroAnimation<T extends HTMLElement>() {
   return scope;
 }
 
-// The entrance timeline and the idle loop for the cube art. Returns the observer that pauses the idle loop.
-function assembleCube(root: HTMLElement, art: HTMLElement, phone: boolean): IntersectionObserver {
-  const rings = gsap.utils.toArray<SVGGElement>("[data-hero-ring]", art);
-  const pieces = gsap.utils.toArray<SVGGElement>("[data-hero-piece]", art);
-  const [left, right] = gsap.utils.toArray<SVGGElement>("[data-hero-fragment]", art);
+// Entrance and idle motion for the cube art. Returns a function that stops the idle loop and puts every layer
+// back as it is in the markup.
+function animateCube(root: HTMLElement, art: HTMLElement, phone: boolean): () => void {
+  const all = <E extends Element>(selector: string) => [...art.querySelectorAll<E>(selector)];
+  const pieces = all<SVGGElement>("[data-hero-piece]");
+  const ringHalves = all<SVGGElement>("[data-hero-ring]");
+  const tilts = all<SVGGElement>("[data-hero-ring-tilt]");
+  const ringClips = all<SVGGElement>("[data-hero-ring-clip]");
+  const lines = all<SVGEllipseElement>("[data-hero-ring-line]");
+  const extras = all<SVGGElement>("[data-hero-ring-extra]");
+  const sheens = all<SVGEllipseElement>("[data-hero-sheen]");
+  const dotGroups = all<SVGGElement>("[data-hero-dots]");
+  const dots = all<SVGCircleElement>("[data-hero-dot]");
+  const float = art.querySelector<HTMLElement>("[data-hero-float]");
+  const fragments = {
+    left: art.querySelector<SVGGElement>('[data-hero-fragment="left"]'),
+    right: art.querySelector<SVGGElement>('[data-hero-fragment="right"]'),
+  };
+  const shadows = {
+    left: art.querySelector<SVGEllipseElement>('[data-hero-shadow="left"]'),
+    right: art.querySelector<SVGEllipseElement>('[data-hero-shadow="right"]'),
+  };
+  const setAll = (els: Element[], name: string, value: string) => els.forEach((el) => el.setAttribute(name, value));
 
-  // Idle loop, started once the cube is assembled: the cube and its ring keep the old float, and the fragments
-  // drift on their own periods so they never move in step.
-  const idle = gsap.timeline({ paused: true });
-  idle.to(art.querySelector("[data-hero-float]"), { y: -14, duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: -1 }, 0);
-  if (left) idle.to(left, { y: -8, rotation: -6, svgOrigin: FRAGMENT_CENTER[0], duration: 2.25, ease: "sine.inOut", yoyo: true, repeat: -1 }, 0);
-  if (right) idle.to(right, { y: -6, rotation: 6, svgOrigin: FRAGMENT_CENTER[1], duration: 2.75, ease: "sine.inOut", yoyo: true, repeat: -1 }, 0.9);
+  // The animated ring splits front from back along its own axis, inside the tilt group, so the split tilts with
+  // the ring and the dots always pass behind the cube on the far side and in front of it on the near side.
+  ringHalves.forEach((half) => half.removeAttribute("clip-path"));
+  ringClips.forEach((clip) => clip.setAttribute("clip-path", `url(#hc-${clip.dataset.heroRingClip}-axis)`));
 
-  let visible = true;
-  const entrance = gsap.timeline({
-    delay: 0.3,
-    onComplete: () => {
-      gsap.set(pieces, { clearProps: "willChange" });
-      if (visible) idle.play();
-    },
-  });
+  // --- Idle loop: one ticker callback with its own clock, which only runs while the hero is on screen.
+  let ringTime = -1;
+  let islandTime = -1;
+  let sheenTravel = 0;
+  let dotTravel = 0;
+  const cube = float
+    ? { x: gsap.quickSetter(float, "x", "px"), y: gsap.quickSetter(float, "y", "px"), r: gsap.quickSetter(float, "rotation", "deg") }
+    : null;
 
-  rings.forEach((ring, i) => {
-    const at = i === 0 ? 0.15 : 0.9;
-    const duration = i === 0 ? 0.7 : 0.6;
-    const line = ring.querySelector("ellipse");
-    if (phone || !line) {
-      // Phones skip the stroke drawing: the ring only fades in.
-      entrance.from(ring, { autoAlpha: 0, duration, ease: "power1.inOut" }, at);
-      return;
+  const placeSheen = (tip: number) => setAll(sheens, "stroke-dashoffset", String(-(((tip % PATH) + PATH) % PATH)));
+  // Dots on the ellipse in the ring's own (untilted) coordinates; the tilt group turns them with the ring.
+  const placeDots = (travel: number) =>
+    dots.forEach((dot, i) => {
+      const theta = DOT_START - travel + ((i % 3) * 2 * Math.PI) / 3;
+      const x = RING.cx + RING.rx * Math.cos(theta);
+      const y = RING.cy + RING.ry * Math.sin(theta);
+      dot.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
+    });
+  placeDots(0);
+
+  const tick = (_time: number, deltaMs: number) => {
+    const dt = Math.min(deltaMs, 100) / 1000;
+    if (ringTime >= 0) {
+      ringTime += dt;
+      const ease = smooth(ringTime / RAMP);
+      const angle = RING.rest + SEESAW.swing * (1 - Math.cos((2 * Math.PI * ringTime) / SEESAW.period));
+      setAll(tilts, "transform", `rotate(${angle.toFixed(3)} ${RING.cx} ${RING.cy})`);
+      sheenTravel += ((PATH / SHEEN_PERIOD) * ease * dt);
+      placeSheen(-sheenTravel);
+      if (!phone) {
+        dotTravel += ((2 * Math.PI) / DOT_PERIOD) * ease * dt;
+        placeDots(dotTravel);
+      }
     }
-    // Drawn with attributes on a pathLength of 1000: tweening the CSS property rounds its px value, which turned
-    // the 0–1 draw into a jump and showed the half ring at once.
-    entrance.fromTo(
-      line,
-      { attr: { "stroke-dasharray": "1000 1000", "stroke-dashoffset": 1000 } },
-      {
-        attr: { "stroke-dashoffset": 0 },
-        duration,
-        ease: "power1.inOut",
-        onComplete: () => {
-          line.removeAttribute("stroke-dasharray");
-          line.removeAttribute("stroke-dashoffset");
-        },
-      },
-      at,
-    );
-  });
+    if (islandTime >= 0) {
+      islandTime += dt;
+      const ease = smooth(islandTime / RAMP);
+      if (cube) {
+        cube.x(wave(ISLANDS.cube.x, islandTime) * ease);
+        cube.y(wave(ISLANDS.cube.y, islandTime) * ease);
+        cube.r(wave(ISLANDS.cube.r, islandTime) * ease);
+      }
+      (["left", "right"] as const).forEach((side) => {
+        const island = ISLANDS[side];
+        const [cx, cy] = FRAGMENT_CENTER[side];
+        const x = wave(island.x, islandTime) * ease;
+        const y = wave(island.y, islandTime) * ease;
+        const r = wave(island.r, islandTime) * ease;
+        fragments[side]?.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${r.toFixed(2)} ${cx} ${cy})`);
+        // Shadow on the ground: smaller and fainter the higher the cube floats.
+        const lift = (1 - y / island.y[0]) / 2;
+        const shadow = shadows[side];
+        if (shadow) {
+          const cxs = Number(shadow.getAttribute("cx"));
+          const cys = Number(shadow.getAttribute("cy"));
+          const scale = 1 - 0.25 * lift;
+          shadow.setAttribute("transform", `translate(${(x + cxs * (1 - scale)).toFixed(2)} ${(cys * (1 - scale)).toFixed(2)}) scale(${scale.toFixed(3)})`);
+          shadow.setAttribute("opacity", ((0.14 - 0.07 * lift) * ease).toFixed(3));
+        }
+      });
+    }
+  };
 
-  // Bottom pieces first, so the cube stacks up.
-  PIECE_ORDER.forEach((index, order) => {
-    const piece = pieces[index];
-    if (!piece) return;
-    const [x, y, rotation] = PIECE_FROM[index];
-    const [cx, cy] = PIECE_CENTER[index];
-    entrance.from(
-      piece,
-      { x, y, rotation, scale: 0.9, autoAlpha: 0, svgOrigin: `${cx} ${cy}`, duration: 0.45, ease: PIECE_EASE },
-      0.2 + order * (phone ? 0.02 : 0.035),
-    );
-  });
-
-  [left, right].forEach((fragment, i) => {
-    if (!fragment) return;
-    entrance.from(fragment, { scale: 0.6, autoAlpha: 0, svgOrigin: FRAGMENT_CENTER[i], duration: 0.4, ease: "back.out(1.7)" }, i === 0 ? 1.1 : 1.25);
-  });
-
-  // Every layer now sits at its start, so the art can be shown in this same frame (the CSS keeps it hidden until
-  // data-hero-ready, or for at most 3 s).
-  gsap.set(pieces, { willChange: "transform, opacity" });
-  art.setAttribute("data-hero-ready", "");
-  // Over 3 s late, the CSS failsafe has already shown the finished cube: skip the entrance, keep the idle.
-  if (performance.now() > 2900) entrance.progress(1);
-
-  // The idle loop stops while the hero is off screen and picks up again when it scrolls back.
+  let onScreen = true;
+  let ticking = false;
+  const sync = () => {
+    const run = onScreen && !document.hidden && (ringTime >= 0 || islandTime >= 0);
+    if (run && !ticking) gsap.ticker.add(tick);
+    if (!run && ticking) gsap.ticker.remove(tick);
+    ticking = run;
+  };
+  const startRing = () => {
+    ringTime = 0;
+    sync();
+  };
+  const startIslands = () => {
+    islandTime = 0;
+    sync();
+  };
   const observer = new IntersectionObserver(([entry]) => {
-    visible = entry.isIntersecting;
-    if (entrance.progress() < 1) return;
-    if (visible) idle.play();
-    else idle.pause();
+    onScreen = entry.isIntersecting;
+    sync();
   });
   observer.observe(root);
-  return observer;
+  document.addEventListener("visibilitychange", sync);
+
+  const ready = () => art.setAttribute("data-hero-ready", "");
+
+  // The script came too late (CSS already showed the art after 3 s): no entrance, only the idle motion.
+  if (performance.now() > 2900) {
+    gsap.set(extras, { attr: { visibility: "visible", opacity: 1 } });
+    if (phone) gsap.set(dotGroups, { attr: { opacity: 0 } });
+    placeSheen(0);
+    ready();
+    startRing();
+    startIslands();
+  } else {
+    const entrance = gsap.timeline({
+      delay: 0.3,
+      onComplete: () => {
+        gsap.set(pieces, { clearProps: "willChange" });
+        startIslands();
+      },
+    });
+
+    // Bottom pieces first, so the cube stacks up.
+    PIECE_ORDER.forEach((index, order) => {
+      const piece = pieces[index];
+      if (!piece) return;
+      const [x, y, rotation] = PIECE_FROM[index];
+      const [cx, cy] = PIECE_CENTER[index];
+      entrance.from(
+        piece,
+        { x, y, rotation, scale: 0.9, autoAlpha: 0, svgOrigin: `${cx} ${cy}`, duration: 0.45, ease: PIECE_EASE },
+        0.2 + order * (phone ? 0.02 : 0.035),
+      );
+    });
+
+    // The ring: hidden at first, then drawn as one stroke starting with the first piece. Ring attributes are
+    // written directly (GSAP's CSS rounding would turn 0–1 dash values into a jump).
+    gsap.set(dotGroups, { attr: { opacity: 0 } });
+    if (phone) {
+      // Phones skip the drawing: the ring fades in, then the sheen starts.
+      entrance.fromTo(ringHalves, { opacity: 0 }, { opacity: 1, duration: RING_DRAW.phoneFade, ease: "power1.inOut", onComplete: () => {
+        placeSheen(0);
+        gsap.set(extras, { attr: { visibility: "visible", opacity: 1 } });
+        startRing();
+      } }, RING_DRAW.start);
+    } else {
+      setAll(lines, "stroke-dasharray", `${PATH} ${PATH}`);
+      setAll(lines, "stroke-dashoffset", String(-PATH));
+      placeSheen(PATH);
+      const draw = { progress: 0 };
+      // The far half is drawn first (along the top, behind the cube), then straight on round the near half; the
+      // sheen rides the tip of the stroke and keeps going as the idle sheen.
+      entrance.to(
+        draw,
+        {
+          progress: 1,
+          duration: RING_DRAW.duration,
+          ease: "power1.inOut",
+          onUpdate: () => {
+            const tip = PATH * (1 - draw.progress);
+            setAll(lines, "stroke-dashoffset", String(-tip));
+            placeSheen(tip);
+          },
+          onComplete: () => {
+            lines.forEach((line) => {
+              line.removeAttribute("stroke-dasharray");
+              line.removeAttribute("stroke-dashoffset");
+            });
+            startRing();
+          },
+        },
+        RING_DRAW.start,
+      );
+      entrance.fromTo(extras, { attr: { visibility: "visible", opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.2, ease: "none" }, RING_DRAW.start);
+      entrance.fromTo(dotGroups, { attr: { opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.6, ease: "power1.out" }, RING_DRAW.start + RING_DRAW.duration);
+    }
+
+    (["left", "right"] as const).forEach((side, i) => {
+      const body = fragments[side]?.querySelector("[data-hero-fragment-body]");
+      if (!body) return;
+      const [cx, cy] = FRAGMENT_CENTER[side];
+      entrance.from(body, { scale: 0.6, autoAlpha: 0, svgOrigin: `${cx} ${cy}`, duration: 0.4, ease: "back.out(1.7)" }, i === 0 ? 1.1 : 1.25);
+    });
+
+    // Every layer now sits at its start, so the art can be shown in this same frame.
+    gsap.set(pieces, { willChange: "transform, opacity" });
+    ready();
+  }
+
+  return () => {
+    observer.disconnect();
+    document.removeEventListener("visibilitychange", sync);
+    gsap.ticker.remove(tick);
+    ringHalves.forEach((half) => half.setAttribute("clip-path", `url(#hc-${half.dataset.heroRing})`));
+    ringClips.forEach((clip) => clip.removeAttribute("clip-path"));
+    setAll(tilts, "transform", `rotate(${RING.rest} ${RING.cx} ${RING.cy})`);
+    lines.forEach((line) => {
+      line.removeAttribute("stroke-dasharray");
+      line.removeAttribute("stroke-dashoffset");
+    });
+    setAll(extras, "visibility", "hidden");
+    extras.forEach((extra) => extra.removeAttribute("opacity"));
+    (["left", "right"] as const).forEach((side) => {
+      fragments[side]?.removeAttribute("transform");
+      shadows[side]?.removeAttribute("transform");
+      shadows[side]?.setAttribute("opacity", "0");
+    });
+    if (float) gsap.set(float, { clearProps: "transform" });
+  };
 }

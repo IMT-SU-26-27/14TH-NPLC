@@ -2,6 +2,7 @@ import type { HeroArtProps } from "@/types/hero";
 
 // The two small cubes beside the hero cube (public/landing/hero-cube-fragments.svg), inline so each can float on
 // its own. Same 540×520 box as the cube, so they line up when stacked. Gradient ids carry an "hf-" prefix.
+// The outer group floats (the idle "island"), the inner body takes the entrance, so the two never fight.
 export function HeroCubeFragments({ className }: HeroArtProps) {
   return (
     <svg viewBox="0 0 540 520" aria-hidden focusable="false" className={className}>
@@ -31,15 +32,23 @@ export function HeroCubeFragments({ className }: HeroArtProps) {
           <stop offset="1" stopColor="#8DA51E" />
         </linearGradient>
       </defs>
+      {/* Shadow on the ground under the left cube: hidden at rest, it shrinks and fades as the cube rises. */}
+      <ellipse data-hero-shadow="left" cx="70" cy="118" rx="11" ry="2.5" className="fill-foreground" opacity="0" />
       <g data-hero-fragment="left">
-        <polygon points="70,74 83.86,82.0 70,90 56.14,82.0" fill="url(#hf-gbt)" stroke="#fff" strokeOpacity=".8" />
-        <polygon points="56.14,82.0 70,90 70,106 56.14,98.0" fill="url(#hf-gpl)" stroke="#fff" strokeOpacity=".8" />
-        <polygon points="70,90 83.86,82.0 83.86,98.0 70,106" fill="url(#hf-gbr)" stroke="#fff" strokeOpacity=".8" />
+        <g data-hero-fragment-body>
+          <polygon points="70,74 83.86,82.0 70,90 56.14,82.0" fill="url(#hf-gbt)" stroke="#fff" strokeOpacity=".8" />
+          <polygon points="56.14,82.0 70,90 70,106 56.14,98.0" fill="url(#hf-gpl)" stroke="#fff" strokeOpacity=".8" />
+          <polygon points="70,90 83.86,82.0 83.86,98.0 70,106" fill="url(#hf-gbr)" stroke="#fff" strokeOpacity=".8" />
+        </g>
       </g>
+      {/* Shadow on the ground under the right cube: hidden at rest, it shrinks and fades as the cube rises. */}
+      <ellipse data-hero-shadow="right" cx="470" cy="84" rx="8" ry="2" className="fill-foreground" opacity="0" />
       <g data-hero-fragment="right">
-        <polygon points="470,48 480.39,54.0 470,60 459.61,54.0" fill="url(#hf-glt)" stroke="#fff" strokeOpacity=".8" />
-        <polygon points="459.61,54.0 470,60 470,72 459.61,66.0" fill="url(#hf-gll)" stroke="#fff" strokeOpacity=".8" />
-        <polygon points="470,60 480.39,54.0 480.39,66.0 470,72" fill="url(#hf-glr)" stroke="#fff" strokeOpacity=".8" />
+        <g data-hero-fragment-body>
+          <polygon points="470,48 480.39,54.0 470,60 459.61,54.0" fill="url(#hf-glt)" stroke="#fff" strokeOpacity=".8" />
+          <polygon points="459.61,54.0 470,60 470,72 459.61,66.0" fill="url(#hf-gll)" stroke="#fff" strokeOpacity=".8" />
+          <polygon points="470,60 480.39,54.0 480.39,66.0 470,72" fill="url(#hf-glr)" stroke="#fff" strokeOpacity=".8" />
+        </g>
       </g>
     </svg>
   );
