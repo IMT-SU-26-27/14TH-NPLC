@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useState } from "react";
-import { ArrowRightIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
+import { ArrowRightIcon, AtSignIcon, IdCardIcon, MailIcon, MessageCircleIcon, OctagonXIcon, SchoolIcon, TriangleAlertIcon, UserIcon, UsersIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature, getTwibbonUploadSignature } from "@/lib/actions/registration";
 import { fieldErrorState, initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
@@ -12,7 +12,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { FormDraftBanner } from "@/components/shared/form-draft-banner";
@@ -134,14 +134,19 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
             <FieldLabel htmlFor="teamName" className={label}>
               {t("register.teamName")} {requiredMark}
             </FieldLabel>
-            <Input
-              id="teamName"
-              name="teamName"
-              maxLength={60}
-              aria-invalid={!!errors.teamName}
-              required
-              onChange={(e) => setTeamName(e.target.value)}
-            />
+            <InputGroup className="h-12">
+              <InputGroupAddon>
+                <UsersIcon />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="teamName"
+                name="teamName"
+                maxLength={60}
+                aria-invalid={!!errors.teamName}
+                required
+                onChange={(e) => setTeamName(e.target.value)}
+              />
+            </InputGroup>
             <FieldDescription>{t("register.teamNameHint")}</FieldDescription>
             <FieldError errors={fieldErrors(errors.teamName)} />
           </Field>
@@ -149,7 +154,12 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
             <FieldLabel htmlFor="school" className={label}>
               {t("register.school")} {requiredMark}
             </FieldLabel>
-            <Input id="school" name="school" maxLength={120} autoComplete="organization" aria-invalid={!!errors.school} required />
+            <InputGroup className="h-12">
+              <InputGroupAddon>
+                <SchoolIcon />
+              </InputGroupAddon>
+              <InputGroupInput id="school" name="school" maxLength={120} autoComplete="organization" aria-invalid={!!errors.school} required />
+            </InputGroup>
             <FieldDescription>{t("register.schoolHint")}</FieldDescription>
             <FieldError errors={fieldErrors(errors.school)} />
           </Field>
@@ -158,7 +168,12 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
           <FieldLabel htmlFor="lineId" className={label}>
             {t("register.lineId")} {requiredMark}
           </FieldLabel>
-          <Input id="lineId" name="lineId" maxLength={21} autoCapitalize="none" spellCheck={false} aria-invalid={!!errors.lineId} required />
+          <InputGroup className="h-12">
+            <InputGroupAddon>
+              <AtSignIcon />
+            </InputGroupAddon>
+            <InputGroupInput id="lineId" name="lineId" maxLength={21} autoCapitalize="none" spellCheck={false} aria-invalid={!!errors.lineId} required />
+          </InputGroup>
           <FieldDescription>{t("register.lineIdHint")}</FieldDescription>
           <FieldError errors={fieldErrors(errors.lineId)} />
         </Field>
@@ -170,14 +185,24 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
           <FieldLabel htmlFor="leaderName" className={label}>
             {t("common.fullName")} {requiredMark}
           </FieldLabel>
-          <Input id="leaderName" name="leaderName" defaultValue={user.full_name} autoComplete="name" aria-invalid={!!errors.leaderName} required />
+          <InputGroup className="h-12">
+            <InputGroupAddon>
+              <UserIcon />
+            </InputGroupAddon>
+            <InputGroupInput id="leaderName" name="leaderName" defaultValue={user.full_name} autoComplete="name" aria-invalid={!!errors.leaderName} required />
+          </InputGroup>
           <FieldError errors={fieldErrors(errors.leaderName)} />
         </Field>
         <Field>
           <FieldLabel htmlFor="leaderEmail" className={label}>
             {t("common.email")}
           </FieldLabel>
-          <Input id="leaderEmail" value={user.email} disabled readOnly />
+          <InputGroup className="bg-muted h-12">
+            <InputGroupAddon>
+              <MailIcon />
+            </InputGroupAddon>
+            <InputGroupInput id="leaderEmail" type="email" value={user.email} readOnly disabled />
+          </InputGroup>
           <FieldDescription>{t("common.fromAccount")}</FieldDescription>
         </Field>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -185,31 +210,41 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
             <FieldLabel htmlFor="leaderPhone" className={label}>
               {t("common.phoneWhatsapp")} {requiredMark}
             </FieldLabel>
-            <Input
-              id="leaderPhone"
-              name="leaderPhone"
-              type="tel"
-              inputMode="tel"
-              placeholder={t("common.phonePlaceholder")}
-              autoComplete="tel"
-              aria-invalid={!!errors.leaderPhone}
-              required
-            />
+            <InputGroup className="h-12">
+              <InputGroupAddon>
+                <MessageCircleIcon />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="leaderPhone"
+                name="leaderPhone"
+                type="tel"
+                inputMode="tel"
+                placeholder={t("common.phonePlaceholder")}
+                autoComplete="tel"
+                aria-invalid={!!errors.leaderPhone}
+                required
+              />
+            </InputGroup>
             <FieldError errors={fieldErrors(errors.leaderPhone)} />
           </Field>
           <Field data-invalid={!!errors.leaderNisn}>
             <FieldLabel htmlFor="leaderNisn" className={label}>
               {t("common.nisn")} {requiredMark}
             </FieldLabel>
-            <Input
-              id="leaderNisn"
-              name="leaderNisn"
-              inputMode="numeric"
-              maxLength={10}
-              placeholder={t("common.nisnPlaceholder")}
-              aria-invalid={!!errors.leaderNisn}
-              required
-            />
+            <InputGroup className="h-12">
+              <InputGroupAddon>
+                <IdCardIcon />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="leaderNisn"
+                name="leaderNisn"
+                inputMode="numeric"
+                maxLength={10}
+                placeholder={t("common.nisnPlaceholder")}
+                aria-invalid={!!errors.leaderNisn}
+                required
+              />
+            </InputGroup>
             <FieldError errors={fieldErrors(errors.leaderNisn)} />
           </Field>
         </div>
