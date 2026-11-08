@@ -5,6 +5,7 @@ import { getT } from "@/lib/i18n/get-dictionary";
 import { buttonVariants } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { MobileNav } from "@/components/shared/mobile-nav";
+import { SectionLink } from "@/components/shared/section-link";
 import { UserMenu } from "@/components/shared/user-menu";
 import type { HeaderActionsProps } from "@/types/landing";
 
@@ -42,9 +43,9 @@ export async function HeaderActions({ lang, sections }: HeaderActionsProps) {
     <>
       <nav aria-label={t("footer.navigate")} className="hidden items-center gap-1 lg:flex">
         {sections.map((link) => (
-          <Link key={link.href} href={link.href} className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          <SectionLink key={link.href} href={link.href} className={buttonVariants({ variant: "ghost", size: "sm" })}>
             {link.label}
-          </Link>
+          </SectionLink>
         ))}
       </nav>
       <div className="flex items-center gap-1">

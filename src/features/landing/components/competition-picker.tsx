@@ -1,13 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRightIcon, CheckIcon, ClockIcon, CodeXmlIcon, NetworkIcon, UsersIcon, WalletIcon } from "lucide-react";
+import { CheckIcon, CodeXmlIcon, NetworkIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CompetitionDetail } from "@/features/landing/components/competition-detail";
 import type { CompetitionPickerProps } from "@/types/landing";
 
 const TYPE_ICON = {
@@ -15,7 +12,8 @@ const TYPE_ICON = {
   logic: { icon: NetworkIcon, tint: "bg-highlight text-highlight-foreground" },
 } as const;
 
-const microLabel = "text-primary flex items-center gap-1.5 font-mono text-xs tracking-[0.2em] uppercase";
+// Fades only colour, shadow and opacity, never position; off for reduced motion.
+const fade = "motion-safe:duration-200 motion-safe:ease-out";
 
 // Two selectable competition cards with the chosen one's members, fee and deadline underneath.
 export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
@@ -23,7 +21,7 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
     <Tabs defaultValue={items[0].id} className="gap-4">
       <TabsList
         variant="line"
-        className="grid h-auto w-full grid-cols-1 gap-4 p-0 group-data-horizontal/tabs:h-auto md:grid-cols-2"
+        className="grid h-auto w-full grid-cols-1 items-stretch gap-4 p-0 group-data-horizontal/tabs:h-auto md:grid-cols-2"
       >
         {items.map((item, i) => {
           const { icon: Icon, tint } = TYPE_ICON[item.type];
@@ -31,23 +29,48 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
             <TabsTrigger
               key={item.id}
               value={item.id}
-              className="group/pick text-foreground hover:border-primary/60 data-active:border-primary data-active:ring-primary/15 border-border h-auto flex-col items-stretch gap-2 rounded-[12px] p-5 text-left whitespace-normal group-data-[variant=line]/tabs-list:bg-card group-data-[variant=line]/tabs-list:data-active:bg-card after:hidden data-active:ring-4 sm:p-6"
+              className={cn(
+                "group/pick text-foreground hover:border-primary/60 border-border h-auto flex-col items-stretch justify-start gap-2 rounded-[12px] p-5 text-left whitespace-normal after:hidden sm:p-6",
+                "group-data-[variant=line]/tabs-list:bg-card group-data-[variant=line]/tabs-list:data-active:bg-card",
+                // Selected, as in design 01: a 2px gradient ring and a soft blue glow.
+                "group-data-[variant=line]/tabs-list:data-active:shadow-[0_0_24px_var(--primary)] group-data-[variant=line]/tabs-list:data-active:shadow-primary/35",
+                "transition-none motion-safe:transition-[border-color,box-shadow]",
+                fade,
+              )}
             >
+              <span
+                aria-hidden
+                className={cn(
+                  "pointer-events-none absolute -inset-px rounded-[12px] bg-(image:--tagline-gradient) p-0.5 opacity-0 group-data-active/pick:opacity-100",
+                  "[mask:linear-gradient(var(--foreground)_0_0)_content-box_exclude,linear-gradient(var(--foreground)_0_0)]",
+                  "motion-safe:transition-opacity",
+                  fade,
+                )}
+              />
               <span className="flex items-start justify-between gap-3">
                 <span className="text-primary font-mono text-xs tracking-[0.2em] uppercase">
                   {`${String(i + 1).padStart(2, "0")} // ${item.name}`}
                 </span>
-                <Badge className="bg-highlight text-highlight-foreground hidden font-mono text-xs tracking-[0.15em] uppercase group-data-active/pick:inline-flex">
+                {/* Always laid out, only shown on the chosen card, so selecting never shifts the card. */}
+                <Badge
+                  className={cn(
+                    "bg-highlight text-highlight-foreground invisible font-mono text-xs tracking-[0.15em] uppercase opacity-0 group-data-active/pick:visible group-data-active/pick:opacity-100",
+                    "motion-safe:transition-[opacity,visibility]",
+                    fade,
+                  )}
+                >
                   <CheckIcon />
                   {labels.selected}
                 </Badge>
               </span>
-              <span className="flex items-end justify-between gap-4">
+              {/* Fills the rest of the card, text at the top and the icon in the bottom corner, so the icons of both
+                  (equal-height) cards line up whatever the description length. */}
+              <span className="flex flex-1 items-start justify-between gap-4">
                 <span className="space-y-1">
                   <span className="font-heading block text-xl font-bold sm:text-2xl">{item.name}</span>
                   {item.description && <span className="text-muted-foreground block text-sm font-normal">{item.description}</span>}
                 </span>
-                <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-full", tint)}>
+                <span className={cn("flex size-11 shrink-0 items-center justify-center self-end rounded-full", tint)}>
                   <Icon aria-hidden className="size-5" />
                 </span>
               </span>
@@ -56,73 +79,24 @@ export function CompetitionPicker({ items, labels }: CompetitionPickerProps) {
         })}
       </TabsList>
 
-      {items.map((item) => (
-        <TabsContent key={item.id} value={item.id}>
-          <Card className="ring-border gap-0 rounded-[12px] py-0">
-            <CardContent className="grid gap-6 p-5 sm:grid-cols-2 sm:p-6">
-              <div className="space-y-1">
-                <p className={microLabel}>
-                  <UsersIcon aria-hidden className="size-3.5" />
-                  {labels.members}
-                </p>
-                <p className="font-heading text-2xl font-bold sm:text-3xl">{item.membersLabel}</p>
-                <p className="text-muted-foreground text-sm">{item.membersHint}</p>
-              </div>
-              <div className="space-y-1 sm:border-l sm:pl-6">
-                <p className={microLabel}>
-                  <WalletIcon aria-hidden className="size-3.5" />
-                  {labels.fee}
-                </p>
-                {item.earlyFee ? (
-                  <>
-                    <p className="text-muted-foreground text-sm line-through">
-                      <span className="sr-only">{`${labels.normalPrice} `}</span>
-                      {item.normalFee}
-                    </p>
-                    <p className="font-heading text-2xl font-bold sm:text-3xl">
-                      <span className="sr-only">{`${labels.earlyPrice} `}</span>
-                      {item.earlyFee}
-                    </p>
-                    <p className="text-muted-foreground text-sm">{item.earlyRange}</p>
-                  </>
-                ) : (
-                  <p className="font-heading text-2xl font-bold sm:text-3xl">{item.normalFee}</p>
-                )}
-              </div>
-            </CardContent>
-            <div className="px-5 sm:px-6">
-              <Separator />
-            </div>
-            <CardFooter className="flex-wrap justify-between gap-4 border-t-0 bg-transparent p-5 sm:p-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="outline" className="font-mono text-xs tracking-[0.15em] uppercase">
-                  <span aria-hidden className={cn("size-2 rounded-full", item.open ? "bg-highlight ring-highlight-foreground/40 ring-1" : "bg-muted-foreground")} />
-                  {item.open ? labels.open : labels.closed}
-                </Badge>
-                {item.closesLabel && (
-                  <span className="text-muted-foreground flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase">
-                    <ClockIcon aria-hidden className="size-3.5" />
-                    {item.closesLabel}
-                  </span>
-                )}
-              </div>
-              {item.open ? (
-                <Link
-                  href={item.href}
-                  className={cn(buttonVariants({ size: "lg" }), "bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 px-5 max-sm:w-full")}
-                >
-                  {item.ctaLabel}
-                  <ArrowRightIcon />
-                </Link>
-              ) : (
-                <span className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pointer-events-none h-11 opacity-60 max-sm:w-full")}>
-                  {labels.registrationClosed}
-                </span>
-              )}
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      ))}
+      {/* Every panel sits in the same cell; hidden copies of all of them hold the cell at the tallest one,
+          so switching competitions never moves the page below. */}
+      <div className="grid">
+        {items.map((item) => (
+          <div key={`size-${item.id}`} aria-hidden inert className="invisible col-start-1 row-start-1">
+            <CompetitionDetail item={item} labels={labels} />
+          </div>
+        ))}
+        {items.map((item) => (
+          <TabsContent
+            key={item.id}
+            value={item.id}
+            className={cn("col-start-1 row-start-1 motion-safe:animate-in motion-safe:fade-in-0", fade)}
+          >
+            <CompetitionDetail item={item} labels={labels} />
+          </TabsContent>
+        ))}
+      </div>
     </Tabs>
   );
 }

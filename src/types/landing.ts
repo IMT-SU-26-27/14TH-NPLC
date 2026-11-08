@@ -1,3 +1,5 @@
+import type { ComponentProps } from "react";
+import type Link from "next/link";
 import type { COMMITTEE_CONTACTS } from "@/lib/event-info";
 import type { Competition } from "@/types/competition";
 import type { Locale } from "@/types/i18n";
@@ -45,6 +47,11 @@ export type CompetitionPickerProps = {
   };
 };
 
+export type CompetitionDetailProps = {
+  item: CompetitionPickerItem;
+  labels: CompetitionPickerProps["labels"];
+};
+
 export type EarlyBirdRingProps = {
   totalDays: number;
   endsAt: string;
@@ -62,6 +69,14 @@ export type HeroProps = {
 export type SectionLink = {
   href: string;
   label: string;
+};
+
+export type HomeSection = "about" | "competitions" | "howToRegister" | "timeline" | "fees" | "faq" | "contact";
+
+export type SectionLinkProps = Omit<ComponentProps<typeof Link>, "href"> & {
+  href: string;
+  // Called instead of scrolling right away, for a menu that has to close (and unlock page scroll) first.
+  onSectionClick?: (id: string) => void;
 };
 
 export type MobileNavProps = {

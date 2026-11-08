@@ -26,7 +26,7 @@ export function SiteHeader({ lang }: LangProps) {
           />
         </Link>
         <Suspense fallback={<Skeleton className="h-8 w-48" />}>
-          <HeaderActions lang={lang} sections={homeSectionLinks(lang)} />
+          <HeaderActions lang={lang} sections={homeSectionLinks(lang, t)} />
         </Suspense>
       </div>
     </header>
