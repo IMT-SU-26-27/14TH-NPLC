@@ -45,6 +45,11 @@ export type CompetitionPickerProps = {
   };
 };
 
+export type CompetitionDetailProps = {
+  item: CompetitionPickerItem;
+  labels: CompetitionPickerProps["labels"];
+};
+
 export type EarlyBirdRingProps = {
   totalDays: number;
   endsAt: string;
