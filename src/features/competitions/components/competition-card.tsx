@@ -15,7 +15,7 @@ import type { CompetitionCardProps } from "@/types/competition";
 const microLabel = "text-primary flex items-center gap-1.5 font-mono text-xs tracking-[0.2em] uppercase";
 
 // Figma "08 // Daftar tim" card: numbered name, open badge, members and fee side by side, deadline and CTA.
-export function CompetitionCard({ competition, lang, index }: CompetitionCardProps) {
+export function CompetitionCard({ competition, lang, index, full }: CompetitionCardProps) {
   const t = getT(lang);
   const open = isRegistrationOpen(competition);
   const category = t(`competition.category.${competition.type}`);
@@ -31,8 +31,11 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
         <div className="flex items-start justify-between gap-3">
           <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{`${String(index + 1).padStart(2, "0")} // ${competition.name}`}</p>
           <Badge variant="outline" className="shrink-0 font-mono text-xs tracking-[0.15em] uppercase">
-            <span aria-hidden className={cn("size-2 rounded-full", open ? "bg-highlight ring-highlight-foreground/40 ring-1" : "bg-muted-foreground")} />
-            {open ? t("competition.open") : t("competition.closed")}
+            <span
+              aria-hidden
+              className={cn("size-2 rounded-full", !open ? "bg-muted-foreground" : full ? "bg-destructive" : "bg-highlight ring-highlight-foreground/40 ring-1")}
+            />
+            {!open ? t("competition.closed") : full ? t("competition.quotaFullBadge") : t("competition.open")}
           </Badge>
         </div>
         <div className="flex items-start justify-between gap-4">
@@ -88,7 +91,7 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
             {t("competition.closes", { date: formatDateTime(competition.registration_closes_at, lang) })}
           </p>
         )}
-        {open ? (
+        {open && !full ? (
           <Link
             href={localePath(lang, `/register/${competition.slug}`)}
             className={cn(buttonVariants({ size: "lg" }), "bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 px-5")}
@@ -97,8 +100,8 @@ export function CompetitionCard({ competition, lang, index }: CompetitionCardPro
             <ArrowRightIcon />
           </Link>
         ) : (
-          <span className={cn(buttonVariants({ variant: "outline", size: "lg" }), "pointer-events-none h-11 opacity-60")}>
-            {t("competition.registrationClosed")}
+          <span aria-disabled className={cn(buttonVariants({ variant: "outline", size: "lg" }), "pointer-events-none h-11 opacity-60")}>
+            {open ? t("competition.quotaFull") : t("competition.registrationClosed")}
           </span>
         )}
       </CardFooter>

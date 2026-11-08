@@ -50,8 +50,11 @@ export function CompetitionDetail({ item, labels }: CompetitionDetailProps) {
       <CardFooter className="flex-wrap justify-between gap-4 border-t-0 bg-transparent p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-3">
           <Badge variant="outline" className="font-mono text-xs tracking-[0.15em] uppercase">
-            <span aria-hidden className={cn("size-2 rounded-full", item.open ? "bg-highlight ring-highlight-foreground/40 ring-1" : "bg-muted-foreground")} />
-            {item.open ? labels.open : labels.closed}
+            <span
+              aria-hidden
+              className={cn("size-2 rounded-full", !item.open ? "bg-muted-foreground" : item.full ? "bg-destructive" : "bg-highlight ring-highlight-foreground/40 ring-1")}
+            />
+            {!item.open ? labels.closed : item.full ? labels.full : labels.open}
           </Badge>
           {item.closesLabel && (
             <span className="text-muted-foreground flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase">
@@ -60,7 +63,7 @@ export function CompetitionDetail({ item, labels }: CompetitionDetailProps) {
             </span>
           )}
         </div>
-        {item.open ? (
+        {item.open && !item.full ? (
           <Link
             href={item.href}
             className={cn(buttonVariants({ size: "lg" }), "bg-highlight text-highlight-foreground hover:bg-highlight/80 h-11 px-5 max-sm:w-full")}
@@ -69,8 +72,8 @@ export function CompetitionDetail({ item, labels }: CompetitionDetailProps) {
             <ArrowRightIcon />
           </Link>
         ) : (
-          <span className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pointer-events-none h-11 opacity-60 max-sm:w-full")}>
-            {labels.registrationClosed}
+          <span aria-disabled className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pointer-events-none h-11 opacity-60 max-sm:w-full")}>
+            {item.open ? labels.quotaFull : labels.registrationClosed}
           </span>
         )}
       </CardFooter>

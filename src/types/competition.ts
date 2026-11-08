@@ -12,6 +12,7 @@ export type PublicCompetition = Pick<
   | "type"
   | "description"
   | "description_en"
+  | "max_teams"
   | "min_members"
   | "max_members"
   | "fee"
@@ -52,4 +53,6 @@ export type CompetitionCardProps = {
   competition: PublicCompetition;
   lang: Locale;
   index: number;
+  // Registration is open but the team quota is reached.
+  full: boolean;
 };

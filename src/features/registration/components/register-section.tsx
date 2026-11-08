@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CircleOffIcon } from "lucide-react";
+import { CircleOffIcon, UsersIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
-import { getActiveCompetitionBySlug, isRegistrationOpen } from "@/lib/data/competitions";
+import { getActiveCompetitionBySlug, getCompetitionTeamCounts, isQuotaFull, isRegistrationOpen } from "@/lib/data/competitions";
 import { hasRegistration } from "@/lib/data/registrations";
 import { formatRupiah, formatTeamSize } from "@/lib/format";
 import { currentFee } from "@/lib/pricing";
@@ -14,6 +14,7 @@ import { resolveLang } from "@/lib/i18n/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { ContactPersonLink } from "@/components/shared/contact-person-link";
 import { PageBand } from "@/components/shared/page-band";
 import { RegisterSteps } from "@/features/registration/components/register-steps";
 import { RegisterSummary } from "@/features/registration/components/register-summary";
@@ -24,7 +25,7 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
   const lang = await resolveLang(params);
   const t = getT(lang);
   const { slug } = await params;
-  const [user, competition] = await Promise.all([requireUser(`/register/${slug}`), getActiveCompetitionBySlug(slug)]);
+  const [user, competition, counts] = await Promise.all([requireUser(`/register/${slug}`), getActiveCompetitionBySlug(slug), getCompetitionTeamCounts()]);
   if (await hasRegistration(user.id)) redirect(`${localePath(lang, "/dashboard")}?notice=already-registered`);
 
   if (!competition || !isRegistrationOpen(competition)) {
@@ -40,6 +41,28 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
           </EmptyHeader>
           <EmptyContent>
             <Link href={sectionHref(lang, "competitions")} className={buttonVariants({ variant: "outline" })}>
+              {t("register.seeAll")}
+            </Link>
+          </EmptyContent>
+        </Empty>
+      </div>
+    );
+  }
+
+  if (isQuotaFull(competition, counts)) {
+    return (
+      <div className="mx-auto w-full max-w-2xl px-4 py-16">
+        <Empty className="bg-card border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <UsersIcon />
+            </EmptyMedia>
+            <EmptyTitle>{t("register.quotaFullTitle")}</EmptyTitle>
+            <EmptyDescription>{t("register.quotaFullDescription", { competition: competition.name })}</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent className="flex-row flex-wrap justify-center">
+            <ContactPersonLink competitionType={competition.type} opensLabel={t("landing.contact.opensWhatsapp")} />
+            <Link href={sectionHref(lang, "competitions")} className={buttonVariants({ variant: "ghost" })}>
               {t("register.seeAll")}
             </Link>
           </EmptyContent>

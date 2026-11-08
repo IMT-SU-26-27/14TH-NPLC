@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { refresh, updateTag } from "next/cache";
+import { COMPETITIONS_TAG } from "@/lib/data/competitions";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -68,6 +69,7 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
   }
 
   after(() => notifyAdminsPaymentToReview(registrationId, false));
+  updateTag(COMPETITIONS_TAG);
   redirect(localePath(await getRequestLocale(), "/dashboard"));
 }
 
@@ -133,6 +135,7 @@ export async function deleteRegistration(registrationId: string): Promise<Action
   for (const member of members ?? []) {
     if (member.twibbon_proof_public_id) await deleteAsset(member.twibbon_proof_public_id, "authenticated");
   }
+  updateTag(COMPETITIONS_TAG);
   refresh();
   return { ok: true, data: undefined };
 }
@@ -189,13 +192,18 @@ export async function submitPayment(input: SubmitPaymentInput): Promise<ActionRe
     .update({ payment_proof_public_id: publicId, payment_proof_format: format, status: "under_review" })
     .eq("id", registrationId)
     .select("id");
-  if (error) return { ok: false, message: databaseErrorMessage(error) };
+  if (error) {
+    // Refused (e.g. the team quota is full): the new upload is not used anywhere.
+    await deleteAsset(publicId, "authenticated");
+    return { ok: false, message: databaseErrorMessage(error) };
+  }
   if (!data?.length) return { ok: false, message: "errors.leaderOnly" };
 
   if (previous?.payment_proof_public_id && previous.payment_proof_public_id !== publicId) {
     await deleteAsset(previous.payment_proof_public_id, "authenticated");
   }
   after(() => notifyAdminsPaymentToReview(registrationId, previous?.status === "rejected"));
+  updateTag(COMPETITIONS_TAG);
   refresh();
   return { ok: true, data: undefined, message: "payment.submitted" };
 }

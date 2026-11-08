@@ -15,8 +15,8 @@ export const GUIDEBOOK_URL: string | null = null;
 // One contact person per competition. `label` is the short competition name shown in every language;
 // `whatsapp` is the international format without "+" or spaces.
 export const COMMITTEE_CONTACTS = [
-  { label: "Programming", name: "Jae", whatsapp: "6281232626369", display: "0812-3262-6369" },
-  { label: "Rally", name: "Caca", whatsapp: "6289506677376", display: "0895-0667-7376" },
+  { label: "Programming", competitionType: "competitive_programming", name: "Jae", whatsapp: "6281232626369", display: "0812-3262-6369" },
+  { label: "Rally", competitionType: "logic", name: "Caca", whatsapp: "6289506677376", display: "0895-0667-7376" },
 ] as const;
 
 export const INSTAGRAM = {
@@ -31,6 +31,10 @@ export function earlyBirdEndsAt(): Date {
 
 export function isEarlyBird(now: Date): boolean {
   return now >= new Date(`${EARLY_BIRD.startsOn}T00:00:00+07:00`) && now <= earlyBirdEndsAt();
+}
+
+export function contactFor(competitionType: string): (typeof COMMITTEE_CONTACTS)[number] | undefined {
+  return COMMITTEE_CONTACTS.find((contact) => contact.competitionType === competitionType);
 }
 
 export function whatsappUrl(number: string): string {
