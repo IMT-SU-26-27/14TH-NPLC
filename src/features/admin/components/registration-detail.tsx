@@ -155,7 +155,14 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
                   </EmptyHeader>
                 </Empty>
               )}
-              <ReviewForm registrationId={team.id} status={team.status} rejectionReason={team.rejection_reason} />
+              <ReviewForm
+                registrationId={team.id}
+                status={team.status}
+                rejectionReason={team.rejection_reason}
+                memberCount={team.members.length}
+                minMembers={team.competition.min_members}
+                maxMembers={team.competition.max_members}
+              />
             </CardContent>
           </Card>
 

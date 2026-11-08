@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CodeIcon, InfoIcon, OctagonXIcon } from "lucide-react";
+import { CodeIcon, InfoIcon, OctagonXIcon, UsersIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -27,6 +27,9 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus }: TeamCar
   // Before the admin starts the contest the old contest pages are closed to participants (the proxy sends them
   // back here), so there is no button until then.
   const contestOpen = contestStatus !== null && contestStatus !== "scheduled";
+  const { min_members: minMembers, max_members: maxMembers } = team.competition;
+  const short = t(`landing.competitions.short.${team.competition.type}`);
+  const belowMinimum = team.members.length < minMembers && team.status !== "accepted";
 
   const label = "text-primary font-mono text-xs font-medium tracking-[0.14em] uppercase";
 
@@ -61,6 +64,15 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus }: TeamCar
           <OctagonXIcon />
           <AlertTitle>{t("dashboard.rejectedTitle")}</AlertTitle>
           <AlertDescription>{team.rejection_reason}</AlertDescription>
+        </Alert>
+      )}
+
+      {belowMinimum && (
+        <Alert>
+          <UsersIcon />
+          <AlertDescription>
+            {t(minMembers === maxMembers ? "dashboard.teamExactSize" : "dashboard.teamMinSize", { short, count: minMembers })}
+          </AlertDescription>
         </Alert>
       )}
 

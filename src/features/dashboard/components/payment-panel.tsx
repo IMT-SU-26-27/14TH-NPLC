@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { InfoIcon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 import { getPaymentUploadSignature, submitPayment } from "@/lib/actions/registration";
+import { memberRange } from "@/lib/format";
 import { currentFee } from "@/lib/pricing";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import { useI18n } from "@/hooks/use-i18n";
@@ -61,7 +62,7 @@ export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
             <Alert>
               <InfoIcon />
               <AlertTitle>{t("payment.teamIncompleteTitle")}</AlertTitle>
-              <AlertDescription>{t("payment.teamIncomplete", { min: min_members, max: max_members, count: memberCount })}</AlertDescription>
+              <AlertDescription>{t("payment.teamIncomplete", { range: memberRange(min_members, max_members), count: memberCount })}</AlertDescription>
             </Alert>
           )}
           <Field data-invalid={!!error}>
