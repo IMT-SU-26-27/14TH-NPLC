@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import type { z } from "zod";
 import type { Enums, Tables } from "@/types/database";
 import type { PublicCompetition } from "@/types/competition";
@@ -123,6 +124,22 @@ export type DashboardPageProps = {
 export type DashboardContentProps = {
   lang: Locale;
   searchParams: Promise<{ notice?: string }>;
+};
+
+export type DashboardEmptyCardProps = {
+  lang: Locale;
+};
+
+export type DashboardEmptyOptionProps = {
+  // "A // KETUA" style label above the option.
+  label: string;
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+  icon: LucideIcon;
+  // leader: primary icon and button; member: lime icon and outline button.
+  variant: "leader" | "member";
 };
 
 export type TeamCardProps = {
