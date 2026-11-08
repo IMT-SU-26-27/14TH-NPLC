@@ -576,6 +576,8 @@ export const en: Dictionary = {
     members: "Members ({count}/{max})",
     payment: "Payment",
     memberPaysNote: "Your team leader uploads the payment proof once everyone has joined.",
+    memberNisn: "NISN {nisn}",
+    memberWhatsapp: "WA {phone}",
     teamCode: "Team code",
     teamCodeHint: "Teammates sign in and enter this code on the Join a team page.",
     copyCode: "Copy code",

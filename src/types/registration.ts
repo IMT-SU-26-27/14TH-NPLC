@@ -134,6 +134,10 @@ export type TeamCardProps = {
 
 export type StepState = "done" | "current" | "upcoming" | "failed";
 
+export type StepMarkerProps = {
+  state: StepState;
+};
+
 export type TimelineStep = {
   key: string;
   title: string;

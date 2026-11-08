@@ -575,6 +575,8 @@ export const id = {
     members: "Anggota ({count}/{max})",
     payment: "Pembayaran",
     memberPaysNote: "Ketua tim mengunggah bukti pembayaran setelah semua anggota bergabung.",
+    memberNisn: "NISN {nisn}",
+    memberWhatsapp: "WA {phone}",
     teamCode: "Kode tim",
     teamCodeHint: "Anggota masuk ke akun mereka lalu memasukkan kode ini di halaman Gabung tim.",
     copyCode: "Salin kode",

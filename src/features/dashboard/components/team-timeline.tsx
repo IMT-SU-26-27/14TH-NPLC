@@ -1,32 +1,13 @@
-import { CheckIcon, HistoryIcon, XIcon } from "lucide-react";
+import { HistoryIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { StepMarker } from "@/features/dashboard/components/step-marker";
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
-import type { StepState, TeamTimelineProps, TimelineStep } from "@/types/registration";
-
-// 24px marker: filled when done, ringed while current, hollow while upcoming.
-function StepMarker({ state }: { state: StepState }) {
-  return (
-    <span
-      aria-hidden
-      className={cn(
-        "relative flex size-6 shrink-0 items-center justify-center rounded-full",
-        state === "done" && "bg-primary text-primary-foreground",
-        state === "current" && "border-primary bg-card border-2",
-        state === "upcoming" && "border-border bg-card border-2",
-        state === "failed" && "bg-destructive text-primary-foreground",
-      )}
-    >
-      {state === "done" && <CheckIcon className="size-3.5" strokeWidth={3} />}
-      {state === "failed" && <XIcon className="size-3.5" strokeWidth={3} />}
-      {state === "current" && <span className="bg-primary size-2 rounded-full" />}
-    </span>
-  );
-}
+import type { TeamTimelineProps, TimelineStep } from "@/types/registration";
 
 // Event notes written by the database in English; shown translated when we know them.
 const EVENT_NOTE: Record<string, string> = {

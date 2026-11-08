@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import type { MemberActionProps, TeamMembersProps } from "@/types/registration";
@@ -52,7 +53,7 @@ function MemberAction({ member, isSelf }: MemberActionProps) {
   );
 }
 
-const chip = "bg-secondary text-secondary-foreground inline-flex h-5 items-center rounded-md px-1.5 font-mono text-[11px] font-medium tracking-[0.1em] uppercase";
+const chip = "h-5 rounded-md px-1.5 font-mono text-[11px] tracking-[0.1em] uppercase";
 
 export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
   const { t } = useI18n();
@@ -68,12 +69,11 @@ export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
             <div className="min-w-0 space-y-1 text-sm">
               <p className="flex flex-wrap items-center gap-2 font-medium">
                 {member.full_name}
-                {member.is_leader && <span className={chip}>{t("common.leader")}</span>}
-                {isSelf && <span className={chip}>{t("common.you")}</span>}
+                {member.is_leader && <Badge variant="secondary" className={chip}>{t("common.leader")}</Badge>}
+                {isSelf && <Badge variant="secondary" className={chip}>{t("common.you")}</Badge>}
               </p>
               <p className="text-muted-foreground break-words">
-                {member.email} · NISN {member.nisn}
-                {member.phone && <> · WA {member.phone}</>}
+                {[member.email, t("dashboard.memberNisn", { nisn: member.nisn }), member.phone && t("dashboard.memberWhatsapp", { phone: member.phone })].filter(Boolean).join(" · ")}
               </p>
             </div>
             {canAct && <MemberAction member={member} isSelf={isSelf} />}
