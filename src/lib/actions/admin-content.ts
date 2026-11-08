@@ -42,6 +42,7 @@ export async function saveTimelineEvent(_prev: FormState, formData: FormData): P
     titleEn: formData.get("titleEn"),
     descriptionId: formData.get("descriptionId") ?? "",
     descriptionEn: formData.get("descriptionEn") ?? "",
+    competitionType: formData.get("competitionType") ?? "all",
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
   const e = parsed.data;
@@ -52,6 +53,7 @@ export async function saveTimelineEvent(_prev: FormState, formData: FormData): P
     title_en: e.titleEn,
     description_id: e.descriptionId,
     description_en: e.descriptionEn,
+    competition_type: e.competitionType,
   };
 
   const supabase = await createSupabaseServerClient();

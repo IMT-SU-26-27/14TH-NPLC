@@ -10,7 +10,7 @@ export function WaGroupCard({ group, lang }: WaGroupCardProps) {
   const t = getT(lang);
 
   return (
-    <section className="bg-card ring-border space-y-3 rounded-[12px] p-6 ring-1 sm:p-7">
+    <section id="grup-peserta" className="bg-card ring-border scroll-mt-20 space-y-3 rounded-[12px] p-6 ring-1 sm:p-7">
       <h2 className="text-primary font-mono text-xs font-medium tracking-[0.14em] uppercase">{`// ${t("dashboard.waGroupLabel")}`}</h2>
       <p className="text-muted-foreground text-sm">{t("dashboard.waGroupText", { competition: group.competition_name })}</p>
       <a

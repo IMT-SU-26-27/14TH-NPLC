@@ -1284,6 +1284,7 @@ export type Database = {
       }
       timeline_events: {
         Row: {
+          competition_type: Database["public"]["Enums"]["competition_type"] | null
           created_at: string
           description_en: string
           description_id: string
@@ -1295,6 +1296,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          competition_type?: Database["public"]["Enums"]["competition_type"] | null
           created_at?: string
           description_en?: string
           description_id?: string
@@ -1306,6 +1308,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          competition_type?: Database["public"]["Enums"]["competition_type"] | null
           created_at?: string
           description_en?: string
           description_id?: string

@@ -1,12 +1,8 @@
-import Link from "next/link";
-import { CodeIcon, InfoIcon, OctagonXIcon, TrophyIcon, UsersIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { localePath } from "@/lib/i18n/config";
+import { InfoIcon, OctagonXIcon, UsersIcon } from "lucide-react";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { isRegistrationOpen } from "@/lib/data/competitions";
-import { rallyLeaderboardOpen, rallyQrVisible } from "@/lib/rally/session-visibility";
+import { rallyQrVisible } from "@/lib/rally/session-visibility";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TeamStatusPill } from "@/features/dashboard/components/team-status-pill";
 import { TeamTimeline } from "@/features/dashboard/components/team-timeline";
@@ -15,12 +11,12 @@ import { PaymentPanel } from "@/features/dashboard/components/payment-panel";
 import { ReferralCode } from "@/features/dashboard/components/referral-code";
 import { DeleteTeamButton } from "@/features/dashboard/components/delete-team-button";
 import { RallyTeamQr } from "@/features/rally/components/rally-team-qr";
-import { CpContestRefresh } from "@/features/dashboard/components/cp-contest-refresh";
 import { RallySessionRefresh } from "@/features/dashboard/components/rally-session-refresh";
+import { NextUpCard } from "@/features/dashboard/components/next-up-card";
 import { DashboardNote } from "@/features/dashboard/components/dashboard-note";
 import type { TeamCardProps } from "@/types/registration";
 
-export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStatus }: TeamCardProps) {
+export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStatus, nextEvent, mainEvent, waGroupAvailable }: TeamCardProps) {
   const t = getT(lang);
   const isLeader = team.leader_id === userId;
   // Members join and can be removed while the competition is open; payment is only re-sent after a rejection.
@@ -77,34 +73,21 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStat
         />
       )}
 
-      {team.status === "accepted" && isCp && (
-        <div className="bg-accent ring-border flex flex-wrap items-center gap-x-4 gap-y-3 rounded-lg px-3.5 py-2.5 ring-1">
-          <CodeIcon aria-hidden className="text-primary size-[18px] shrink-0" />
-          <div className="min-w-0 flex-1 basis-48 text-sm">
-            <p className="font-medium">{t("dashboard.cpAcceptedTitle")}</p>
-            <p className="text-muted-foreground">{t(contestOpen ? "dashboard.cpAcceptedDescription" : "dashboard.cpContestNotStarted")}</p>
-          </div>
-          {contestOpen ? (
-            <Link href={localePath(lang, "/cp")} className={cn(buttonVariants(), "rounded-[8px]")}>
-              {t("dashboard.goToContest")}
-            </Link>
-          ) : (
-            <CpContestRefresh competitionId={team.competition.id} />
-          )}
-        </div>
+      {team.status === "accepted" && (
+        <NextUpCard
+          team={team}
+          lang={lang}
+          event={nextEvent}
+          mainEvent={mainEvent}
+          contestOpen={isCp && contestOpen}
+          rallyStatus={rallyStatus}
+          waGroupAvailable={waGroupAvailable}
+        />
       )}
 
       {team.status === "accepted" && rallyStatus !== null && (
         <>
           {rallyQrVisible(rallyStatus) && <RallyTeamQr token={team.rally_qr_token} referralCode={team.referral_code} lang={lang} />}
-          {rallyLeaderboardOpen(rallyStatus) && (
-            <div className="flex justify-center">
-              <Link href={localePath(lang, "/rally/leaderboard")} className={buttonVariants({ variant: "outline" })}>
-                <TrophyIcon />
-                {t("rally.leaderboard.title")}
-              </Link>
-            </div>
-          )}
           <RallySessionRefresh competitionId={team.competition.id} status={rallyStatus} />
         </>
       )}

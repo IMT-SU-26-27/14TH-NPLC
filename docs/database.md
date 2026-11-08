@@ -16,6 +16,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261108130000_twibbon_post_url.sql` | `registration_members.twibbon_post_url` (link to the Instagram post, checked format); `create_registration` and `join_team` take `p_twibbon_post_url` and accept that link (or an older screenshot) as the twibbon proof |
 | `20261109100000_competition_description_en.sql` | `competitions.description_en`: the English description for the `/en` pages; empty means the Indonesian `description` is shown |
 | `20261109120000_team_quota_and_wa_group.sql` | `competitions.max_teams` (team quota, null = no limit; every team that is not rejected counts) enforced in `create_registration` and when a rejected team comes back, with the competition row locked; `competitions.wa_group_url` (participants' WhatsApp group), hidden from the API by column privileges; `competition_team_counts()`, `my_wa_group()`, `admin_competition_wa_group_url()` |
+| `20261109140000_timeline_event_competition.sql` | `timeline_events.competition_type` (null = every competition): which competition an event is for, so an accepted team's dashboard shows its own next date |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -79,7 +80,7 @@ All changes to results go through these functions, and direct writes are refused
 | Table | What it holds |
 |---|---|
 | `site_content` | One row: the About NPLC title and body in Indonesian and English. Empty fields fall back to the built-in copy. Anyone can read it; admins edit it on `/admin/content`. |
-| `timeline_events` | The homepage timeline: `starts_on`, optional `ends_on`, title and description in both languages, sorted by start date. Anyone can read; admins add, edit and delete. |
+| `timeline_events` | The homepage timeline: `starts_on`, optional `ends_on`, title and description in both languages, sorted by start date. `competition_type`: the competition an event is for (null = every competition); the dashboard shows each accepted team the next event for its competition. Anyone can read; admins add, edit and delete. |
 
 ### Notifications
 

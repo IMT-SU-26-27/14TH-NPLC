@@ -10,12 +10,8 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { GridBackdrop } from "@/features/landing/components/grid-backdrop";
 import { SectionHeading } from "@/features/landing/components/section-heading";
+import { todayInWib } from "@/lib/timeline";
 import type { TimelineSectionProps } from "@/types/content";
-
-// Today's date in WIB as "YYYY-MM-DD", comparable with the date-only timeline columns.
-function todayInWib(): string {
-  return new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
-}
 
 // "04 // Timeline": the admin's timeline events (Admin > Content), the running phase highlighted.
 export async function TimelineSection({ lang }: TimelineSectionProps) {
