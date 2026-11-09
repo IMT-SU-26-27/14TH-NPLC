@@ -48,6 +48,7 @@ export const id = {
     fees: "Biaya",
     faq: "FAQ",
     openMenu: "Buka menu",
+    closeMenu: "Tutup menu",
     menu: "Menu",
     loPosts: "Pos saya",
     home: "Beranda",

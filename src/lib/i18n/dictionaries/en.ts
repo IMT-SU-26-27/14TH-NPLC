@@ -49,6 +49,7 @@ export const en: Dictionary = {
     fees: "Fees",
     faq: "FAQ",
     openMenu: "Open menu",
+    closeMenu: "Close menu",
     menu: "Menu",
     loPosts: "My posts",
     home: "Home",
