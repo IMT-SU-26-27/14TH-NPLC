@@ -8,8 +8,9 @@ import { initialFormState } from "@/lib/form";
 import { useI18n } from "@/hooks/use-i18n";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import type { FormState } from "@/types";
@@ -31,6 +32,11 @@ export function TimelineEventDialog({ event }: TimelineEventDialogProps) {
     return result;
   }, initialFormState);
   const errors = state.fieldErrors ?? {};
+  const competitionItems = [
+    { value: "all", label: t("admin.content.forAll") },
+    { value: "competitive_programming", label: t("competition.type.competitive_programming") },
+    { value: "logic", label: t("competition.type.logic") },
+  ];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -76,6 +82,22 @@ export function TimelineEventDialog({ event }: TimelineEventDialogProps) {
               <Field>
                 <FieldLabel htmlFor="descriptionEn">{t("admin.content.descriptionEn")}</FieldLabel>
                 <Textarea id="descriptionEn" name="descriptionEn" defaultValue={event?.description_en} rows={3} />
+              </Field>
+              <Field>
+                <FieldLabel>{t("admin.content.forCompetition")}</FieldLabel>
+                <Select name="competitionType" items={competitionItems} defaultValue={event?.competition_type ?? "all"}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {competitionItems.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldDescription>{t("admin.content.forCompetitionHint")}</FieldDescription>
               </Field>
             </div>
           </FieldGroup>

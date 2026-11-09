@@ -2,6 +2,9 @@ import { InfoIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
 import { getMyTeams, getMyWaGroup } from "@/lib/data/registrations";
 import { getCpSessionStatus } from "@/lib/data/cp";
+import { getRallySession } from "@/lib/data/rally";
+import { getTimelineEvents } from "@/lib/data/content";
+import { lastEventFor, nextEventFor, todayInWib } from "@/lib/timeline";
 import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { pushEnabledFor } from "@/lib/push/config";
@@ -17,12 +20,22 @@ import type { DashboardContentProps } from "@/types/registration";
 
 export async function DashboardContent({ lang, searchParams }: DashboardContentProps) {
   const t = getT(lang);
-  const [{ notice }, user, teams, waGroup] = await Promise.all([searchParams, requireUser("/dashboard"), getMyTeams(), getMyWaGroup()]);
+  const [{ notice }, user, teams, waGroup, events] = await Promise.all([
+    searchParams,
+    requireUser("/dashboard"),
+    getMyTeams(),
+    getMyWaGroup(),
+    getTimelineEvents(),
+  ]);
+  const today = todayInWib();
 
   const team = teams[0];
   // An accepted CP team sees the contest button only once the contest has started.
   const cpTeam = teams.find((item) => item.status === "accepted" && item.competition.type === "competitive_programming");
   const contestStatus = cpTeam ? await getCpSessionStatus(cpTeam.competition.id) : null;
+  // An accepted Rally team sees its QR and the leaderboard only once the admin has started the session.
+  const rallyTeam = teams.find((item) => item.status === "accepted" && item.competition.type === "logic");
+  const rallyStatus = rallyTeam ? (await getRallySession(rallyTeam.competition.id)).status : null;
 
   return (
     <div className="space-y-5">
@@ -57,6 +70,10 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
                 userId={user.id}
                 lang={lang}
                 contestStatus={item.id === cpTeam?.id ? contestStatus : null}
+                rallyStatus={item.id === rallyTeam?.id ? rallyStatus : null}
+                nextEvent={item.status === "accepted" ? nextEventFor(events, item.competition.type, today) : null}
+                mainEvent={item.status === "accepted" ? lastEventFor(events, item.competition.type) : null}
+                waGroupAvailable={item.status === "accepted" && waGroup !== null}
                 qrisUrl={item.competition.qris_public_id ? publicImageUrl(item.competition.qris_public_id) : null}
               />
             ))

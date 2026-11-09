@@ -1,4 +1,7 @@
+import Link from "next/link";
+import { ArrowRightIcon } from "lucide-react";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { localePath } from "@/lib/i18n/config";
 import { sectionId } from "@/lib/home-sections";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import type { LangProps } from "@/types/i18n";
@@ -31,6 +34,12 @@ export function StepsSection({ lang }: LangProps) {
                 <p className="text-primary font-mono text-xs tracking-[0.2em] uppercase">{t("landing.steps.step", { n })}</p>
                 <h3 className="text-lg font-bold">{t(`landing.steps.${step}Title`)}</h3>
                 <p className="text-muted-foreground text-sm">{t(`landing.steps.${step}Body`)}</p>
+                {step === "share" && (
+                  <Link href={localePath(lang, "/join")} className="text-primary focus-visible:ring-ring/50 inline-flex items-center gap-1 rounded-sm text-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-3">
+                    {t("landing.steps.shareLink")}
+                    <ArrowRightIcon aria-hidden className="size-3.5" />
+                  </Link>
+                )}
               </div>
             </li>
           );

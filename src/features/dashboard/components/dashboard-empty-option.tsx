@@ -32,7 +32,7 @@ export function DashboardEmptyOption({ label, title, description, href, cta, ico
         className={cn(
           buttonVariants({ variant: leader ? "default" : "outline" }),
           "mt-auto h-11 w-full rounded-[8px] px-4.5",
-          !leader && "border-primary text-primary",
+          leader ? "bg-highlight text-highlight-foreground hover:bg-highlight/80" : "border-primary text-primary",
         )}
       >
         {cta}

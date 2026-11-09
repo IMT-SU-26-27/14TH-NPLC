@@ -4,6 +4,8 @@ import type { Enums, Tables } from "@/types/database";
 import type { PublicCompetition } from "@/types/competition";
 import type { CurrentUser } from "@/types/auth";
 import type { CpSessionStatus } from "@/types/cp";
+import type { RallySessionStatus } from "@/types/rally";
+import type { TimelineEvent } from "@/types/content";
 import type { LangParams, Locale } from "@/types/i18n";
 import type {
   createRegistrationSchema,
@@ -157,6 +159,29 @@ export type TeamCardProps = {
   lang: Locale;
   // The CP contest state for an accepted CP team (null otherwise, or before a session exists).
   contestStatus: CpSessionStatus | null;
+  // The Rally session state for an accepted Rally team (null otherwise).
+  rallyStatus: RallySessionStatus | null;
+  // The next timeline event for this team's competition (shown once the team is accepted).
+  nextEvent: TimelineEvent | null;
+  // The competition's main day (the Rally day for a Rally team), for "the QR appears here on the day".
+  mainEvent: TimelineEvent | null;
+  // The competition's WhatsApp group card is on the page (accepted team, link set).
+  waGroupAvailable: boolean;
+};
+
+export type NextUpCardProps = {
+  team: Team;
+  lang: Locale;
+  event: TimelineEvent | null;
+  mainEvent: TimelineEvent | null;
+  contestOpen: boolean;
+  rallyStatus: RallySessionStatus | null;
+  waGroupAvailable: boolean;
+};
+
+export type RallySessionRefreshProps = {
+  competitionId: string;
+  status: RallySessionStatus;
 };
 
 export type CpContestRefreshProps = {
@@ -209,6 +234,12 @@ export type RegistrationStatusBadgeProps = {
 export type AccountCardProps = {
   user: CurrentUser;
   lang: Locale;
+};
+
+export type DashboardNoteProps = {
+  icon: LucideIcon;
+  title?: string;
+  description: string;
 };
 
 export type AccountNoteProps = {

@@ -1,20 +1,10 @@
 import { InfoIcon } from "lucide-react";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { DashboardNote } from "@/features/dashboard/components/dashboard-note";
 import type { AccountNoteProps } from "@/types/registration";
 
 // One account, one team: shown once the account is on a team.
 export function AccountNote({ teamName, lang }: AccountNoteProps) {
   const t = getT(lang);
-
-  return (
-    <section className="bg-brand-purple/10 ring-primary/45 flex gap-4 rounded-[12px] p-6 ring-1 sm:p-7">
-      <span className="bg-brand-purple text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-full">
-        <InfoIcon aria-hidden className="size-[18px]" />
-      </span>
-      <div className="space-y-0.5 text-sm">
-        <h2 className="font-medium">{t("dashboard.oneAccountTitle")}</h2>
-        <p className="text-muted-foreground">{t("dashboard.oneAccountDescription", { team: teamName })}</p>
-      </div>
-    </section>
-  );
+  return <DashboardNote icon={InfoIcon} title={t("dashboard.oneAccountTitle")} description={t("dashboard.oneAccountDescription", { team: teamName })} />;
 }
