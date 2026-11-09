@@ -105,22 +105,12 @@ export async function joinTeam(_prev: FormState, formData: FormData): Promise<Fo
   redirect(localePath(await getRequestLocale(), "/dashboard"));
 }
 
-// Leader removes a member, or a member removes themselves (RLS decides which rows they may delete).
+// Only admins change a team's members (HOD, 10 Nov): leaders no longer remove members and members no longer leave, in
+// any status. Admins use adminRemoveMember; RLS refuses everyone else. This action stays so a page still open from
+// before the change gets a clear answer instead of a generic error.
 export async function removeMember(memberId: string): Promise<ActionResult> {
-  const id = registrationIdSchema.safeParse(memberId);
-  if (!id.success) return { ok: false, message: "errors.invalidRequest" };
-
-  const supabase = await createSupabaseServerClient();
-  // Members are fixed once the team is accepted (changes go through the contact person). RLS enforces the same.
-  const { data: member } = await supabase.from("registration_members").select("registration:registrations ( status )").eq("id", id.data).maybeSingle();
-  if (member?.registration?.status === "accepted") return { ok: false, message: "errors.membersLocked" };
-  const { data, error } = await supabase.from("registration_members").delete().eq("id", id.data).select("twibbon_proof_public_id");
-  if (error) return { ok: false, message: databaseErrorMessage(error) };
-  if (!data?.length) return { ok: false, message: "errors.cannotRemoveMember" };
-  if (data[0].twibbon_proof_public_id) await deleteAsset(data[0].twibbon_proof_public_id, "authenticated");
-
-  refresh();
-  return { ok: true, data: undefined };
+  if (!registrationIdSchema.safeParse(memberId).success) return { ok: false, message: "errors.invalidRequest" };
+  return { ok: false, message: "errors.membersViaContact" };
 }
 
 // Signature for the payment proof uploaded with a new registration (before the team exists).

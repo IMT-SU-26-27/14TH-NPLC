@@ -98,7 +98,7 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStat
         </section>
         <section className="space-y-3">
           <h3 className={label}>{t("dashboard.members", { count: team.members.length, max: team.competition.max_members })}</h3>
-          <TeamMembers team={team} userId={userId} canEdit={membershipOpen} />
+          <TeamMembers team={team} userId={userId} />
           {membershipOpen && <ReferralCode code={team.referral_code} />}
         </section>
       </div>

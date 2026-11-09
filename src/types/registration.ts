@@ -210,12 +210,6 @@ export type TeamTimelineProps = {
 export type TeamMembersProps = {
   team: Team;
   userId: string;
-  canEdit: boolean;
-};
-
-export type MemberActionProps = {
-  member: TeamMember;
-  isSelf: boolean;
 };
 
 export type PaymentPanelProps = {

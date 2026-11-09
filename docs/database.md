@@ -18,6 +18,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261109120000_team_quota_and_wa_group.sql` | `competitions.max_teams` (team quota, null = no limit; every team that is not rejected counts) enforced in `create_registration` and when a rejected team comes back, with the competition row locked; `competitions.wa_group_url` (participants' WhatsApp group), hidden from the API by column privileges; `competition_team_counts()`, `my_wa_group()`, `admin_competition_wa_group_url()` |
 | `20261109140000_timeline_event_competition.sql` | `timeline_events.competition_type` (null = every competition): which competition an event is for, so an accepted team's dashboard shows its own next date |
 | `20261110090000_lock_accepted_team_members.sql` | Only admins delete a registration (the leader no longer can, in any status). Leaving a team or removing a member is closed once the team is `accepted` (`private.registration_accepted`); admins can still change members |
+| `20261110200000_members_admin_only.sql` | Only admins remove a member, in every status: leaders no longer remove members and members no longer leave (policy "members: admin removes"). `private.registration_accepted` is dropped. Joining with the code is unchanged |
 | `20261110210000_registration_events_without_realtime.sql` | `registration_events` leaves the `supabase_realtime` publication: realtime is for the CP and Rally contests only. The dashboard and the admin registrations list refresh when the tab is opened again (at most every 30 s) or with "Muat ulang" |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
@@ -134,7 +135,7 @@ members join with the referral code at any point while the competition's registr
 
 - Each person gives the link to their twibbon post on Instagram when registering or joining (`https://www.instagram.com/p|reel|reels/...`). It is required only once the competition has a `twibbon_url`. Before 2026-11-08 a screenshot was uploaded instead (`14th-nplc/twibbon-proofs/<user id>/`); those stay. Members who joined before the link was set keep an empty proof, and admins see that in the registration detail.
 - Paying is part of registering: the register form takes the team details and the payment proof together. The proof is uploaded to Cloudinary first (`14th-nplc/payment-proofs/new/<user id>/`), then `create_registration()` creates the team as `under_review` with the referral code.
-- Members join with the code, and the leader can remove members (or a member can leave), while the competition's registration window is open, whatever the status. Nobody, admins included, can remove the leader row.
+- Members join with the code while the competition's registration window is open, whatever the status, also after the team is accepted. Only admins remove members (since 2026-11-10); leaders can't remove members and members can't leave, so changes go through the competition's contact person. Nobody, admins included, can remove the leader row.
 - Participants can't change the team name, competition or referral code. Admins can fix the name.
 - The minimum team size is checked when an admin accepts: accepting a team with too few members is refused. The maximum is enforced on every join.
 - After a rejection the leader uploads a new proof, which sends the team back to `under_review`.
@@ -147,7 +148,7 @@ members join with the referral code at any point while the competition's registr
 |---|---|---|
 | Active competitions | Everyone, including logged-out visitors, every column except `wa_group_url` | All columns except `wa_group_url` (read it with `admin_competition_wa_group_url`) |
 | Competition WhatsApp group link | Members of an accepted team of that competition, through `my_wa_group()` | Through `admin_competition_wa_group_url()`; edited in the competition form |
-| Registrations, members, timeline | Only their own team. They cannot delete their team; members can leave (or be removed by the leader) only until the team is accepted | All, full edit, including deleting teams and changing members of accepted teams |
+| Registrations, members, timeline | Only their own team. They cannot delete their team or remove members, and members cannot leave | All, full edit, including deleting teams and changing members of accepted teams |
 | CP session status | Members of accepted CP teams | All, start/end |
 | CP problems | Members of accepted CP teams, **only while the contest is live** | All |
 | CP test cases | Sample cases only, only while live | All |
