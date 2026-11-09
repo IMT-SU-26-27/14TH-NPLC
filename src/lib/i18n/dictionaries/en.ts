@@ -251,6 +251,14 @@ export const en: Dictionary = {
           q: "How do I join the participants' group?",
           a: "The group link appears on the NPLC website once an admin has verified your registration.",
         },
+        {
+          q: "How do members join a team?",
+          a: "Each member creates their own account, then joins with the team code or the invite link shown on the leader's dashboard.",
+        },
+        {
+          q: "How do I pay the registration fee?",
+          a: "The team leader transfers the fee to the blu by BCA account 003202798281 (Angga Dhammika Jaya), then uploads the transfer receipt on the registration form. Each team pays once.",
+        },
       ],
     },
     contact: {
