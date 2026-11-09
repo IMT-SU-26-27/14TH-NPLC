@@ -10,7 +10,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE: ghcr.io/${{ github.repository }}
+  # IMAGE is computed per job: GHCR requires a lowercase repository name and
+  # github.repository preserves the owner/repo casing.
   SITE_DIR: /var/www/websites/panit/su/nplc/14th-nplc
 
 jobs:
@@ -42,11 +43,25 @@ jobs:
       packages: write
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
+      image: ${{ steps.meta.outputs.image }}
     steps:
       - uses: actions/checkout@v4
 
       - id: meta
-        run: echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      # NEXT_PUBLIC_* are inlined into the browser bundle at build time, so an
+      # empty one would ship a broken app rather than fail. Stop here instead.
+      - name: Require build-time public env
+        env:
+          URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          ANON: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          [ -n "$URL" ]  || { echo "::error::NEXT_PUBLIC_SUPABASE_URL secret is empty"; exit 1; }
+          [ -n "$ANON" ] || { echo "::error::NEXT_PUBLIC_SUPABASE_ANON_KEY secret is empty"; exit 1; }
+          case "$URL" in https://*) ;; *) echo "::error::NEXT_PUBLIC_SUPABASE_URL must be an https URL"; exit 1;; esac
 
       - uses: docker/setup-buildx-action@v3
 
@@ -61,8 +76,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}
-            ${{ env.IMAGE }}:latest
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.image }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -87,6 +102,7 @@ jobs:
       - name: Compose runtime env file
         env:
           TAG: ${{ needs.build.outputs.tag }}
+          IMAGE: ${{ needs.build.outputs.image }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
