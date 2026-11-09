@@ -19,6 +19,7 @@ export const id = {
   common: {
     cancel: "Batal",
     save: "Simpan",
+    reload: "Muat ulang",
     delete: "Hapus",
     back: "Kembali",
     copied: "Tersalin",
@@ -651,8 +652,6 @@ export const id = {
     inviteCopied: "Tautan undangan tersalin",
     remove: "Keluarkan",
     membersViaContact: "Butuh ganti anggota? Hubungi contact person lomba.",
-    accepted: "Pendaftaran kamu diterima",
-    rejected: "Pendaftaran kamu ditolak. Lihat alasannya di dasbor.",
   },
   timeline: {
     created: "Tim dibuat",

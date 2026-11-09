@@ -20,6 +20,7 @@ export const en: Dictionary = {
   common: {
     cancel: "Cancel",
     save: "Save",
+    reload: "Reload",
     delete: "Delete",
     back: "Back",
     copied: "Copied",
@@ -650,8 +651,6 @@ export const en: Dictionary = {
     inviteCopied: "Invite link copied",
     remove: "Remove",
     membersViaContact: "Need to change a member? Contact the competition's contact person.",
-    accepted: "Your registration was accepted",
-    rejected: "Your registration was rejected. See the reason on your dashboard.",
   },
   timeline: {
     created: "Team created",
