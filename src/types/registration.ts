@@ -252,9 +252,6 @@ export type TeamStatusPillProps = {
   lang: Locale;
 };
 
-export type DeleteTeamButtonProps = {
-  registrationId: string;
-};
 
 export type RegistrationRealtimeProps = {
   registrationIds: string[];
