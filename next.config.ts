@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Minimal runtime bundle for the Docker image built by .github/workflows/deploy.yml.
+  output: "standalone",
   experimental: {
     agentFeedback: true,
   },
