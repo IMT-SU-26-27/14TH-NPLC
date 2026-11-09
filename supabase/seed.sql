@@ -1,23 +1,26 @@
 -- Sample data for YOUR OWN Supabase project (README "Setup mandiri penuh"): paste the whole file into the SQL Editor
 -- and run it once, after the migrations (`supabase db push`). It also runs on `supabase db reset` for a local Supabase.
--- Everything here is made up: no accounts, no real people, keys, payment details or group links, nothing from the
--- team's Supabase. Never run it on the team's Supabase (DEV or production).
+-- No accounts, no participants, keys or group links. Never run it on the team's Supabase (DEV or production); production
+-- gets supabase/production-content.sql instead, and this file mirrors its public content.
 
--- Competitions, as on staging. The bank account is an example; wa_group_url stays empty (the real link is never in
--- the repo). Registration has no window, so it is open.
+-- Competitions, as in production-content.sql. wa_group_url stays empty (the real link is never in the repo).
+-- Registration is open from 10 Nov 2026 to 10 Jan 2027 23:59 WIB.
 insert into public.competitions (
   slug, name, type, description, description_en, min_members, max_members, max_teams, fee, sort_order,
-  payment_method, bank_account_number, bank_account_holder, twibbon_url, wa_group_url
+  payment_method, bank_account_number, bank_account_holder, twibbon_url, registration_opens_at, registration_closes_at,
+  wa_group_url
 )
 values
   ('competitive-programming', 'Competitive Programming', 'competitive_programming',
    'Lomba pemrograman individu atau tim (maks. 3 orang). Selesaikan soal algoritmik yang dinilai otomatis.',
    'A programming contest for individuals or teams of up to 3. Solve algorithmic problems with automatic judging.',
-   1, 3, 20, 100000, 1, 'bank_transfer', '000000000000', 'Bendahara Contoh', 'https://twibbo.nz/contoh-nplc', null),
+   1, 3, 20, 100000, 1, 'bank_transfer', '003202798281', 'Angga Dhammika Jaya', 'https://canva.link/twibbonnplcxiv',
+   '2026-11-10 00:00:00+07', '2027-01-10 23:59:59+07', null),
   ('logic-rally-games', 'Logic Rally Games', 'logic',
    'Rally beregu dengan beberapa pos logika, fisik dan digital. Kumpulkan poin di setiap pos dan bersaing di leaderboard.',
    'A team rally with several logic posts, physical and digital. Collect points at every post and climb the leaderboard.',
-   3, 3, 35, 100000, 2, 'bank_transfer', '000000000000', 'Bendahara Contoh', 'https://twibbo.nz/contoh-nplc', null)
+   3, 3, 35, 100000, 2, 'bank_transfer', '003202798281', 'Angga Dhammika Jaya', 'https://canva.link/twibbonnplcxiv',
+   '2026-11-10 00:00:00+07', '2027-01-10 23:59:59+07', null)
 on conflict (slug) do nothing;
 
 -- Homepage "About" text.
@@ -28,21 +31,25 @@ update public.site_content set
   about_body_en = 'The National Programming & Logic Competition is a national programming and logic competition for high school students. (Sample text for local development.)'
 where id;
 
--- Timeline: registration and the final day are for every competition; the preliminary round is CP only.
+-- Timeline: registration and the final day are for every competition; the preliminary round is CP only and the
+-- technical meeting is Rally only.
 insert into public.timeline_events (starts_on, ends_on, title_id, title_en, description_id, description_en, competition_type)
 select * from (values
-  ('2026-11-10'::date, '2026-12-13'::date, 'Pendaftaran', 'Registration',
+  ('2026-11-10'::date, '2027-01-10'::date, 'Pendaftaran', 'Registration',
    'Daftarkan tim dan unggah bukti pembayaran.', 'Register your team and upload the payment proof.', null::public.competition_type),
   ('2027-01-18'::date, null::date, 'Penyisihan', 'Preliminary round',
    'Babak penyisihan Competitive Programming.', 'Competitive Programming preliminary round.', 'competitive_programming'::public.competition_type),
+  ('2027-01-25'::date, null::date, 'Technical Meeting', 'Technical Meeting',
+   'Technical Meeting online, minimal 1 peserta per tim wajib ikut.', 'Online technical meeting; at least one member per team must attend.',
+   'logic'::public.competition_type),
   ('2027-01-29'::date, null::date, 'Final & Rally Games', 'Final & Rally Games',
    'Hari puncak NPLC XIV di Universitas Ciputra.', 'The NPLC XIV main day at Universitas Ciputra.', null::public.competition_type)
 ) as e(starts_on, ends_on, title_id, title_en, description_id, description_en, competition_type)
 where not exists (select 1 from public.timeline_events);
 
--- The CP contest: scheduled for the preliminary round (00:00 WIB), 2 hours.
+-- The CP contest: scheduled for the preliminary round (09:00 WIB), 2 hours.
 insert into public.cp_sessions (competition_id, status, scheduled_start_at, duration_seconds)
-select id, 'scheduled', '2027-01-18 00:00:00+07', 7200 from public.competitions where slug = 'competitive-programming'
+select id, 'scheduled', '2027-01-18 09:00:00+07', 7200 from public.competitions where slug = 'competitive-programming'
 on conflict (competition_id) do nothing;
 
 -- The Rally session is created by a trigger together with the Rally competition (status not_open); nothing to add.
