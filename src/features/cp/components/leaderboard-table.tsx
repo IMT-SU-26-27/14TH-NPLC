@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SnowflakeIcon, TrophyIcon } from "lucide-react";
+import { ClockIcon, SnowflakeIcon, TrophyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateTime, formatScore } from "@/lib/format";
 import { useCpSessionRealtime } from "@/hooks/use-cp-session-realtime";
 import { useI18n } from "@/hooks/use-i18n";
 import { useLeaderboardRealtime } from "@/hooks/use-leaderboard-realtime";
+import { useRefreshAt } from "@/hooks/use-refresh-at";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
@@ -17,7 +18,7 @@ import type { LeaderboardTableProps } from "@/types/cp";
 
 const PAGE_SIZE = 10;
 
-export function LeaderboardTable({ initialRows, competitionId, highlightRegistrationId, viewer, frozenAt }: LeaderboardTableProps) {
+export function LeaderboardTable({ initialRows, competitionId, highlightRegistrationId, viewer, frozenAt, frozenAuto, autoFreezeAt }: LeaderboardTableProps) {
   const { t, lang, href } = useI18n();
   const router = useRouter();
   const participantFrozen = viewer === "participant" && !!frozenAt;
@@ -36,19 +37,32 @@ export function LeaderboardTable({ initialRows, competitionId, highlightRegistra
     else router.refresh();
   });
 
+  // At the last-hour cut-off the server closes the participants' leaderboard; reload then to show the snapshot.
+  useRefreshAt(frozenAt ? null : autoFreezeAt);
+
   const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const current = Math.min(page, pageCount);
   const start = (current - 1) * PAGE_SIZE;
   const visible = rows.slice(start, start + PAGE_SIZE);
 
-  const notice = frozenAt && (
+  const notice = frozenAt ? (
     <Alert>
       <SnowflakeIcon />
-      <AlertTitle>{viewer === "admin" ? t("cp.frozenAdminTitle") : t("cp.frozenTitle")}</AlertTitle>
+      <AlertTitle>{viewer === "admin" ? t("cp.frozenAdminTitle") : t(frozenAuto ? "cp.frozenAutoTitle" : "cp.frozenTitle")}</AlertTitle>
       <AlertDescription>
-        {t(viewer === "admin" ? "cp.frozenAdmin" : "cp.frozen", { date: formatDateTime(frozenAt, lang) })}
+        {viewer === "participant" && frozenAuto
+          ? t("cp.frozenAuto")
+          : t(viewer === "admin" ? "cp.frozenAdmin" : "cp.frozen", { date: formatDateTime(frozenAt, lang) })}
       </AlertDescription>
     </Alert>
+  ) : (
+    viewer === "admin" &&
+    autoFreezeAt && (
+      <Alert>
+        <ClockIcon />
+        <AlertDescription>{t("cp.autoFreezeAdmin", { date: formatDateTime(autoFreezeAt, lang) })}</AlertDescription>
+      </Alert>
+    )
   );
 
   if (rows.length === 0) {

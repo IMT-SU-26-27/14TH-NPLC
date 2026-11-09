@@ -396,6 +396,8 @@ export type Database = {
           ended_at: string | null
           id: string
           leaderboard_frozen_at: string | null
+          leaderboard_frozen_auto: boolean
+          leaderboard_released_at: string | null
           paused_at: string | null
           paused_seconds: number
           scheduled_end_at: string | null
@@ -413,6 +415,8 @@ export type Database = {
           ended_at?: string | null
           id?: string
           leaderboard_frozen_at?: string | null
+          leaderboard_frozen_auto?: boolean
+          leaderboard_released_at?: string | null
           paused_at?: string | null
           paused_seconds?: number
           scheduled_end_at?: string | null
@@ -430,6 +434,8 @@ export type Database = {
           ended_at?: string | null
           id?: string
           leaderboard_frozen_at?: string | null
+          leaderboard_frozen_auto?: boolean
+          leaderboard_released_at?: string | null
           paused_at?: string | null
           paused_seconds?: number
           scheduled_end_at?: string | null
@@ -785,18 +791,27 @@ export type Database = {
         Row: {
           competition_id: string
           leaderboard_frozen_at: string | null
+          leaderboard_frozen_auto: boolean
+          leaderboard_released_at: string | null
+          scheduled_end_at: string | null
           status: Database["public"]["Enums"]["rally_session_status"]
           updated_at: string
         }
         Insert: {
           competition_id: string
           leaderboard_frozen_at?: string | null
+          leaderboard_frozen_auto?: boolean
+          leaderboard_released_at?: string | null
+          scheduled_end_at?: string | null
           status?: Database["public"]["Enums"]["rally_session_status"]
           updated_at?: string
         }
         Update: {
           competition_id?: string
           leaderboard_frozen_at?: string | null
+          leaderboard_frozen_auto?: boolean
+          leaderboard_released_at?: string | null
+          scheduled_end_at?: string | null
           status?: Database["public"]["Enums"]["rally_session_status"]
           updated_at?: string
         }
@@ -1430,6 +1445,14 @@ export type Database = {
           p_twibbon_proof_public_id?: string
           p_twibbon_post_url?: string
         }
+        Returns: string
+      }
+      cp_leaderboard_freeze_check: {
+        Args: { p_competition_id: string }
+        Returns: string
+      }
+      rally_leaderboard_freeze_check: {
+        Args: { p_competition_id: string }
         Returns: string
       }
       my_wa_group: {

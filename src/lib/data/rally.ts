@@ -136,11 +136,17 @@ export async function listRallyLog(filters: RallyFilters): Promise<RallyLogList>
 const SCORE_COLUMNS = "registration_id, team_name, school, total_points, posts_finished, last_result_at";
 
 // A trigger creates the session with every Rally competition.
+// Before reading it, closes the participants' leaderboard for the last hour if that time has come.
 export async function getRallySession(competitionId: string): Promise<RallySession> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.from("rally_sessions").select("competition_id, status, leaderboard_frozen_at").eq("competition_id", competitionId).single();
+  const { data: autoFreezeAt } = await supabase.rpc("rally_leaderboard_freeze_check", { p_competition_id: competitionId });
+  const { data, error } = await supabase
+    .from("rally_sessions")
+    .select("competition_id, status, leaderboard_frozen_at, leaderboard_frozen_auto, scheduled_end_at")
+    .eq("competition_id", competitionId)
+    .single();
   if (error) throw new Error(`Could not load the Rally session: ${error.message}`);
-  return data;
+  return { ...data, autoFreezeAt: autoFreezeAt ?? null };
 }
 
 // RLS decides who may read which: participants get the live scores, or the snapshot while frozen.

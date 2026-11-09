@@ -1,20 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { SnowflakeIcon, TrophyIcon } from "lucide-react";
+import { ClockIcon, SnowflakeIcon, TrophyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/format";
 import { RALLY_FINALIST_COUNT } from "@/lib/rally/ranking";
 import { useI18n } from "@/hooks/use-i18n";
 import { useRallyLeaderboardRealtime } from "@/hooks/use-rally-leaderboard-realtime";
 import { useRallySessionRealtime } from "@/hooks/use-rally-session-realtime";
+import { useRefreshAt } from "@/hooks/use-refresh-at";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { RallyLeaderboardTableProps } from "@/types/rally";
 
-export function RallyLeaderboardTable({ competitionId, initialRows, viewer, frozenAt, highlightRegistrationId }: RallyLeaderboardTableProps) {
+export function RallyLeaderboardTable({ competitionId, initialRows, viewer, frozenAt, frozenAuto, autoFreezeAt, highlightRegistrationId }: RallyLeaderboardTableProps) {
   const { t, lang } = useI18n();
   const router = useRouter();
   const { rows, changedId } = useRallyLeaderboardRealtime(competitionId, initialRows, viewer === "admin" || !frozenAt);
@@ -24,12 +25,29 @@ export function RallyLeaderboardTable({ competitionId, initialRows, viewer, froz
     if ((session.leaderboard_frozen_at ?? null) !== (frozenAt ?? null)) router.refresh();
   });
 
-  const notice = frozenAt && (
+  // At the last-hour cut-off the server closes the participants' leaderboard; reload then to show the snapshot.
+  useRefreshAt(frozenAt ? null : autoFreezeAt);
+
+  const notice = frozenAt ? (
     <Alert>
       <SnowflakeIcon />
-      <AlertTitle>{t(viewer === "admin" ? "rally.leaderboard.frozenAdminTitle" : "rally.leaderboard.frozenTitle")}</AlertTitle>
-      <AlertDescription>{t(viewer === "admin" ? "rally.leaderboard.frozenAdmin" : "rally.leaderboard.frozen", { date: formatDateTime(frozenAt, lang) })}</AlertDescription>
+      <AlertTitle>
+        {t(viewer === "admin" ? "rally.leaderboard.frozenAdminTitle" : frozenAuto ? "rally.leaderboard.frozenAutoTitle" : "rally.leaderboard.frozenTitle")}
+      </AlertTitle>
+      <AlertDescription>
+        {viewer === "participant" && frozenAuto
+          ? t("rally.leaderboard.frozenAuto")
+          : t(viewer === "admin" ? "rally.leaderboard.frozenAdmin" : "rally.leaderboard.frozen", { date: formatDateTime(frozenAt, lang) })}
+      </AlertDescription>
     </Alert>
+  ) : (
+    viewer === "admin" &&
+    autoFreezeAt && (
+      <Alert>
+        <ClockIcon />
+        <AlertDescription>{t("rally.leaderboard.autoFreezeAdmin", { date: formatDateTime(autoFreezeAt, lang) })}</AlertDescription>
+      </Alert>
+    )
   );
 
   if (rows.length === 0) {

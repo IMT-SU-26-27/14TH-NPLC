@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { wibDateTime } from "@/lib/validations/admin";
 
 const points = z.coerce.number().int("validation.rallyPoints").min(0, "validation.rallyPoints").max(100000, "validation.rallyPoints");
 
@@ -73,4 +74,10 @@ export const rallySessionStatusSchema = z.object({
 export const rallyFreezeSchema = z.object({
   competitionId: z.uuid(),
   frozen: z.boolean(),
+});
+
+// When the Rally Games end (WIB). Empty clears it: the leaderboard then never closes on its own.
+export const rallyScheduledEndSchema = z.object({
+  competitionId: z.uuid(),
+  scheduledEndAt: wibDateTime,
 });
