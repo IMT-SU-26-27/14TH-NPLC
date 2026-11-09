@@ -212,12 +212,46 @@ export const id = {
     faq: {
       label: "FAQ",
       title: "Pertanyaan umum",
-      oneCompetitionQ: "Apakah satu akun bisa ikut dua lomba?",
-      oneCompetitionA: "Tidak. Satu akun hanya bisa terdaftar di satu lomba, jadi pastikan pilihan lombamu sebelum mendaftar.",
-      joinTeamQ: "Bagaimana anggota bergabung ke tim?",
-      joinTeamA: "Setiap anggota membuat akun sendiri, lalu bergabung memakai kode tim yang ada di dasbor ketua.",
-      paymentQ: "Bagaimana cara membayar biaya pendaftaran?",
-      paymentA: "Pembayaran hanya lewat blu by BCA. Nomor rekening tampil di form pendaftaran, dan bukti pembayarannya diunggah di form yang sama.",
+      // One list for both competitions, shown as Q.1, Q.2, ... in this order. Add or remove an item here and in en.ts.
+      // TODO: FAQ CP dari Kenneth — digabung, ambil yang umum.
+      items: [
+        {
+          q: "Apa itu Logic Rally Games?",
+          a: "Lomba Kategori 2 NPLC 14th berupa permainan logika untuk siswa/siswi SMA/SMK/MA sederajat. Setiap tim bermain di beberapa pos rally games. Empat tim dengan poin tertinggi lanjut ke babak final.",
+        },
+        {
+          q: "Berapa jumlah anggota dalam satu tim?",
+          a: "Competitive Programming: 1–3 orang. Logic Rally Games: 3 peserta dari sekolah yang sama. Satu sekolah boleh mengirimkan lebih dari satu tim.",
+        },
+        {
+          q: "Kapan pendaftaran dibuka dan ditutup?",
+          a: "Pendaftaran dibuka 10 November 2026 dan ditutup 10 Januari 2027. Early bird berlaku hingga 23 November 2026.",
+        },
+        {
+          q: "Kapan dan di mana Rally Games diadakan?",
+          a: "Secara offline di Universitas Ciputra Surabaya pada 29 Januari 2027.",
+        },
+        {
+          q: "Apakah peserta boleh mengikuti lebih dari satu tim atau lomba?",
+          a: "Tidak. Satu peserta hanya boleh tergabung dalam satu tim dan satu lomba di NPLC 14th.",
+        },
+        {
+          q: "Bagaimana jika ada anggota tim Rally Games yang berhalangan hadir?",
+          a: "Seluruh anggota tim (3 orang) wajib hadir. Anggota tidak dapat diganti dengan peserta lain. Apabila ada anggota yang tidak hadir, tim akan didiskualifikasi.",
+        },
+        {
+          q: "Apakah ada Technical Meeting Rally Games?",
+          a: "Ada. Technical Meeting diadakan secara online pada 25 Januari 2027, dan minimal 1 peserta dari setiap tim wajib mengikutinya.",
+        },
+        {
+          q: "Apa dresscode Rally Games?",
+          a: "Seragam olahraga SMA/SMK masing-masing. Celana wajib minimal sepanjang lutut. Apabila celana seragam olahraga tidak sepanjang lutut, peserta boleh menggunakan celana lain yang sopan dengan panjang minimal selutut.",
+        },
+        {
+          q: "Bagaimana cara masuk grup peserta?",
+          a: "Link grup peserta diberikan di website NPLC setelah pendaftaran diverifikasi admin.",
+        },
+      ],
     },
     contact: {
       label: "Kontak",

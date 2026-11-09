@@ -213,12 +213,44 @@ export const en: Dictionary = {
     faq: {
       label: "FAQ",
       title: "Frequently asked questions",
-      oneCompetitionQ: "Can one account enter two competitions?",
-      oneCompetitionA: "No. Each account can be registered in one competition only, so decide before you register.",
-      joinTeamQ: "How do members join a team?",
-      joinTeamA: "Each member creates their own account, then joins with the team code shown on the leader's dashboard.",
-      paymentQ: "How do I pay the registration fee?",
-      paymentA: "Payment is through blu by BCA only. The account number is shown on the registration form, and you upload the proof of payment on the same form.",
+      items: [
+        {
+          q: "What is Logic Rally Games?",
+          a: "The 14th NPLC's second competition category: logic games for senior high school students (SMA/SMK/MA or equivalent). Each team plays at several rally posts, and the four teams with the most points go on to the final.",
+        },
+        {
+          q: "How many members are on a team?",
+          a: "Competitive Programming: 1–3 people. Logic Rally Games: 3 participants from the same school. A school may send more than one team.",
+        },
+        {
+          q: "When does registration open and close?",
+          a: "Registration opens on 10 November 2026 and closes on 10 January 2027. The early-bird price applies until 23 November 2026.",
+        },
+        {
+          q: "When and where is the Rally Games held?",
+          a: "In person at Universitas Ciputra Surabaya, on 29 January 2027.",
+        },
+        {
+          q: "Can a participant join more than one team or competition?",
+          a: "No. Each participant can be on only one team, in one competition, at the 14th NPLC.",
+        },
+        {
+          q: "What if a Rally Games team member can't attend?",
+          a: "All three team members must attend. Members can't be replaced by someone else, and a team with a member missing is disqualified.",
+        },
+        {
+          q: "Is there a Rally Games technical meeting?",
+          a: "Yes. The technical meeting is held online on 25 January 2027, and at least one member of every team must attend.",
+        },
+        {
+          q: "What is the Rally Games dress code?",
+          a: "Your own school's PE uniform. Trousers must reach at least the knee; if your PE trousers are shorter, wear other modest trousers that reach the knee.",
+        },
+        {
+          q: "How do I join the participants' group?",
+          a: "The group link appears on the NPLC website once an admin has verified your registration.",
+        },
+      ],
     },
     contact: {
       label: "Contact",
