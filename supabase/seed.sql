@@ -15,8 +15,8 @@ values
    'A programming contest for individuals or teams of up to 3. Solve algorithmic problems with automatic judging.',
    1, 3, 20, 100000, 1, 'bank_transfer', '000000000000', 'Bendahara Contoh', 'https://twibbo.nz/contoh-nplc', null),
   ('logic-rally-games', 'Logic Rally Games', 'logic',
-   'Rally beregu dengan 20+ pos logika, fisik dan digital. Kumpulkan poin di setiap pos dan bersaing di leaderboard.',
-   'A team rally with 20+ logic posts, physical and digital. Collect points at every post and climb the leaderboard.',
+   'Rally beregu dengan beberapa pos logika, fisik dan digital. Kumpulkan poin di setiap pos dan bersaing di leaderboard.',
+   'A team rally with several logic posts, physical and digital. Collect points at every post and climb the leaderboard.',
    3, 3, 35, 100000, 2, 'bank_transfer', '000000000000', 'Bendahara Contoh', 'https://twibbo.nz/contoh-nplc', null)
 on conflict (slug) do nothing;
 
