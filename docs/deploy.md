@@ -80,10 +80,10 @@ Nama variabel saja. Nilainya dipegang pengelola server.
 | Variabel | Isi / catatan |
 |---|---|
 | `ENABLE_EMAIL_AUTOCONFIRM` | `true`. Setelah daftar, akun langsung masuk tanpa email konfirmasi. |
-| `SITE_URL` | domain production, `https://…` |
-| `ADDITIONAL_REDIRECT_URLS` | `https://<domain>/auth/confirm` |
+| `SITE_URL` | Domain yang aktif, sekarang `https://nplc.simawa-imtuc.com`. |
+| `ADDITIONAL_REDIRECT_URLS` | Isi **kedua** domain dari sekarang, dipisah koma: `https://nplc.simawa-imtuc.com/auth/confirm,https://nplc.ciputra.ac.id/auth/confirm`. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_ADMIN_EMAIL`, `SMTP_SENDER_NAME` | Wajib. Hanya dipakai untuk email lupa kata sandi. |
-| `GOTRUE_MAILER_TEMPLATES_RECOVERY` | `https://<domain>/email/recovery.html` (file `public/email/recovery.html`) |
+| `GOTRUE_MAILER_TEMPLATES_RECOVERY` | `https://nplc.simawa-imtuc.com/email/recovery.html` (file `public/email/recovery.html`) |
 | `GOTRUE_MAILER_SUBJECTS_RECOVERY` | judul email, mis. "Atur ulang kata sandi NPLC / Reset your NPLC password" |
 | `GOTRUE_RATE_LIMIT_EMAIL_SENT` | Jumlah email per jam untuk seluruh situs. Sesuaikan dengan kuota penyedia SMTP. |
 | `GOTRUE_RATE_LIMIT_VERIFY` | Batas verifikasi link per IP per 5 menit. |
@@ -117,3 +117,36 @@ Backup disimpan **di luar VPS**. Kalau VPS rusak, backup di dalamnya ikut hilang
   ```
 
   Coba dulu di database kosong, jangan langsung di production.
+
+### 7. Pindah domain ke `nplc.ciputra.ac.id`
+
+Domain aktif sekarang `https://nplc.simawa-imtuc.com`. `nplc.ciputra.ac.id` diaktifkan ICT nanti, mengarah ke IP VPS yang sama.
+
+Urutan langkahnya:
+
+1. **DNS (ICT).** Record A `nplc.ciputra.ac.id` → IP VPS. Cek dengan `dig +short nplc.ciputra.ac.id` sebelum lanjut.
+2. **Nginx Proxy Manager.**
+   - Buat proxy host `nplc.ciputra.ac.id` → `nplc-web:3000`, centang Websockets Support, lalu minta sertifikat SSL Let's Encrypt (Force SSL, HTTP/2).
+   - Proxy host lama dibiarkan dulu. Setelah domain baru stabil, ubah menjadi redirect 301 ke domain baru.
+   - Kalau API Supabase juga pindah domain, buat proxy host + SSL untuk domain API yang baru dengan cara yang sama.
+3. **Env Supabase (`/var/www/supabase/.env`).** Backup dulu (`cp .env .env.bak-YYYYMMDD-HHMM`).
+
+   | Variabel | Nilai baru |
+   |---|---|
+   | `SITE_URL` | `https://nplc.ciputra.ac.id` |
+   | `ADDITIONAL_REDIRECT_URLS` | Sudah berisi kedua domain (langkah 5), tidak perlu diubah. |
+   | `GOTRUE_MAILER_TEMPLATES_RECOVERY` | `https://nplc.ciputra.ac.id/email/recovery.html` |
+   | `API_EXTERNAL_URL`, `SUPABASE_PUBLIC_URL` | Hanya diubah kalau domain API Supabase ikut pindah. |
+
+   Setelah itu restart service yang terkena saja. `auth` selalu; `studio` dan `envoy` hanya kalau URL API berubah. Jangan restart seluruh stack.
+4. **GitHub Actions (Settings → Secrets).**
+   - `NEXT_PUBLIC_SUPABASE_URL`: hanya kalau domain API Supabase ikut pindah. Nilai ini ditanam ke kode browser saat build, jadi perlu build ulang: jalankan ulang workflow deploy.
+   - `VAPID_SUBJECT`: kalau isinya `https://nplc.simawa-imtuc.com`, ganti ke domain baru (atau `mailto:`).
+   - Secret lain tidak bergantung pada domain.
+5. **Aplikasi.** Redirect auth dibangun dari header `Host` (`src/lib/request-origin.ts`), jadi tidak ada kode yang perlu diubah. Setelah pindah, cek:
+   - daftar, masuk, dan keluar di domain baru;
+   - "Lupa kata sandi": link di email mengarah ke domain baru (`{{ .SiteURL }}`) dan berhasil masuk ke `/reset-password`.
+6. **Yang ikut berubah bagi pengguna.**
+   - Cookie login terikat domain, jadi semua orang perlu masuk lagi di domain baru.
+   - Langganan notifikasi push terikat origin, jadi admin perlu menyalakan notifikasi lagi di Profil.
+   - Link lama tetap jalan selama redirect 301 dari domain lama aktif.
