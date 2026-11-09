@@ -18,6 +18,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261109120000_team_quota_and_wa_group.sql` | `competitions.max_teams` (team quota, null = no limit; every team that is not rejected counts) enforced in `create_registration` and when a rejected team comes back, with the competition row locked; `competitions.wa_group_url` (participants' WhatsApp group), hidden from the API by column privileges; `competition_team_counts()`, `my_wa_group()`, `admin_competition_wa_group_url()` |
 | `20261109140000_timeline_event_competition.sql` | `timeline_events.competition_type` (null = every competition): which competition an event is for, so an accepted team's dashboard shows its own next date |
 | `20261110090000_lock_accepted_team_members.sql` | Only admins delete a registration (the leader no longer can, in any status). Leaving a team or removing a member is closed once the team is `accepted` (`private.registration_accepted`); admins can still change members |
+| `20261110210000_registration_events_without_realtime.sql` | `registration_events` leaves the `supabase_realtime` publication: realtime is for the CP and Rally contests only. The dashboard and the admin registrations list refresh when the tab is opened again (at most every 30 s) or with "Muat ulang" |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -179,17 +180,18 @@ score = points × (passed / total) × efficiency
 
 ## Realtime
 
-These tables are in the `supabase_realtime` publication:
+Realtime is used only during the contests (CP and Rally), because Supabase, Judge0 and the site share one 2-core server. These tables are in the `supabase_realtime` publication:
 
 | Table | Purpose |
 |---|---|
 | `cp_sessions` | Waiting room moves into the contest when the admin presses start or resume; the contest page goes back to the waiting room when it is paused, and locks when it ends |
 | `cp_scores` | Live leaderboard |
-| `registration_events` | Participant dashboard updates when the admin accepts or rejects |
 | `rally_sessions` | LO screen follows the session; leaderboards refresh on freeze and unfreeze |
 | `rally_scores` | Live Rally leaderboard |
 
 Realtime respects the policies above, so each user only receives changes they're allowed to read.
+
+Registration pages have no realtime: the participant dashboard and the admin registrations list refresh when the tab becomes visible again (at most every 30 seconds, `use-refresh-on-focus`) and have a "Muat ulang" button.
 
 ## Web push notifications
 
