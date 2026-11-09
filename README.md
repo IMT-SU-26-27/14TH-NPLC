@@ -7,7 +7,166 @@ Registration website and online competitive programming contest for the 14th Nat
 - Accepted competitive programming teams compete on `/cp`: a waiting room that opens when the admin starts the contest, problems judged by Judge0, and a live leaderboard.
 - Bilingual: Bahasa Indonesia (default, `/id/...`) and English (`/en/...`).
 
+**Team member running it on your own laptop?** Follow [Setup cepat anggota tim (Windows)](#setup-cepat-anggota-tim-windows): no Docker, no Supabase account, no team secrets. The numbered steps further down are for setting up a real deployment.
+
 **Stack:** Next.js 16 (App Router, Cache Components) · Supabase (Postgres, Auth, Realtime) · Cloudinary · Judge0 · shadcn/ui · Tailwind CSS v4 · Zod · GSAP.
+
+---
+
+## Setup cepat anggota tim (Windows)
+
+Jalur utama untuk anggota tim yang ingin menjalankan web di laptop sendiri dan **menguji alur pendaftaran**: daftar akun, daftar tim, gabung tim, dan dasbor. Web jalan di laptopmu dan terhubung ke **Supabase DEV tim**.
+
+Yang **tidak** perlu disiapkan:
+- Docker;
+- akun Supabase;
+- kunci rahasia tim.
+
+Yang dibutuhkan hanya **URL + anon key DEV dari Koor Tech** (lewat japri) dan akun Cloudinary gratis milikmu sendiri.
+
+### Prasyarat
+
+| Alat | Versi | Cara pasang (PowerShell) | Cek |
+|---|---|---|---|
+| Git | terbaru | `winget install Git.Git` | `git --version` |
+| Node.js | **22 LTS** (minimal 20.9) | `winget install OpenJS.NodeJS.LTS` | `node -v` |
+| pnpm | **10.17.0** | `corepack enable` | `pnpm -v` |
+| Cloudinary | akun gratis **milik sendiri** | daftar di [cloudinary.com](https://cloudinary.com) | — |
+
+Catatan pemasangan:
+- Setelah memasang Git atau Node, **tutup lalu buka lagi** PowerShell supaya perintah barunya dikenali.
+- Kalau `corepack enable` gagal dengan *EPERM*, jalankan PowerShell **sebagai Administrator** satu kali saja. Kalau `pnpm -v` sudah menampilkan `10.x`, error itu boleh diabaikan.
+- Jangan pakai `npm`, `npx`, atau `yarn` untuk proyek ini.
+
+### Langkah
+
+1. **Clone dan install** (di folder tempat kamu menyimpan proyek):
+
+   ```powershell
+   git clone https://github.com/IMT-SU-26-27/14TH-NPLC.git
+   cd 14TH-NPLC
+   git checkout staging
+   pnpm install
+   ```
+
+2. **Buat `.env.local`:**
+
+   ```powershell
+   Copy-Item .env.local.example .env.local
+   notepad .env.local
+   ```
+
+   Isi file itu:
+   - `NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_ANON_KEY`: **minta ke Koor Tech lewat japri**, lalu tempel menggantikan nilai `isi-dari-koor`.
+   - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: dari **akun Cloudinary milikmu**. Login di cloudinary.com, buka **Console → Settings** (ikon roda gigi) **→ API Keys**, lalu salin *Cloud name*, *API Key*, dan *API Secret*.
+   - **Sisanya biarkan apa adanya:** `SUPABASE_SERVICE_ROLE_KEY` dan `JUDGE0_*` sudah berisi dummy yang lolos validasi, dan baris VAPID tetap dikomentari.
+
+   Simpan file-nya.
+
+3. **Jalankan:**
+
+   ```powershell
+   pnpm dev
+   ```
+
+   Buka **http://localhost:3000/id**. Halaman pertama butuh 10–20 detik untuk dikompilasi; berikutnya cepat. Biarkan terminal ini tetap terbuka selama web dipakai.
+
+4. **Uji alur pendaftaran:**
+   1. Klik **Daftar** di header, lalu buat akun dengan data fiktif.
+   2. Buka **Pilih lomba**, pilih lomba, isi form, unggah bukti bayar (gambar apa saja), lalu kirim.
+   3. Buat akun kedua di jendela *Incognito*. Klik **Gabung tim** dan masukkan **kode tim** dari dasbor ketua.
+
+5. **Berhenti:** tekan `Ctrl+C` di terminal `pnpm dev`.
+
+6. **Memperbarui ke versi terbaru tim:**
+
+   ```powershell
+   git pull
+   pnpm install
+   ```
+
+   Setelah itu jalankan lagi `pnpm dev`.
+
+### Tes di HP Android (lewat kabel USB)
+
+1. Pasang Android platform-tools di laptop: `winget install Google.PlatformTools`, lalu buka lagi PowerShell.
+2. Di HP, aktifkan USB debugging:
+   1. Buka **Setelan → Tentang ponsel**, lalu ketuk **Nomor build** 7 kali sampai muncul "Anda sekarang developer".
+   2. Buka **Setelan → Sistem → Opsi developer**, lalu nyalakan **Debugging USB**.
+3. Sambungkan HP ke laptop dengan kabel USB. Di HP akan muncul pertanyaan "Izinkan debugging USB?"; pilih **Izinkan**.
+4. Di laptop, dengan `pnpm dev` tetap menyala:
+
+   ```powershell
+   adb devices                    # HP harus terdaftar sebagai "device", bukan "unauthorized"
+   adb reverse tcp:3000 tcp:3000
+   ```
+
+5. Di HP, buka Chrome ke **http://localhost:3000/id**.
+
+Kalau kabel dicabut, ulangi `adb reverse`.
+
+### Yang tidak bisa di jalur ini
+
+| Fitur | Kenapa |
+|---|---|
+| Panel Admin (menerima tim, melihat bukti bayar, mengatur lomba) | Butuh akun admin di DEV. Tes admin dilakukan Koor di server tim. |
+| Melihat bukti bayar dari server tim | Bukti tersimpan di Cloudinary **milikmu**, jadi admin di server tim hanya melihat gambar kosong. Menerima atau menolak tim tetap bisa. |
+| Lupa sandi sampai selesai | Email terkirim, tetapi link di dalamnya membuka alamat web DEV (*Site URL*), bukan `localhost`. |
+| Kontes CP (menilai kode), akun LO, notifikasi push | Butuh kunci rahasia tim (service role, Judge0, VAPID), yang memang tidak dibagikan. |
+
+### Troubleshooting
+
+| Masalah | Solusi |
+|---|---|
+| Terminal atau halaman menampilkan *ZodError* / *invalid_type* / *Invalid URL* | Ada isi `.env.local` yang kosong atau salah format; nama variabelnya disebut di pesan error. URL harus diawali `https://`. Jangan kosongkan baris VAPID: biarkan dikomentari (`#`). |
+| *Port 3000 is in use* | Masih ada `pnpm dev` lain yang jalan. Tutup terminalnya, atau buka port yang tercetak (mis. 3001). Untuk HP, sesuaikan `adb reverse tcp:3001 tcp:3001`. |
+| `.env.local` sudah diubah tapi tidak berpengaruh | Hentikan `pnpm dev` (Ctrl+C) lalu jalankan lagi. Env hanya dibaca saat start. |
+| Error aneh setelah `git pull` (modul tidak ditemukan dsb.) | Jalankan `pnpm install`, lalu `pnpm dev` lagi. |
+| Upload bukti bayar gagal (mis. *cloud_name is disabled*, *Invalid API key*) | `CLOUDINARY_*` masih nilai contoh atau salah salin. Cek lagi di Console → Settings → API Keys, lalu restart `pnpm dev`. |
+| Login gagal: "akun belum aktif" | Laporkan ke Koor: pengaturan "Confirm email" di DEV. |
+| HP tidak bisa membuka `localhost:3000` | Cek `adb devices` (harus `device`), ulangi `adb reverse tcp:3000 tcp:3000`, dan pastikan `pnpm dev` masih menyala. |
+
+### Aturan
+
+- **Jangan commit `.env.local` atau `.env*` apa pun.** File-file itu sudah di-`.gitignore`, kecuali `.env.local.example`. Cek `git status` sebelum commit.
+- **Jangan bagikan URL atau anon key DEV di grup**, dokumen, atau screenshot. Koor memberikannya lewat japri.
+- **Data uji harus fiktif:** nama, email, NISN, nomor WA, dan bukti bayar karangan. Jangan memakai data peserta asli.
+- **Setelah selesai tes, hapus akun dan tim ujimu**, atau laporkan email-nya ke Koor supaya dihapus. DEV dipakai bersama.
+
+---
+
+## Setup mandiri penuh (opsional, project Supabase sendiri)
+
+Untuk yang ingin database **sendiri**, misalnya untuk mencoba panel Admin. Kamu butuh akun [supabase.com](https://supabase.com) gratis. Semua perintah di bawah memakai Supabase CLI **2.101.0** lewat `pnpm sb` (tanpa install, tanpa `npx`).
+
+1. Di supabase.com, buat **project baru milikmu sendiri**. Ref project ada di URL dashboard: `supabase.com/dashboard/project/<ref>`.
+2. Terapkan skema:
+
+   ```powershell
+   pnpm sb login
+   pnpm sb link --project-ref <ref>
+   pnpm sb db push
+   ```
+
+3. Isi data contoh: buka **SQL Editor** di dashboard, tempel seluruh isi [`supabase/seed.sql`](supabase/seed.sql), lalu **Run**. Isinya:
+   - 2 lomba (rekening contoh);
+   - timeline;
+   - sesi CP dan Rally;
+   - 10 soal CP.
+
+   Seed ini tidak membuat akun apa pun.
+4. **Authentication → Sign In / Providers → Email:** matikan **Confirm email**.
+5. Buat admin di **Authentication → Users → Add user** (centang *Auto Confirm User*). Login sekali di web, lalu jalankan di SQL Editor:
+
+   ```sql
+   update public.profiles set role = 'admin' where email = 'email-adminmu@example.com';
+   ```
+
+6. Isi `.env.local` dari **Project Settings → API** project-mu: Project URL, `anon` key, dan `service_role` key ke `SUPABASE_SERVICE_ROLE_KEY`. Cloudinary tetap dari akunmu sendiri. Lalu jalankan `pnpm dev`.
+
+Catatan:
+- `pnpm sb link` menyimpan ref project di `supabase/.temp` (tidak ikut di-commit). Jangan pernah me-*link* ke project tim.
+- Punya Docker Desktop? Supabase lokal juga bisa dipakai: `pnpm sb start` menjalankan migration dan seed otomatis, lalu ambil URL dan key dari `pnpm sb status`.
 
 ---
 
@@ -46,7 +205,6 @@ cp .env.local.example .env.local
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API (self-hosted: your Kong/API URL) | browser + server |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → API keys → `anon` | browser + server |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → API keys → `service_role`. **Secret, server only.** | judging submissions |
-| `SUPABASE_MCP_KEY` | Only for the self-hosted Supabase MCP server (`.mcp.json`). Not needed to run the app. | Claude Code |
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Cloudinary → Settings → API Keys. **Secret, server only.** | uploads |
 | `JUDGE0_URL` | Base URL of your Judge0 server, e.g. `http://your-host:2358` | CP contest |
 | `JUDGE0_AUTH_TOKEN` | The `AUTHN_TOKEN` configured in Judge0's `judge0.conf` | CP contest |
@@ -68,7 +226,7 @@ supabase db push
 
 **Option B: SQL editor** (works for self-hosted Supabase too)
 
-Open Supabase Studio → SQL Editor and run each file in `supabase/migrations/` **in filename order**, then run [`supabase/seed.sql`](supabase/seed.sql). The seed creates the two competitions (Competitive Programming and Category 2) and the contest session.
+Open Supabase Studio → SQL Editor and run each file in `supabase/migrations/` **in filename order**, then run [`supabase/seed.sql`](supabase/seed.sql). The seed is **sample data** (example competitions with a dummy bank account, timeline, sessions and 10 CP problems, no accounts): on a real deployment set the competitions up in Admin instead and keep only its CP problems part.
 
 Then regenerate the TypeScript types if you changed the schema (self-hosted, with Supabase running in Docker on the same machine):
 
