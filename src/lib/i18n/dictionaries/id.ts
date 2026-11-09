@@ -316,6 +316,9 @@ export const id = {
   rally: {
     session: {
       title: "Sesi Rally",
+      endLabel: "Waktu selesai Rally Games (WIB)",
+      endHint: "Papan peringkat peserta ditutup otomatis 1 jam sebelum waktu ini. Kosongkan kalau tidak perlu.",
+      endSaved: "Waktu selesai disimpan",
       lead: "LO hanya bisa mencatat dan membatalkan hasil saat sesi dibuka. Admin tetap bisa mengoreksi kapan saja.",
       status: {
         not_open: "Belum dibuka",
@@ -362,6 +365,9 @@ export const id = {
       frozen: "Peringkat ini adalah posisi saat dibekukan pada {date}. Skor tetap dihitung.",
       frozenAdminTitle: "Dibekukan untuk peserta",
       frozenAdmin: "Peserta melihat peringkat saat dibekukan pada {date}. Kamu melihat skor terbaru.",
+      frozenAutoTitle: "Papan peringkat ditutup",
+      frozenAuto: "Papan peringkat ditutup 1 jam terakhir. Hasil diumumkan saat penutupan.",
+      autoFreezeAdmin: "Untuk peserta, papan peringkat ditutup otomatis pada {date} (1 jam sebelum selesai). Kamu tetap melihat skor terbaru.",
       freeze: "Bekukan",
       unfreeze: "Buka pembekuan",
       freezeTitle: "Bekukan papan peringkat?",
@@ -1042,6 +1048,9 @@ export const id = {
     frozen: "Peringkat ini adalah posisi saat dibekukan pada {date}. Skor tetap dihitung untuk setiap kiriman; peringkat terbaru muncul setelah panitia membukanya kembali.",
     frozenAdminTitle: "Dibekukan untuk peserta",
     frozenAdmin: "Peserta melihat peringkat saat dibekukan pada {date}. Kamu melihat skor terbaru.",
+    frozenAutoTitle: "Papan peringkat ditutup",
+    frozenAuto: "Papan peringkat ditutup 1 jam terakhir. Hasil diumumkan saat penutupan.",
+    autoFreezeAdmin: "Untuk peserta, papan peringkat ditutup otomatis pada {date} (1 jam sebelum selesai). Kamu tetap melihat skor terbaru.",
     noScores: "Belum ada tim di papan peringkat.",
     timePaused: "Dijeda, sisa",
     timeUp: "Waktu habis",

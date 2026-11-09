@@ -317,6 +317,9 @@ export const en: Dictionary = {
   rally: {
     session: {
       title: "Rally session",
+      endLabel: "Rally Games end time (WIB)",
+      endHint: "The participants' leaderboard closes on its own one hour before this time. Leave it empty if not needed.",
+      endSaved: "End time saved",
       lead: "LOs can record and undo results only while the session is open. Admins can correct at any time.",
       status: {
         not_open: "Not open yet",
@@ -363,6 +366,9 @@ export const en: Dictionary = {
       frozen: "These are the standings when it was frozen on {date}. Scores keep counting.",
       frozenAdminTitle: "Frozen for participants",
       frozenAdmin: "Participants see the standings frozen on {date}. You see the latest scores.",
+      frozenAutoTitle: "Leaderboard closed",
+      frozenAuto: "The leaderboard is closed for the last hour. Results are announced at the closing.",
+      autoFreezeAdmin: "For participants, the leaderboard closes on its own on {date} (one hour before the end). You still see the latest scores.",
       freeze: "Freeze",
       unfreeze: "Unfreeze",
       freezeTitle: "Freeze the leaderboard?",
@@ -1043,6 +1049,9 @@ export const en: Dictionary = {
     frozen: "These are the standings when it was frozen on {date}. Every submission is still scored; the latest standings appear once the committee unfreezes it.",
     frozenAdminTitle: "Frozen for participants",
     frozenAdmin: "Participants see the standings from when it was frozen on {date}. You're seeing the latest scores.",
+    frozenAutoTitle: "Leaderboard closed",
+    frozenAuto: "The leaderboard is closed for the last hour. Results are announced at the closing.",
+    autoFreezeAdmin: "For participants, the leaderboard closes on its own on {date} (one hour before the end). You still see the latest scores.",
     noScores: "No teams on the leaderboard yet.",
     timePaused: "Paused, left",
     timeUp: "Time's up",

@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { RallyEndTimeForm } from "@/features/rally/components/rally-end-time-form";
 import type { RallySessionControlProps, RallySessionStatusButtonProps } from "@/types/rally";
 
 const ICONS = { not_open: RotateCcwIcon, open: DoorOpenIcon, closed: DoorClosedIcon };
@@ -65,10 +66,13 @@ export function RallySessionControl({ session }: RallySessionControlProps) {
           <Badge variant={VARIANT[session.status]}>{t(`rally.session.status.${session.status}`)}</Badge>
         </CardAction>
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-2">
-        {others.map((to) => (
-          <StatusButton key={to} competitionId={session.competition_id} to={to} />
-        ))}
+      <CardContent className="space-y-5">
+        <div className="flex flex-wrap gap-2">
+          {others.map((to) => (
+            <StatusButton key={to} competitionId={session.competition_id} to={to} />
+          ))}
+        </div>
+        <RallyEndTimeForm competitionId={session.competition_id} scheduledEndAt={session.scheduled_end_at} />
       </CardContent>
     </Card>
   );
