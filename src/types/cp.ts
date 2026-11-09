@@ -361,6 +361,10 @@ export type VerdictGuideState = {
   onOpenChange: (open: boolean) => void;
 };
 
+export type VerdictGuideProps = {
+  className?: string;
+};
+
 export type VerdictGuideEntry = {
   title: string;
   description: string;

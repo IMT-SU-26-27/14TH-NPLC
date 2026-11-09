@@ -54,7 +54,7 @@ export function ResultsPanel({ result, recent, pending }: ResultsPanelProps) {
                       {t("cp.efficiency", { value: Math.round(result.efficiency * 100) })}
                     </p>
                   ) : (
-                    <p className="text-muted-foreground text-xs">{t("cp.sampleRunNote")}</p>
+                    <p className="text-muted-foreground text-sm">{t("cp.sampleRunNote")}</p>
                   )}
                   <p className="text-muted-foreground text-sm">{t(`cp.verdict.${result.verdict}.description`)}</p>
                 </div>
