@@ -113,3 +113,8 @@ export type HeaderActionsProps = {
   lang: Locale;
   sections: SectionLink[];
 };
+
+export type GridBackdropProps = {
+  // Fraction of the grid layer's own height it drifts in total as the band crosses the viewport.
+  speed?: number;
+};
