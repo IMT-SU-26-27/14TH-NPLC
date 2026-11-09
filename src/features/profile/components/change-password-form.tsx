@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { CircleCheckIcon, LockIcon, OctagonXIcon } from "lucide-react";
 import { changePassword } from "@/lib/actions/profile";
 import { initialFormState } from "@/lib/form";
@@ -21,7 +22,7 @@ const requiredMark = (
 
 export function ChangePasswordForm() {
   const [state, action, pending] = useActionState(changePassword, initialFormState);
-  const { t, fieldErrors } = useI18n();
+  const { t, href, fieldErrors } = useI18n();
   const errors = state.fieldErrors ?? {};
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -50,6 +51,12 @@ export function ChangePasswordForm() {
                 <InputGroupInput id="currentPassword" name="currentPassword" type="password" autoComplete="current-password" aria-invalid={!!errors.currentPassword} required />
               </InputGroup>
               <FieldError errors={fieldErrors(errors.currentPassword)} />
+              <Link
+                href={href("/forgot-password")}
+                className="text-primary focus-visible:ring-ring/50 w-fit rounded-sm text-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3"
+              >
+                {t("profile.forgotPassword")}
+              </Link>
             </Field>
             <Field data-invalid={!!errors.password}>
               <FieldLabel htmlFor="password" className={labelClass}>

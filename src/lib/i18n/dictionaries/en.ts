@@ -1247,6 +1247,7 @@ export const en: Dictionary = {
     passwordTitle: "Password",
     passwordLead: "Enter your current password to confirm it's you.",
     currentPassword: "Current password",
+    forgotPassword: "Forgot your password?",
     changePassword: "Change password",
     passwordNoDraft: "Passwords are never saved as a draft.",
     passwordChanged: "Password changed. Use the new one the next time you sign in.",

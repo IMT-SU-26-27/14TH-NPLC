@@ -1246,6 +1246,7 @@ export const id = {
     passwordTitle: "Kata sandi",
     passwordLead: "Masukkan kata sandi sekarang untuk memastikan ini memang kamu.",
     currentPassword: "Kata sandi sekarang",
+    forgotPassword: "Lupa kata sandi?",
     changePassword: "Ganti kata sandi",
     passwordNoDraft: "Kata sandi tidak disimpan sebagai draf.",
     passwordChanged: "Kata sandi diganti. Gunakan kata sandi baru saat masuk berikutnya.",
