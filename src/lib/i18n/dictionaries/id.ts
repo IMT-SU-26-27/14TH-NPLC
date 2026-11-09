@@ -252,6 +252,14 @@ export const id = {
           q: "Bagaimana cara masuk grup peserta?",
           a: "Link grup peserta diberikan di website NPLC setelah pendaftaran diverifikasi admin.",
         },
+        {
+          q: "Bagaimana anggota bergabung ke tim?",
+          a: "Setiap anggota membuat akun sendiri, lalu bergabung memakai kode tim atau tautan undangan yang ada di dasbor ketua.",
+        },
+        {
+          q: "Bagaimana cara membayar biaya pendaftaran?",
+          a: "Ketua tim mentransfer biaya pendaftaran ke rekening blu by BCA 003202798281 a.n. Angga Dhammika Jaya, lalu mengunggah bukti transfernya di form pendaftaran. Satu tim cukup membayar satu kali.",
+        },
       ],
     },
     contact: {
