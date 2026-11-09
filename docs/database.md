@@ -22,12 +22,21 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261110210000_registration_events_without_realtime.sql` | `registration_events` leaves the `supabase_realtime` publication: realtime is for the CP and Rally contests only. The dashboard and the admin registrations list refresh when the tab is opened again (at most every 30 s) or with "Muat ulang" |
 | `20261110220000_auto_freeze_leaderboards.sql` | The participants' leaderboard (CP and Rally) closes on its own `private.leaderboard_freeze_minutes()` (60, FREEZE_MINUTES) before the end: `cp_sessions.scheduled_end_at`, and the new `rally_sessions.scheduled_end_at` set in Admin → Rally. New columns `leaderboard_frozen_auto` and `leaderboard_released_at` on both session tables; `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` for the pages |
 
-Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
+Where migrations are applied, and how each database keeps track:
+
+| Database | How migrations run | History |
+|---|---|---|
+| DEV (supabase.com) | `pnpm sb db push --linked` | `supabase_migrations.schema_migrations` |
+| Production (self-hosted, `supabase-db` container on the VPS) | **By hand with psql**, one file at a time in file-name order, each in its own transaction | **None**: production has no `supabase_migrations` schema. To see whether a migration is applied, check for the objects it creates (a column, function or policy). |
+
+Production gets `supabase/production-content.sql` for its public content, not `seed.sql` (see `docs/deploy.md`). To apply a new migration there, take a backup first, then:
 
 ```bash
 docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 --single-transaction < supabase/migrations/<file>.sql
-docker exec supabase-db psql -U postgres -d postgres -c "insert into supabase_migrations.schema_migrations (version, name) values ('<version>', '<name>'); notify pgrst, 'reload schema';"
+docker exec supabase-db psql -U postgres -d postgres -c "notify pgrst, 'reload schema';"
 ```
+
+The `notify` makes the API (PostgREST) see new columns and functions straight away.
 
 After a schema change, regenerate the TypeScript types in `src/types/database.ts` (both Supabase clients use them):
 

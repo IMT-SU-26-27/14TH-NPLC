@@ -8,28 +8,20 @@ Jangan tulis nilai env, password, key, email, atau link grup WhatsApp di repo in
 
 ### 1. Jalankan semua migration, berurutan
 
-Jalankan semua file di `supabase/migrations/`, urut nama file (tanggal paling lama dulu). Pilih salah satu cara.
-
-**A. Supabase CLI lewat SSH tunnel (disarankan).** CLI mencatat migration yang sudah jalan, jadi deploy berikutnya hanya menjalankan yang baru.
-
-```bash
-# Terminal 1: buka tunnel ke port Postgres container (sesuaikan host dan port).
-ssh -N -L 54322:localhost:5432 <user>@<vps>
-# Terminal 2, dari folder repo:
-pnpm sb db push --db-url "postgresql://postgres:<password>@localhost:54322/postgres" --dry-run   # cek daftarnya dulu
-pnpm sb db push --db-url "postgresql://postgres:<password>@localhost:54322/postgres"
-```
-
-Password diketik saat itu juga. Jangan simpan ke file.
-
-**B. psql di container `db`.** Cara ini tidak mencatat riwayat, jadi catat sendiri migration terakhir yang sudah jalan.
+Jalankan semua file di `supabase/migrations/`, urut nama file (tanggal paling lama dulu), lewat psql di container `db`, masing-masing dalam satu transaksi:
 
 ```bash
 for f in supabase/migrations/*.sql; do
   echo "== $f"
-  docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < "$f" || break
+  docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 --single-transaction < "$f" || break
 done
+docker exec supabase-db psql -U postgres -d postgres -c "notify pgrst, 'reload schema';"
 ```
+
+Production **tidak punya riwayat migration** (`supabase_migrations.schema_migrations`); semua migration dijalankan manual dengan psql seperti di atas. Karena itu:
+
+- Untuk migration baru berikutnya: backup dulu (`pg_dump`, bagian 6), lalu jalankan **hanya file yang baru**, satu per satu dengan perintah yang sama. Cek dulu apakah sudah pernah jalan lewat objek yang dibuatnya (kolom, fungsi, policy); lihat `docs/database.md`.
+- **Jangan pakai `supabase db push` ke production.** Tanpa riwayat, CLI menganggap semua migration belum jalan dan mencoba menjalankan ulang semuanya.
 
 Kalau ada satu file gagal, berhenti dan perbaiki dulu. Jangan lompati file.
 
