@@ -1,0 +1,67 @@
+<!doctype html>
+<!--
+  Password reset email for Supabase Auth (self-hosted GoTrue), fetched from
+  GOTRUE_MAILER_TEMPLATES_RECOVERY=https://nplc.ciputra.ac.id/email/recovery.html (docs/deploy.md).
+  Inline styles and tables only, no external images or fonts, so every mail client shows it the same.
+  Colors are the theme values in src/app/globals.css (background, card, foreground, primary, muted-foreground).
+-->
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atur ulang kata sandi · Reset your password</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#F4F7FD;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F4F7FD;">
+      <tr>
+        <td align="center" style="padding:32px 16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background-color:#FFFFFF;border:1px solid #D9E1F0;border-radius:12px;">
+            <tr>
+              <td style="padding:28px 28px 0 28px;font-family:Arial,Helvetica,sans-serif;">
+                <p style="margin:0;font-family:'Courier New',Courier,monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#315BF0;">// 14th NPLC</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 28px 0 28px;font-family:Arial,Helvetica,sans-serif;color:#1D3451;">
+                <h1 style="margin:0 0 12px 0;font-size:22px;line-height:1.3;color:#1D3451;">Atur ulang kata sandi</h1>
+                <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#1D3451;">
+                  Kami menerima permintaan untuk mengatur ulang kata sandi akun NPLC kamu. Tekan tombol di bawah untuk membuat kata sandi baru.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="left" style="padding:0 28px 8px 28px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="border-radius:8px;background-color:#315BF0;">
+                      <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password" style="display:inline-block;padding:12px 20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#FFFFFF;text-decoration:none;border-radius:8px;">Atur ulang kata sandi · Reset password</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 28px 0 28px;font-family:Arial,Helvetica,sans-serif;color:#1D3451;">
+                <h2 style="margin:0 0 8px 0;font-size:17px;line-height:1.3;color:#1D3451;">Reset your password</h2>
+                <p style="margin:0;font-size:15px;line-height:1.6;color:#1D3451;">
+                  We received a request to reset the password of your NPLC account. Press the button above to choose a new password.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 28px 28px 28px;font-family:Arial,Helvetica,sans-serif;">
+                <p style="margin:0;padding-top:16px;border-top:1px solid #D9E1F0;font-size:13px;line-height:1.6;color:#56657D;">
+                  Bukan kamu yang meminta? Abaikan email ini; kata sandimu tidak berubah.<br />
+                  Didn't ask for this? Ignore this email; your password stays the same.
+                </p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin:16px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#56657D;">
+            National Programming &amp; Logic Competition · Universitas Ciputra
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
