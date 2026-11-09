@@ -84,12 +84,15 @@ export function NextUpCard({ team, lang, event, mainEvent, contestOpen, rallySta
             </a>
           </li>
         )}
-        <li>
-          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" className={todoLink}>
-            <InstagramIcon aria-hidden className="text-primary size-4 shrink-0" />
-            {t("dashboard.nextInstagram", { handle: INSTAGRAM.handle })}
-          </a>
-        </li>
+        {/* With a WhatsApp group the Instagram link sits in that block, under the status history. */}
+        {!waGroupAvailable && (
+          <li>
+            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" className={todoLink}>
+              <InstagramIcon aria-hidden className="text-primary size-4 shrink-0" />
+              {t("dashboard.nextInstagram", { handle: INSTAGRAM.handle })}
+            </a>
+          </li>
+        )}
       </ul>
 
       <div className="border-border flex flex-wrap items-center justify-between gap-3 border-t pt-4">

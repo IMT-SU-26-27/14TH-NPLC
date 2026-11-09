@@ -11,7 +11,6 @@ import { pushEnabledFor } from "@/lib/push/config";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AccountCard } from "@/features/dashboard/components/account-card";
 import { AccountNote } from "@/features/dashboard/components/account-note";
-import { WaGroupCard } from "@/features/dashboard/components/wa-group-card";
 import { DashboardEmptyCard } from "@/features/dashboard/components/dashboard-empty-card";
 import { TeamCard } from "@/features/dashboard/components/team-card";
 import { RegistrationRealtime } from "@/features/dashboard/components/registration-realtime";
@@ -73,7 +72,7 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
                 rallyStatus={item.id === rallyTeam?.id ? rallyStatus : null}
                 nextEvent={item.status === "accepted" ? nextEventFor(events, item.competition.type, today) : null}
                 mainEvent={item.status === "accepted" ? lastEventFor(events, item.competition.type) : null}
-                waGroupAvailable={item.status === "accepted" && waGroup !== null}
+                waGroup={item.status === "accepted" ? waGroup : null}
                 qrisUrl={item.competition.qris_public_id ? publicImageUrl(item.competition.qris_public_id) : null}
               />
             ))
@@ -83,7 +82,6 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
         <div className="space-y-5">
           <AccountCard user={user} lang={lang} />
           {team && <AccountNote teamName={team.team_name} lang={lang} />}
-          {waGroup && <WaGroupCard group={waGroup} lang={lang} />}
         </div>
       </div>
 
