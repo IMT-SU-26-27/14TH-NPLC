@@ -20,6 +20,7 @@ export const en: Dictionary = {
   common: {
     cancel: "Cancel",
     save: "Save",
+    reload: "Reload",
     delete: "Delete",
     back: "Back",
     copied: "Copied",
@@ -213,12 +214,52 @@ export const en: Dictionary = {
     faq: {
       label: "FAQ",
       title: "Frequently asked questions",
-      oneCompetitionQ: "Can one account enter two competitions?",
-      oneCompetitionA: "No. Each account can be registered in one competition only, so decide before you register.",
-      joinTeamQ: "How do members join a team?",
-      joinTeamA: "Each member creates their own account, then joins with the team code shown on the leader's dashboard.",
-      paymentQ: "How do I pay the registration fee?",
-      paymentA: "Payment is through blu by BCA only. The account number is shown on the registration form, and you upload the proof of payment on the same form.",
+      items: [
+        {
+          q: "What is Logic Rally Games?",
+          a: "The 14th NPLC's second competition category: logic games for senior high school students (SMA/SMK/MA or equivalent). Each team plays at several rally posts, and the four teams with the most points go on to the final.",
+        },
+        {
+          q: "How many members are on a team?",
+          a: "Competitive Programming: 1–3 people. Logic Rally Games: 3 participants from the same school. A school may send more than one team.",
+        },
+        {
+          q: "When does registration open and close?",
+          a: "Registration opens on 10 November 2026 and closes on 10 January 2027. The early-bird price applies until 23 November 2026.",
+        },
+        {
+          q: "When and where is the Rally Games held?",
+          a: "In person at Universitas Ciputra Surabaya, on 29 January 2027.",
+        },
+        {
+          q: "Can a participant join more than one team or competition?",
+          a: "No. Each participant can be on only one team, in one competition, at the 14th NPLC.",
+        },
+        {
+          q: "What if a Rally Games team member can't attend?",
+          a: "All three team members must attend. Members can't be replaced by someone else, and a team with a member missing is disqualified.",
+        },
+        {
+          q: "Is there a Rally Games technical meeting?",
+          a: "Yes. The technical meeting is held online on 25 January 2027, and at least one member of every team must attend.",
+        },
+        {
+          q: "What is the Rally Games dress code?",
+          a: "Your own school's PE uniform. Trousers must reach at least the knee; if your PE trousers are shorter, wear other modest trousers that reach the knee.",
+        },
+        {
+          q: "How do I join the participants' group?",
+          a: "The group link appears on the NPLC website once an admin has verified your registration.",
+        },
+        {
+          q: "How do members join a team?",
+          a: "Each member creates their own account, then joins with the team code or the invite link shown on the leader's dashboard.",
+        },
+        {
+          q: "How do I pay the registration fee?",
+          a: "The team leader transfers the fee to the blu by BCA account 003202798281 (Angga Dhammika Jaya), then uploads the transfer receipt on the registration form. Each team pays once.",
+        },
+      ],
     },
     contact: {
       label: "Contact",
@@ -317,6 +358,9 @@ export const en: Dictionary = {
   rally: {
     session: {
       title: "Rally session",
+      endLabel: "Rally Games end time (WIB)",
+      endHint: "The participants' leaderboard closes on its own one hour before this time. Leave it empty if not needed.",
+      endSaved: "End time saved",
       lead: "LOs can record and undo results only while the session is open. Admins can correct at any time.",
       status: {
         not_open: "Not open yet",
@@ -363,6 +407,9 @@ export const en: Dictionary = {
       frozen: "These are the standings when it was frozen on {date}. Scores keep counting.",
       frozenAdminTitle: "Frozen for participants",
       frozenAdmin: "Participants see the standings frozen on {date}. You see the latest scores.",
+      frozenAutoTitle: "Leaderboard closed",
+      frozenAuto: "The leaderboard is closed for the last hour. Results are announced at the closing.",
+      autoFreezeAdmin: "For participants, the leaderboard closes on its own on {date} (one hour before the end). You still see the latest scores.",
       freeze: "Freeze",
       unfreeze: "Unfreeze",
       freezeTitle: "Freeze the leaderboard?",
@@ -617,17 +664,7 @@ export const en: Dictionary = {
     inviteLink: "Invite link",
     inviteCopied: "Invite link copied",
     remove: "Remove",
-    leave: "Leave",
-    removeTitle: "Remove {name}?",
-    removeDescription: "They can rejoin with the team code while the team is still open.",
-    leaveTitle: "Leave this team?",
-    leaveDescription: "You can join again later with the team code while the team is still open.",
-    leaveConfirm: "Leave team",
-    memberRemoved: "Member removed",
-    youLeft: "You left the team",
-    membersLocked: "Changes to members after acceptance go through the contact person.",
-    accepted: "Your registration was accepted",
-    rejected: "Your registration was rejected. See the reason on your dashboard.",
+    membersViaContact: "Need to change a member? Contact the competition's contact person.",
   },
   timeline: {
     created: "Team created",
@@ -1043,6 +1080,9 @@ export const en: Dictionary = {
     frozen: "These are the standings when it was frozen on {date}. Every submission is still scored; the latest standings appear once the committee unfreezes it.",
     frozenAdminTitle: "Frozen for participants",
     frozenAdmin: "Participants see the standings from when it was frozen on {date}. You're seeing the latest scores.",
+    frozenAutoTitle: "Leaderboard closed",
+    frozenAuto: "The leaderboard is closed for the last hour. Results are announced at the closing.",
+    autoFreezeAdmin: "For participants, the leaderboard closes on its own on {date} (one hour before the end). You still see the latest scores.",
     noScores: "No teams on the leaderboard yet.",
     timePaused: "Paused, left",
     timeUp: "Time's up",
@@ -1368,8 +1408,7 @@ export const en: Dictionary = {
     leaderProtected: "The team leader can't be removed",
     teamSize: "The team doesn't have the required number of members",
     proofRequired: "Upload the payment proof before submitting",
-    cannotRemoveMember: "You can't remove this member right now",
-    membersLocked: "The team is accepted, so its members can't be changed here. Contact the competition's contact person.",
+    membersViaContact: "Member changes go through the competition's contact person.",
     paymentAlreadySubmitted: "Payment was already submitted for this team",
     uploadMissing: "We couldn't find that upload. Try uploading again.",
     uploadTooLarge: "The file is larger than 5 MB, so it was rejected and deleted. Upload a smaller file.",

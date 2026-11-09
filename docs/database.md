@@ -18,13 +18,25 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261109120000_team_quota_and_wa_group.sql` | `competitions.max_teams` (team quota, null = no limit; every team that is not rejected counts) enforced in `create_registration` and when a rejected team comes back, with the competition row locked; `competitions.wa_group_url` (participants' WhatsApp group), hidden from the API by column privileges; `competition_team_counts()`, `my_wa_group()`, `admin_competition_wa_group_url()` |
 | `20261109140000_timeline_event_competition.sql` | `timeline_events.competition_type` (null = every competition): which competition an event is for, so an accepted team's dashboard shows its own next date |
 | `20261110090000_lock_accepted_team_members.sql` | Only admins delete a registration (the leader no longer can, in any status). Leaving a team or removing a member is closed once the team is `accepted` (`private.registration_accepted`); admins can still change members |
+| `20261110200000_members_admin_only.sql` | Only admins remove a member, in every status: leaders no longer remove members and members no longer leave (policy "members: admin removes"). `private.registration_accepted` is dropped. Joining with the code is unchanged |
+| `20261110210000_registration_events_without_realtime.sql` | `registration_events` leaves the `supabase_realtime` publication: realtime is for the CP and Rally contests only. The dashboard and the admin registrations list refresh when the tab is opened again (at most every 30 s) or with "Muat ulang" |
+| `20261110220000_auto_freeze_leaderboards.sql` | The participants' leaderboard (CP and Rally) closes on its own `private.leaderboard_freeze_minutes()` (60, FREEZE_MINUTES) before the end: `cp_sessions.scheduled_end_at`, and the new `rally_sessions.scheduled_end_at` set in Admin → Rally. New columns `leaderboard_frozen_auto` and `leaderboard_released_at` on both session tables; `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` for the pages |
 
-Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
+Where migrations are applied, and how each database keeps track:
+
+| Database | How migrations run | History |
+|---|---|---|
+| DEV (supabase.com) | `pnpm sb db push --linked` | `supabase_migrations.schema_migrations` |
+| Production (self-hosted, `supabase-db` container on the VPS) | **By hand with psql**, one file at a time in file-name order, each in its own transaction | **None**: production has no `supabase_migrations` schema. To see whether a migration is applied, check for the objects it creates (a column, function or policy). |
+
+Production gets `supabase/production-content.sql` for its public content, not `seed.sql` (see `docs/deploy.md`). To apply a new migration there, take a backup first, then:
 
 ```bash
 docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 --single-transaction < supabase/migrations/<file>.sql
-docker exec supabase-db psql -U postgres -d postgres -c "insert into supabase_migrations.schema_migrations (version, name) values ('<version>', '<name>'); notify pgrst, 'reload schema';"
+docker exec supabase-db psql -U postgres -d postgres -c "notify pgrst, 'reload schema';"
 ```
+
+The `notify` makes the API (PostgREST) see new columns and functions straight away.
 
 After a schema change, regenerate the TypeScript types in `src/types/database.ts` (both Supabase clients use them):
 
@@ -57,7 +69,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | `rally_posts` | One post of the competition of type `logic` (Category 2): `name`, `kind` (`physical` or `digital`, recorded the same way), `location`, `points_win`, `points_lose`, `points_draw` (placeholders 100, 25 and 50 until the Divisi Event sets them), `allow_draw`, `is_active`. Names are unique per competition. |
 | `rally_post_assignments` | Which LO runs which post. A trigger accepts only accounts with the role `lo`. |
 | `rally_results` | One team's result at one post: `outcome` (`win`, `lose`, `draw`), `points` copied from the post when recorded, who recorded it and, after an admin correction, who corrected it (`corrected_by`, `corrected_at`; the original `recorded_by` and `recorded_at` stay). Never deleted: undo and admin changes fill `voided_at`. For now one active result per team per post (`rally_results_one_active`); replays would change this index. |
-| `rally_sessions` | One per Rally competition: `status` (`not_open`, `open`, `closed`) and `leaderboard_frozen_at`. LOs can look up, record and undo only while `open`; admins can correct at any time. |
+| `rally_sessions` | One per Rally competition: `status` (`not_open`, `open`, `closed`), `leaderboard_frozen_at`, `scheduled_end_at` (when the Rally ends, set by an admin; only used for the last-hour freeze), `leaderboard_frozen_auto` and `leaderboard_released_at` (see "Last-hour freeze"). LOs can look up, record and undo only while `open`; admins can correct at any time. |
 | `rally_scores` | One row per accepted team with `total_points`, `posts_finished` and `last_result_at`, kept up to date by triggers from active results only. The order is defined in `src/lib/rally/ranking.ts`. |
 | `rally_leaderboard_snapshots` | Copy of `rally_scores` taken when an admin freezes the leaderboard. Participants read this while frozen; admins always read the live scores. |
 | `rally_result_log` | Append-only audit log: action, who, when, team, post, old and new outcome and points, reason. Admins read it; nobody can change it. |
@@ -100,7 +112,7 @@ All changes to results go through these functions, and direct writes are refused
 | `cp_submission_results` | The result of each test case in a submission. Never stores the expected output of hidden tests. |
 | `cp_problem_scores` | A team's best score on each problem, and whether it solved it. |
 | `cp_scores` | The leaderboard: one row per accepted CP team, with total points, problems solved and `last_improved_at` for tie-breaks. |
-| `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when an admin freezes the leaderboard (`cp_sessions.leaderboard_frozen_at` set), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
+| `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when the leaderboard is frozen (`cp_sessions.leaderboard_frozen_at` set, by an admin or by the last-hour cut-off), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
 
 ### Views and functions
 
@@ -133,7 +145,7 @@ members join with the referral code at any point while the competition's registr
 
 - Each person gives the link to their twibbon post on Instagram when registering or joining (`https://www.instagram.com/p|reel|reels/...`). It is required only once the competition has a `twibbon_url`. Before 2026-11-08 a screenshot was uploaded instead (`14th-nplc/twibbon-proofs/<user id>/`); those stay. Members who joined before the link was set keep an empty proof, and admins see that in the registration detail.
 - Paying is part of registering: the register form takes the team details and the payment proof together. The proof is uploaded to Cloudinary first (`14th-nplc/payment-proofs/new/<user id>/`), then `create_registration()` creates the team as `under_review` with the referral code.
-- Members join with the code, and the leader can remove members (or a member can leave), while the competition's registration window is open, whatever the status. Nobody, admins included, can remove the leader row.
+- Members join with the code while the competition's registration window is open, whatever the status, also after the team is accepted. Only admins remove members (since 2026-11-10); leaders can't remove members and members can't leave, so changes go through the competition's contact person. Nobody, admins included, can remove the leader row.
 - Participants can't change the team name, competition or referral code. Admins can fix the name.
 - The minimum team size is checked when an admin accepts: accepting a team with too few members is refused. The maximum is enforced on every join.
 - After a rejection the leader uploads a new proof, which sends the team back to `under_review`.
@@ -146,7 +158,7 @@ members join with the referral code at any point while the competition's registr
 |---|---|---|
 | Active competitions | Everyone, including logged-out visitors, every column except `wa_group_url` | All columns except `wa_group_url` (read it with `admin_competition_wa_group_url`) |
 | Competition WhatsApp group link | Members of an accepted team of that competition, through `my_wa_group()` | Through `admin_competition_wa_group_url()`; edited in the competition form |
-| Registrations, members, timeline | Only their own team. They cannot delete their team; members can leave (or be removed by the leader) only until the team is accepted | All, full edit, including deleting teams and changing members of accepted teams |
+| Registrations, members, timeline | Only their own team. They cannot delete their team or remove members, and members cannot leave | All, full edit, including deleting teams and changing members of accepted teams |
 | CP session status | Members of accepted CP teams | All, start/end |
 | CP problems | Members of accepted CP teams, **only while the contest is live** | All |
 | CP test cases | Sample cases only, only while live | All |
@@ -177,19 +189,30 @@ score = points × (passed / total) × efficiency
 - Only a team's best submission per problem counts, so a worse later submission never lowers the score.
 - Leaderboard order: `total_points` descending, then `last_improved_at` ascending (whoever got there first).
 
+## Last-hour freeze
+
+Participants stop seeing live standings `private.leaderboard_freeze_minutes()` minutes (60) before the end of the CP contest (`cp_sessions.scheduled_end_at`) and of the Rally Games (`rally_sessions.scheduled_end_at`). Admins always see live scores.
+
+- There is no scheduler. The first score change after the cut-off freezes the leaderboard **before** it is applied (`cp_scores_auto_freeze` / `rally_scores_auto_freeze`), and every leaderboard page calls `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` when it loads. Either way the snapshot holds the standings exactly as they were at the cut-off.
+- The freeze is the normal one (`leaderboard_frozen_at` = the cut-off, snapshot table, RLS, participant realtime off), with `leaderboard_frozen_auto = true` so participants read "closed for the last hour".
+- An open page reloads itself at the cut-off (`use-refresh-at`).
+- An admin can unfreeze as usual. Unfreezing after the cut-off sets `leaderboard_released_at`, so it is not frozen again until a new run (a new start of the CP contest, opening the Rally again, or a new Rally end time).
+- Applies while the CP contest is `live`/`paused` and while the Rally session is `open`. Resuming a paused CP contest moves `scheduled_end_at`, and the cut-off with it.
+
 ## Realtime
 
-These tables are in the `supabase_realtime` publication:
+Realtime is used only during the contests (CP and Rally), because Supabase, Judge0 and the site share one 2-core server. These tables are in the `supabase_realtime` publication:
 
 | Table | Purpose |
 |---|---|
 | `cp_sessions` | Waiting room moves into the contest when the admin presses start or resume; the contest page goes back to the waiting room when it is paused, and locks when it ends |
 | `cp_scores` | Live leaderboard |
-| `registration_events` | Participant dashboard updates when the admin accepts or rejects |
 | `rally_sessions` | LO screen follows the session; leaderboards refresh on freeze and unfreeze |
 | `rally_scores` | Live Rally leaderboard |
 
 Realtime respects the policies above, so each user only receives changes they're allowed to read.
+
+Registration pages have no realtime: the participant dashboard and the admin registrations list refresh when the tab becomes visible again (at most every 30 seconds, `use-refresh-on-focus`) and have a "Muat ulang" button.
 
 ## Web push notifications
 

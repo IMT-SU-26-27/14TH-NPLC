@@ -98,6 +98,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // sw.js and the manifest must be served at the root, without a language prefix.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm)$).*)"],
+  // sw.js and the manifest must be served at the root, without a language prefix. /email/ holds the auth email
+  // templates that Supabase Auth (GoTrue) fetches over HTTP, so they are served as plain files too.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|email/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm)$).*)"],
 };

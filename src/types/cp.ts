@@ -91,6 +91,8 @@ export type ContestContext = {
   registrationId: string | null; // null for admins previewing
   teamName: string | null;
   session: CpSession;
+  // When the participants' leaderboard closes for the last hour (null: not on its own).
+  autoFreezeAt: string | null;
 };
 
 export type ProblemView = Pick<
@@ -124,6 +126,7 @@ export type AdminContest = {
   competitionId: string;
   competitionName: string;
   session: CpSession;
+  autoFreezeAt: string | null;
   problems: AdminProblemRow[];
 };
 
@@ -184,6 +187,10 @@ export type LeaderboardTableProps = {
   // Who is looking: admins always get live scores; participants get the snapshot while frozen.
   viewer: "admin" | "participant";
   frozenAt: string | null;
+  // The current freeze came from the last-hour cut-off, not from an admin.
+  frozenAuto: boolean;
+  // When the participants' leaderboard closes on its own (null: not on its own).
+  autoFreezeAt: string | null;
 };
 
 export type LeaderboardFreezeButtonProps = {

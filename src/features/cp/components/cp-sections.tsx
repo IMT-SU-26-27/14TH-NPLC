@@ -85,6 +85,8 @@ export async function ContestLeaderboard({ lang }: LangProps) {
       highlightRegistrationId={context.registrationId}
       viewer={viewer}
       frozenAt={frozenAt}
+      frozenAuto={context.session.leaderboard_frozen_auto}
+      autoFreezeAt={context.autoFreezeAt}
     />
   );
 }

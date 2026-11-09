@@ -13,9 +13,10 @@ import { RallyTeamQr } from "@/features/rally/components/rally-team-qr";
 import { RallySessionRefresh } from "@/features/dashboard/components/rally-session-refresh";
 import { NextUpCard } from "@/features/dashboard/components/next-up-card";
 import { DashboardNote } from "@/features/dashboard/components/dashboard-note";
+import { WaGroupCard } from "@/features/dashboard/components/wa-group-card";
 import type { TeamCardProps } from "@/types/registration";
 
-export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStatus, nextEvent, mainEvent, waGroupAvailable }: TeamCardProps) {
+export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStatus, nextEvent, mainEvent, waGroup }: TeamCardProps) {
   const t = getT(lang);
   const isLeader = team.leader_id === userId;
   // Members join and can be removed while the competition is open; payment is only re-sent after a rejection.
@@ -80,7 +81,7 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStat
           mainEvent={mainEvent}
           contestOpen={isCp && contestOpen}
           rallyStatus={rallyStatus}
-          waGroupAvailable={waGroupAvailable}
+          waGroupAvailable={waGroup !== null}
         />
       )}
 
@@ -95,10 +96,11 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStat
         <section className="space-y-3.5">
           <h3 className={label}>{t("dashboard.progress")}</h3>
           <TeamTimeline team={team} lang={lang} />
+          {waGroup && <WaGroupCard group={waGroup} lang={lang} />}
         </section>
         <section className="space-y-3">
           <h3 className={label}>{t("dashboard.members", { count: team.members.length, max: team.competition.max_members })}</h3>
-          <TeamMembers team={team} userId={userId} canEdit={membershipOpen} />
+          <TeamMembers team={team} userId={userId} />
           {membershipOpen && <ReferralCode code={team.referral_code} />}
         </section>
       </div>

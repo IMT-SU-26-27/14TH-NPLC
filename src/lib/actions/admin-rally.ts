@@ -16,6 +16,7 @@ import {
   rallyDeleteResultSchema,
   rallyFreezeSchema,
   rallyPostSchema,
+  rallyScheduledEndSchema,
   rallySessionStatusSchema,
 } from "@/lib/validations/rally";
 import type { ActionResult, FormState } from "@/types";
@@ -155,6 +156,26 @@ export async function setRallySessionStatus(competitionId: string, status: strin
 
   refresh();
   return { ok: true, data: undefined, message: `rally.session.changed.${parsed.data.status}` };
+}
+
+// The Rally's end time, used for the participants' leaderboard: it closes on its own one hour before.
+export async function setRallyScheduledEnd(_prev: FormState, formData: FormData): Promise<FormState> {
+  if (!(await isAdmin())) return errorState(NOT_ADMIN);
+  const parsed = rallyScheduledEndSchema.safeParse({
+    competitionId: formData.get("competitionId"),
+    scheduledEndAt: formData.get("scheduledEndAt") ?? "",
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("rally_sessions")
+    .update({ scheduled_end_at: parsed.data.scheduledEndAt })
+    .eq("competition_id", parsed.data.competitionId);
+  if (error) return errorState(databaseErrorMessage(error));
+
+  refresh();
+  return successState("rally.session.endSaved");
 }
 
 // Freeze: participants keep seeing the standings from this moment while results keep counting. Admins always see live scores.

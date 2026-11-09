@@ -52,10 +52,12 @@ export async function getContestContext(isAdmin: boolean): Promise<ContestContex
   }
   if (!competitionId) return null;
 
+  // Closes the participants' leaderboard for the last hour if that time has come (before the session is read).
+  const { data: autoFreezeAt } = await supabase.rpc("cp_leaderboard_freeze_check", { p_competition_id: competitionId });
   const { data: session } = await supabase.from("cp_sessions").select("*").eq("competition_id", competitionId).maybeSingle();
   if (!session) return null;
 
-  return { competitionId, registrationId, teamName, session };
+  return { competitionId, registrationId, teamName, session, autoFreezeAt: autoFreezeAt ?? null };
 }
 
 export async function listContestProblems(competitionId: string, registrationId: string | null): Promise<ContestProblemListItem[]> {
@@ -134,6 +136,7 @@ export async function listCpCompetitions(): Promise<CompetitionOption[]> {
 
 export async function getAdminContest(competitionId: string): Promise<AdminContest | null> {
   const supabase = await createSupabaseServerClient();
+  const { data: autoFreezeAt } = await supabase.rpc("cp_leaderboard_freeze_check", { p_competition_id: competitionId });
   const [{ data: competition }, { data: session }, { data: problems }] = await Promise.all([
     supabase.from("competitions").select("id, name").eq("id", competitionId).maybeSingle(),
     supabase.from("cp_sessions").select("*").eq("competition_id", competitionId).maybeSingle(),
@@ -149,6 +152,7 @@ export async function getAdminContest(competitionId: string): Promise<AdminConte
     competitionId: competition.id,
     competitionName: competition.name,
     session,
+    autoFreezeAt: autoFreezeAt ?? null,
     problems: (problems ?? []).map(({ cp_test_cases, ...p }) => ({
       ...p,
       testCaseCount: (cp_test_cases as unknown as { count: number }[])[0]?.count ?? 0,

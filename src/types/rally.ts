@@ -191,7 +191,13 @@ export type RallyResultActionsProps = {
 };
 
 export type RallySessionStatus = Enums<"rally_session_status">;
-export type RallySession = Pick<Tables<"rally_sessions">, "competition_id" | "status" | "leaderboard_frozen_at">;
+export type RallySession = Pick<
+  Tables<"rally_sessions">,
+  "competition_id" | "status" | "leaderboard_frozen_at" | "leaderboard_frozen_auto" | "scheduled_end_at"
+> & {
+  // When the participants' leaderboard closes for the last hour (null: not on its own).
+  autoFreezeAt: string | null;
+};
 export type RallyScore = Pick<Tables<"rally_scores">, "registration_id" | "team_name" | "school" | "total_points" | "posts_finished" | "last_result_at">;
 
 export type RallySessionStatusButtonProps = {
@@ -208,7 +214,15 @@ export type RallyLeaderboardTableProps = {
   initialRows: RallyScore[];
   viewer: "admin" | "participant";
   frozenAt: string | null;
+  // The current freeze came from the last-hour cut-off, not from an admin.
+  frozenAuto: boolean;
+  autoFreezeAt: string | null;
   highlightRegistrationId?: string;
+};
+
+export type RallyEndTimeFormProps = {
+  competitionId: string;
+  scheduledEndAt: string | null;
 };
 
 export type RallyFreezeButtonProps = {
