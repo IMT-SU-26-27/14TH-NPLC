@@ -63,6 +63,12 @@ export function CompetitionForm({ competition }: CompetitionFormProps) {
           <Textarea id="description" name="description" defaultValue={competition?.description} rows={3} />
           <FieldError errors={fieldErrors(errors.description)} />
         </Field>
+        <Field data-invalid={!!errors.descriptionEn}>
+          <FieldLabel htmlFor="descriptionEn">{t("admin.competitions.descriptionEn")}</FieldLabel>
+          <Textarea id="descriptionEn" name="descriptionEn" defaultValue={competition?.description_en ?? ""} rows={3} />
+          <FieldDescription>{t("admin.competitions.descriptionEnHint")}</FieldDescription>
+          <FieldError errors={fieldErrors(errors.descriptionEn)} />
+        </Field>
         <div className="grid gap-6 sm:grid-cols-3">
           <Field data-invalid={!!errors.minMembers}>
             <FieldLabel htmlFor="minMembers">{t("admin.competitions.minMembers")}</FieldLabel>
@@ -79,6 +85,26 @@ export function CompetitionForm({ competition }: CompetitionFormProps) {
             <FieldLabel htmlFor="fee">{t("admin.competitions.fee")}</FieldLabel>
             <Input id="fee" name="fee" type="number" min={0} step={1000} defaultValue={competition?.fee ?? 0} aria-invalid={!!errors.fee} required />
             <FieldError errors={fieldErrors(errors.fee)} />
+          </Field>
+        </div>
+        <Field data-invalid={!!errors.twibbonUrl}>
+          <FieldLabel htmlFor="twibbonUrl">{t("admin.competitions.twibbonUrl")}</FieldLabel>
+          <Input id="twibbonUrl" name="twibbonUrl" type="url" placeholder="https://" defaultValue={competition?.twibbon_url ?? ""} aria-invalid={!!errors.twibbonUrl} />
+          <FieldDescription>{t("admin.competitions.twibbonUrlHint")}</FieldDescription>
+          <FieldError errors={fieldErrors(errors.twibbonUrl)} />
+        </Field>
+        <div className="grid gap-6 sm:grid-cols-[minmax(0,14rem)_1fr]">
+          <Field data-invalid={!!errors.maxTeams}>
+            <FieldLabel htmlFor="maxTeams">{t("admin.competitions.maxTeams")}</FieldLabel>
+            <Input id="maxTeams" name="maxTeams" type="number" min={1} step={1} defaultValue={competition?.max_teams ?? ""} aria-invalid={!!errors.maxTeams} />
+            <FieldDescription>{t("admin.competitions.maxTeamsHint")}</FieldDescription>
+            <FieldError errors={fieldErrors(errors.maxTeams)} />
+          </Field>
+          <Field data-invalid={!!errors.waGroupUrl}>
+            <FieldLabel htmlFor="waGroupUrl">{t("admin.competitions.waGroupUrl")}</FieldLabel>
+            <Input id="waGroupUrl" name="waGroupUrl" type="url" placeholder="https://chat.whatsapp.com/…" defaultValue={competition?.wa_group_url ?? ""} aria-invalid={!!errors.waGroupUrl} />
+            <FieldDescription>{t("admin.competitions.waGroupUrlHint")}</FieldDescription>
+            <FieldError errors={fieldErrors(errors.waGroupUrl)} />
           </Field>
         </div>
         <div className="grid gap-6 sm:grid-cols-2">

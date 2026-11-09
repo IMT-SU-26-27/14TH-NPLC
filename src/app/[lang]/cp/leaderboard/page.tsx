@@ -24,9 +24,9 @@ export default async function Page({ params }: LangPageProps) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-1">
           <h1 className="font-heading text-2xl font-semibold tracking-tight">{t("cp.leaderboard")}</h1>
-          <p className="text-muted-foreground">{t("cp.leaderboardLead")}</p>
+          <p className="text-muted-foreground text-sm">{t("cp.leaderboardLead")}</p>
         </div>
-        <Link href={localePath(lang, "/cp")} className={buttonVariants({ variant: "outline" })}>
+        <Link href={localePath(lang, "/cp")} className={buttonVariants({ variant: "ghost" })}>
           <ArrowLeftIcon />
           {t("cp.backToProblems")}
         </Link>

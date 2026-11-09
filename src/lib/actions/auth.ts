@@ -17,15 +17,17 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   if (!parsed.success) return fieldErrorState(parsed.error);
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
-    if (error.code === "email_not_confirmed") {
-      return errorState("auth.errors.emailNotConfirmed");
-    }
+    // Only accounts made while "Confirm email" was still on. No confirmation email is sent, so the committee activates them.
+    if (error.code === "email_not_confirmed") return errorState("auth.errors.notActivated");
     return errorState("auth.errors.wrongCredentials");
   }
 
-  redirect(localePath(await getRequestLocale(), nextPathSchema.parse(formData.get("next"))));
+  // LO accounts only have the post pages. Going there directly keeps the URL right, unlike a second redirect from the proxy.
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+  const target = profile?.role === "lo" ? "/lo" : nextPathSchema.parse(formData.get("next"));
+  redirect(localePath(await getRequestLocale(), target));
 }
 
 export async function signUp(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -37,16 +39,12 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
 
-  const origin = (await headers()).get("origin") ?? "";
   const next = localePath(await getRequestLocale(), nextPathSchema.parse(formData.get("next")));
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    options: {
-      data: { full_name: parsed.data.fullName },
-      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
-    },
+    options: { data: { full_name: parsed.data.fullName } },
   });
 
   if (error) {
@@ -55,10 +53,10 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
     return errorState(error.message);
   }
 
-  // Email confirmation off: the user is signed in straight away.
-  if (data.session) redirect(next);
-
-  return { status: "success", message: "auth.checkEmail", params: { email: parsed.data.email } };
+  // "Confirm email" is off in Supabase Auth, so sign-up returns a session and the user is signed in straight away.
+  // No session means Auth still asks for confirmation, which this site never sends (SMTP is for password resets only).
+  if (!data.session) return errorState("auth.errors.notActivated");
+  redirect(next);
 }
 
 export async function signOut(): Promise<void> {
@@ -67,7 +65,7 @@ export async function signOut(): Promise<void> {
   redirect(localePath(await getRequestLocale(), "/"));
 }
 
-// Always reports success, so the form can't be used to find out which emails have an account.
+// The only email the site sends. Always reports success, so the form can't be used to find out which emails have an account.
 export async function requestPasswordReset(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = forgotPasswordSchema.safeParse({ email: formData.get("email") });
   if (!parsed.success) return fieldErrorState(parsed.error);

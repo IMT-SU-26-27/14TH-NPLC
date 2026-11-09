@@ -1,21 +1,13 @@
-import { ChevronsUpDownIcon, CircleCheckIcon, CircleDashedIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
+import { HistoryIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, memberRange } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { StepMarker } from "@/features/dashboard/components/step-marker";
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
-import type { TeamTimelineProps } from "@/types/registration";
-
-type StepState = "done" | "current" | "upcoming" | "failed";
-
-const ICON = {
-  done: CircleCheckIcon,
-  current: CircleDotIcon,
-  upcoming: CircleDashedIcon,
-  failed: CircleXIcon,
-} as const;
+import type { TeamTimelineProps, TimelineStep } from "@/types/registration";
 
 // Event notes written by the database in English; shown translated when we know them.
 const EVENT_NOTE: Record<string, string> = {
@@ -35,17 +27,19 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
   const paymentPending = status === "pending_payment" || status === "rejected";
 
   // Registering means paying: the team exists once its payment proof is sent.
-  const steps: { key: string; title: string; description: string; state: StepState }[] = [
+  const steps: TimelineStep[] = [
     {
       key: "registered",
       title: t("timeline.registered"),
-      description: paymentPending ? t("timeline.paidPending") : formatDateTime(team.payment_submitted_at ?? team.created_at, lang),
+      description: paymentPending
+        ? t(team.competition.payment_method === "bank_transfer" ? "timeline.paidPendingBank" : "timeline.paidPendingQris")
+        : formatDateTime(team.payment_submitted_at ?? team.created_at, lang),
       state: paymentPending ? "current" : "done",
     },
     {
       key: "joined",
       title: t("timeline.joined"),
-      description: `${t("timeline.joinedDescription", { count: memberCount, min, max })}${teamComplete ? "" : ` · ${t("timeline.joinedHint", { min })}`}`,
+      description: `${t("timeline.joinedDescription", { count: memberCount, range: memberRange(min, max) })}${teamComplete ? "" : ` · ${t("timeline.joinedHint", { min })}`}`,
       state: teamComplete ? "done" : "current",
     },
     {
@@ -57,9 +51,10 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
     {
       key: "final",
       title: status === "rejected" ? t("timeline.rejected") : t("timeline.accepted"),
+      // The reason itself is shown once, in the alert under the team name.
       description:
         status === "rejected"
-          ? (team.rejection_reason ?? "")
+          ? t("timeline.rejectedDescription")
           : status === "accepted"
             ? t("timeline.acceptedDescription")
             : t("timeline.final"),
@@ -69,44 +64,44 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
 
   return (
     <div className="space-y-4">
-      <ol className="space-y-4">
-        {steps.map((step, i) => {
-          const Icon = ICON[step.state];
-          return (
-            <li key={step.key} className="relative flex gap-3" aria-current={step.state === "current" ? "step" : undefined}>
-              {i < steps.length - 1 && (
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute top-6 left-2.5 h-[calc(100%-0.5rem)] w-px",
-                    step.state === "done" ? "bg-primary" : "bg-border",
-                  )}
-                />
-              )}
-              <Icon
-                className={cn(
-                  "relative size-5 shrink-0",
-                  step.state === "done" && "text-primary",
-                  step.state === "current" && "text-primary",
-                  step.state === "upcoming" && "text-muted-foreground",
-                  step.state === "failed" && "text-destructive",
-                )}
+      <ol>
+        {steps.map((step, i) => (
+          <li key={step.key} className="relative flex gap-3 pb-4 last:pb-0" aria-current={step.state === "current" ? "step" : undefined}>
+            {i < steps.length - 1 && (
+              <span
+                aria-hidden
+                className={cn("absolute top-6 bottom-0 left-[11px] w-0.5", step.state === "done" ? "bg-(image:--tagline-gradient)" : "bg-border")}
               />
-              <div className="space-y-0.5">
-                <p className={cn("font-medium", step.state === "upcoming" && "text-muted-foreground")}>{step.title}</p>
-                {step.description && (
-                  <p className={cn("text-muted-foreground text-sm", step.state === "failed" && "text-destructive")}>{step.description}</p>
-                )}
-              </div>
-            </li>
-          );
-        })}
+            )}
+            <StepMarker state={step.state} final={i === steps.length - 1} />
+            <div className="min-w-0 text-sm">
+              <p className={cn("font-medium", step.state === "upcoming" && "text-muted-foreground")}>{step.title}</p>
+              {step.description && (
+                <p className={cn("text-muted-foreground", step.state === "failed" && "text-destructive")}>{step.description}</p>
+              )}
+            </div>
+          </li>
+        ))}
       </ol>
+
+      {/* One segment per step: filled once the step is done. */}
+      <div aria-hidden className="flex gap-1">
+        {steps.map((step, i) => (
+          <span
+            key={step.key}
+            className={cn(
+              "h-2 flex-1 rounded-full",
+              step.state !== "done" && "bg-primary/15",
+              step.state === "done" && (i === steps.length - 1 ? "bg-highlight" : "bg-(image:--tagline-gradient)"),
+            )}
+          />
+        ))}
+      </div>
 
       {team.events.length > 0 && (
         <Collapsible>
           <CollapsibleTrigger render={<Button variant="ghost" size="sm" />}>
-            <ChevronsUpDownIcon />
+            <HistoryIcon />
             {t("timeline.history", { count: team.events.length })}
           </CollapsibleTrigger>
           <CollapsibleContent>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { schoolSchema } from "@/lib/validations/registration";
 
 export const REGISTRATION_STATUSES = ["pending_payment", "under_review", "accepted", "rejected"] as const;
 
@@ -34,6 +35,7 @@ export const updateTeamNameSchema = z.object({
 export const adminCreateRegistrationSchema = z.object({
   competitionId: z.uuid("validation.chooseCompetition"),
   teamName: z.string().trim().min(2, "validation.teamNameMin").max(60, "validation.teamNameMax"),
+  school: schoolSchema,
   leaderEmail: z.email("validation.email").trim().toLowerCase(),
   leaderName: z.string().trim().min(2, "validation.fullName").max(100),
   leaderPhone: z
@@ -62,9 +64,33 @@ export const competitionSchema = z
       .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "validation.slug"),
     type: z.enum(["competitive_programming", "logic"]),
     description: z.string().trim().max(2000),
+    descriptionEn: z
+      .string()
+      .trim()
+      .max(2000)
+      .transform((v) => v || null),
     minMembers: z.coerce.number().int().min(1, "validation.atLeastOne").max(10, "validation.atMostTen"),
     maxMembers: z.coerce.number().int().min(1, "validation.atLeastOne").max(10, "validation.atMostTen"),
     fee: z.coerce.number().int().min(0, "validation.nonNegative"),
+    twibbonUrl: z
+      .string()
+      .trim()
+      .max(500, "validation.twibbonUrl")
+      .regex(/^(https:\/\/\S+)?$/, "validation.twibbonUrl")
+      .transform((v) => v || null),
+    // Empty means no limit.
+    maxTeams: z
+      .string()
+      .trim()
+      .regex(/^\d{0,5}$/, "validation.maxTeams")
+      .transform((v) => (v ? Number(v) : null))
+      .refine((v) => v === null || v > 0, "validation.maxTeams"),
+    waGroupUrl: z
+      .string()
+      .trim()
+      .max(200, "validation.waGroupUrl")
+      .regex(/^(https:\/\/chat\.whatsapp\.com\/\S+)?$/, "validation.waGroupUrl")
+      .transform((v) => v || null),
     registrationOpensAt: wibDateTime,
     registrationClosesAt: wibDateTime,
     isActive: z.boolean(),

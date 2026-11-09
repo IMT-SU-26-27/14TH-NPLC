@@ -29,11 +29,6 @@ export type DeleteTimelineEventButtonProps = {
   eventId: string;
 };
 
-export type HeroProps = {
-  title: string;
-  paragraphs: string[];
-};
-
 export type MarkdownProps = {
   children: string;
 };

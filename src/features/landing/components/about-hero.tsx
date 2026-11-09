@@ -1,23 +1,20 @@
 import { cacheLife, cacheTag } from "next/cache";
-import { CONTENT_TAG, getSiteContent } from "@/lib/data/content";
-import { getT } from "@/lib/i18n/get-dictionary";
+import { COMPETITIONS_TAG, getActiveCompetitions, isRegistrationOpen } from "@/lib/data/competitions";
+import { EARLY_BIRD, isEarlyBird } from "@/lib/event-info";
+import { formatDateRange } from "@/lib/format";
 import { Hero } from "@/features/landing/components/hero";
 import type { LangProps } from "@/types/i18n";
 
-// Admin-written About text in the visitor's language, falling back to the built-in copy.
+// Server half of the homepage hero: works out the "registration open · early bird until" line.
 export async function AboutHero({ lang }: LangProps) {
   "use cache";
-  cacheLife("hours");
-  cacheTag(CONTENT_TAG);
+  cacheLife("minutes");
+  cacheTag(COMPETITIONS_TAG);
 
-  const t = getT(lang);
-  const content = await getSiteContent();
-  const title = (lang === "id" ? content?.about_title_id : content?.about_title_en) || t("landing.title");
-  const body = (lang === "id" ? content?.about_body_id : content?.about_body_en) || t("landing.lead");
-  const paragraphs = body
-    .split(/\n\s*\n/)
-    .map((p) => p.trim())
-    .filter(Boolean);
+  const now = new Date();
+  const competitions = await getActiveCompetitions();
+  const open = competitions.some((c) => isRegistrationOpen(c, now));
+  const earlyBirdDate = isEarlyBird(now) ? formatDateRange(EARLY_BIRD.endsOn, null, lang) : null;
 
-  return <Hero title={title} paragraphs={paragraphs} />;
+  return <Hero status={{ open, earlyBirdDate }} />;
 }

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint --max-warnings=0",
+    "sb": "pnpm dlx supabase@2.101.0",
     "db:types": "docker exec supabase-meta node -e \"fetch('http://localhost:8080/generators/typescript?included_schemas=public&detect_one_to_one_relationships=true').then(r => r.text()).then(t => process.stdout.write(t))\" > src/types/database.ts"
   },
   "dependencies": {
@@ -15,6 +16,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
+    "@yudiel/react-qr-scanner": "2.6.0",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.11.0",
     "cn": "^0.4.0",
@@ -22,6 +24,7 @@
     "lucide-react": "^1.57.0",
     "next": "16.4.1",
     "next-themes": "^0.4.6",
+    "qrcode": "1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-markdown": "^10.1.0",
@@ -37,6 +40,7 @@
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/web-push": "^3.6.4",

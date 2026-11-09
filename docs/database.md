@@ -11,6 +11,13 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261016120000_push_subscriptions.sql` | `push_subscriptions` for web push notifications |
 | `20261016130000_cp_leaderboard_freeze.sql` | Leaderboard freeze (`cp_sessions.leaderboard_frozen_at`, `cp_leaderboard_snapshots`) and hiding the leaderboard from participants after the contest ends |
 | `20261016140000_cp_contest_duration.sql` | `cp_sessions.duration_seconds`; the end time is set from it on start, submissions are refused after it, and `cp_finish_if_time_up()` ends the contest |
+| `20261107120000_competition_sort_order.sql` | `competitions.sort_order` (lowest first) for the display order on the landing and register pages; Competitive Programming 1, the logic competition 2 |
+| `20261108120000_line_id_optional.sql` | `create_registration` no longer requires a LINE ID (only the school); the `line_id` column and older values stay, new teams store none |
+| `20261108130000_twibbon_post_url.sql` | `registration_members.twibbon_post_url` (link to the Instagram post, checked format); `create_registration` and `join_team` take `p_twibbon_post_url` and accept that link (or an older screenshot) as the twibbon proof |
+| `20261109100000_competition_description_en.sql` | `competitions.description_en`: the English description for the `/en` pages; empty means the Indonesian `description` is shown |
+| `20261109120000_team_quota_and_wa_group.sql` | `competitions.max_teams` (team quota, null = no limit; every team that is not rejected counts) enforced in `create_registration` and when a rejected team comes back, with the competition row locked; `competitions.wa_group_url` (participants' WhatsApp group), hidden from the API by column privileges; `competition_team_counts()`, `my_wa_group()`, `admin_competition_wa_group_url()` |
+| `20261109140000_timeline_event_competition.sql` | `timeline_events.competition_type` (null = every competition): which competition an event is for, so an accepted team's dashboard shows its own next date |
+| `20261110090000_lock_accepted_team_members.sql` | Only admins delete a registration (the leader no longer can, in any status). Leaving a team or removing a member is closed once the team is `accepted` (`private.registration_accepted`); admins can still change members |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -37,18 +44,44 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 
 | Table | What it holds |
 |---|---|
-| `profiles` | One row per account, created automatically on sign-up. `role` is `participant` or `admin`. Users can edit their name and avatar but not their role or email. |
-| `competitions` | Each competition: `type` (`competitive_programming` or `logic`), team size (`min_members` to `max_members`, leader included), `fee` in rupiah, `qris_public_id` (Cloudinary), registration window, `is_active`. |
-| `registrations` | One team in one competition: `team_name`, `leader_id`, `referral_code` (unique 8-character code members join with), `status`, payment proof (Cloudinary `public_id` + format), `rejection_reason`, reviewer. Team names are unique per competition (case-insensitive) and can't be changed by participants. |
-| `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (required for the leader), 10-digit NISN. A person (account, NISN or email) can be on only one team per competition. |
+| `profiles` | One row per account, created automatically on sign-up. `role` is `participant`, `admin` or `lo`. Users can edit their name and avatar but not their role or email. |
+| `competitions` | Each competition: `type` (`competitive_programming` or `logic`), `sort_order` (display order, lowest first), `description` and `description_en` (English, optional; the `/en` pages fall back to `description`), team size (`min_members` to `max_members`, leader included; a fixed size such as Logic Rally Games 3 to 3 sets both to the same number; joining is refused at `max_members`, and accepting a team is refused below `min_members`), `max_teams` (team quota, null = no limit), `wa_group_url` (participants' WhatsApp group invite, `https://chat.whatsapp.com/…`; not readable through the API, see below), `fee` in rupiah, `twibbon_url` (optional), `qris_public_id` (Cloudinary), registration window, `is_active`. |
+| `registrations` | One team in one competition: `team_name`, `school`, `line_id` (the contact person's LINE ID; no longer asked for since 2026-11-08, so only some teams from before then have one; fixed for participants; `school` is required for new teams), `leader_id`, `referral_code` (unique 8-character code members join with), `status`, payment proof (Cloudinary `public_id` + format), `rejection_reason`, reviewer. Team names are unique per competition (case-insensitive) and can't be changed by participants. |
+| `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (WhatsApp, required for every member since 2026-11-08; older members may have none), 10-digit NISN, twibbon post proof: `twibbon_post_url`, the link to the Instagram post (since 2026-11-08), or for older members an uploaded screenshot (Cloudinary `public_id` + format); required on join and register once the competition has a `twibbon_url`. A person (account, NISN or email) can be on only one team across all competitions, enforced by unique indexes. |
 | `registration_events` | The timeline on the participant dashboard. Written automatically on every status change; the rejection reason is stored as the event's `note`. |
+
+### Rally Games
+
+| Table | What it holds |
+|---|---|
+| `rally_posts` | One post of the competition of type `logic` (Category 2): `name`, `kind` (`physical` or `digital`, recorded the same way), `location`, `points_win`, `points_lose`, `points_draw` (placeholders 100, 25 and 50 until the Divisi Event sets them), `allow_draw`, `is_active`. Names are unique per competition. |
+| `rally_post_assignments` | Which LO runs which post. A trigger accepts only accounts with the role `lo`. |
+| `rally_results` | One team's result at one post: `outcome` (`win`, `lose`, `draw`), `points` copied from the post when recorded, who recorded it and, after an admin correction, who corrected it (`corrected_by`, `corrected_at`; the original `recorded_by` and `recorded_at` stay). Never deleted: undo and admin changes fill `voided_at`. For now one active result per team per post (`rally_results_one_active`); replays would change this index. |
+| `rally_sessions` | One per Rally competition: `status` (`not_open`, `open`, `closed`) and `leaderboard_frozen_at`. LOs can look up, record and undo only while `open`; admins can correct at any time. |
+| `rally_scores` | One row per accepted team with `total_points`, `posts_finished` and `last_result_at`, kept up to date by triggers from active results only. The order is defined in `src/lib/rally/ranking.ts`. |
+| `rally_leaderboard_snapshots` | Copy of `rally_scores` taken when an admin freezes the leaderboard. Participants read this while frozen; admins always read the live scores. |
+| `rally_result_log` | Append-only audit log: action, who, when, team, post, old and new outcome and points, reason. Admins read it; nobody can change it. |
+
+`registrations.rally_qr_token` is what the team's QR holds, separate from the referral code so an admin can replace it. Teams, posts and LOs with history cannot be deleted.
+
+All changes to results go through these functions, and direct writes are refused:
+
+| Function | Who | What |
+|---|---|---|
+| `rally_lookup_team(post, code)` | LO of the post | Finds a team by QR or team code. Refuses unaccepted teams and teams of other competitions. Returns the team name, school and any existing result, never NISN, phone or email. |
+| `rally_record_result(post, team, outcome, request id)` | LO of the post | Saves the result with points from the post. Repeating a request id returns the saved result. |
+| `rally_recent_results(post)` | LO of the post | The latest 10 active results, with team names only. |
+| `rally_undo_result(result)` | The LO who recorded it | Within `private.rally_undo_window()`, 5 minutes for now. |
+| `rally_admin_correct_result`, `rally_admin_delete_result` | Admin | Reason required. |
+
+`profiles.role` also has the value `lo`. Admins create these accounts with the service role. A trigger stops LO accounts joining a team, and `src/proxy.ts` keeps them out of the participant and admin pages. Routes and replays are not built yet: see `docs/rally-games-plan.md`.
 
 ### Homepage content
 
 | Table | What it holds |
 |---|---|
 | `site_content` | One row: the About NPLC title and body in Indonesian and English. Empty fields fall back to the built-in copy. Anyone can read it; admins edit it on `/admin/content`. |
-| `timeline_events` | The homepage timeline: `starts_on`, optional `ends_on`, title and description in both languages, sorted by start date. Anyone can read; admins add, edit and delete. |
+| `timeline_events` | The homepage timeline: `starts_on`, optional `ends_on`, title and description in both languages, sorted by start date. `competition_type`: the competition an event is for (null = every competition); the dashboard shows each accepted team the next event for its competition. Anyone can read; admins add, edit and delete. |
 
 ### Notifications
 
@@ -75,7 +108,10 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 |---|---|
 | `registration_overview` (view) | Admin registrations table: one row per team with competition name, referral code, leader details and member count. Search and filter on it. |
 | `competition_stats` (view) | Admin dashboard counts per competition: `accepted_teams`, `accepted_people`, `under_review_teams`, `total_teams`. Add the rows together for the overall total. |
-| `create_registration(competition_id, team_name, leader_name, leader_phone, leader_nisn, payment_proof_public_id, payment_proof_format)` | Registration form. Creates the team already paid (status `under_review`) with the leader's member row and the referral code. The server action first checks the proof exists in Cloudinary. |
+| `create_registration(competition_id, team_name, leader_name, leader_phone, leader_nisn, payment_proof_public_id, payment_proof_format)` | Registration form. Creates the team already paid (status `under_review`) with the leader's member row and the referral code. Refused with "The team quota for this competition is full" once `max_teams` is reached; the competition row is locked first, so two registrations at once cannot both take the last place. The server action first checks the proof exists in Cloudinary. |
+| `competition_team_counts()` | Home and register pages, Admin competitions. Teams that are not rejected, per competition (active ones; admins get all). Only numbers. |
+| `my_wa_group()` | Dashboard. The WhatsApp group (competition name and link) of the caller's team, **only once the team is accepted** and only if the competition has a link. The one place that decides who sees the link. |
+| `admin_competition_wa_group_url(competition_id)` | Admin competition form. The current link; admins only. |
 | `preview_team(referral_code)` | Join page. Shows team name, competition, leader, member count and whether it can still be joined, before the user confirms. |
 | `join_team(referral_code, full_name, nisn, phone?)` | Join page. Adds the signed-in user to the team. |
 | `cp_access()` | `src/proxy.ts`. Returns the caller's accepted CP teams and each contest's status. |
@@ -95,6 +131,7 @@ under_review ──(admin)──▶ accepted
 members join with the referral code at any point while the competition's registration window is open
 ```
 
+- Each person gives the link to their twibbon post on Instagram when registering or joining (`https://www.instagram.com/p|reel|reels/...`). It is required only once the competition has a `twibbon_url`. Before 2026-11-08 a screenshot was uploaded instead (`14th-nplc/twibbon-proofs/<user id>/`); those stay. Members who joined before the link was set keep an empty proof, and admins see that in the registration detail.
 - Paying is part of registering: the register form takes the team details and the payment proof together. The proof is uploaded to Cloudinary first (`14th-nplc/payment-proofs/new/<user id>/`), then `create_registration()` creates the team as `under_review` with the referral code.
 - Members join with the code, and the leader can remove members (or a member can leave), while the competition's registration window is open, whatever the status. Nobody, admins included, can remove the leader row.
 - Participants can't change the team name, competition or referral code. Admins can fix the name.
@@ -107,8 +144,9 @@ members join with the referral code at any point while the competition's registr
 
 | Data | Participants | Admins |
 |---|---|---|
-| Active competitions | Everyone, including logged-out visitors | All |
-| Registrations, members, timeline | Only their own team | All, full edit |
+| Active competitions | Everyone, including logged-out visitors, every column except `wa_group_url` | All columns except `wa_group_url` (read it with `admin_competition_wa_group_url`) |
+| Competition WhatsApp group link | Members of an accepted team of that competition, through `my_wa_group()` | Through `admin_competition_wa_group_url()`; edited in the competition form |
+| Registrations, members, timeline | Only their own team. They cannot delete their team; members can leave (or be removed by the leader) only until the team is accepted | All, full edit, including deleting teams and changing members of accepted teams |
 | CP session status | Members of accepted CP teams | All, start/end |
 | CP problems | Members of accepted CP teams, **only while the contest is live** | All |
 | CP test cases | Sample cases only, only while live | All |
@@ -116,13 +154,15 @@ members join with the referral code at any point while the competition's registr
 | Leaderboard (`cp_scores`) | Members of accepted CP teams, **only while the contest hasn't ended and the leaderboard isn't frozen** | All, always live |
 | Frozen leaderboard (`cp_leaderboard_snapshots`) | Members of accepted CP teams, only while frozen and the contest hasn't ended | All |
 
+`competitions` is read through column privileges (since `20261109120000`): `anon` and `authenticated` may select every column except `wa_group_url`. A new column on `competitions` needs its own `grant select (…)`, and `select *` on it fails from the browser and the server client; list the columns.
+
 Submissions can't be written from the browser at all. The server judges the code with Judge0 and records the result using the service role. The database also rejects submissions when the contest isn't live, the team isn't accepted, or the cooldown hasn't passed.
 
 ## Accounts
 
 Every team member signs in before creating or joining a team, so each member row belongs to a real account and the email comes from that account. Participants can only create teams through `create_registration()` and join through `join_team()`; direct inserts are blocked.
 
-Supabase links a Google sign-in to an existing email/password account with the same verified email automatically. This needs email confirmation turned on in your self-hosted Auth settings.
+"Confirm email" is off, so an account is active right after sign-up. The only email the site sends is the password reset link; see README step 4.
 
 ## Scoring
 
@@ -146,6 +186,8 @@ These tables are in the `supabase_realtime` publication:
 | `cp_sessions` | Waiting room moves into the contest when the admin presses start or resume; the contest page goes back to the waiting room when it is paused, and locks when it ends |
 | `cp_scores` | Live leaderboard |
 | `registration_events` | Participant dashboard updates when the admin accepts or rejects |
+| `rally_sessions` | LO screen follows the session; leaderboards refresh on freeze and unfreeze |
+| `rally_scores` | Live Rally leaderboard |
 
 Realtime respects the policies above, so each user only receives changes they're allowed to read.
 
@@ -167,4 +209,5 @@ Each device gets the text in the language it subscribed with. Needs `NEXT_PUBLIC
 Only Cloudinary `public_id`s are stored in the database:
 
 - `competitions.qris_public_id`: public image in the `14th-nplc/qris` folder.
+- `registration_members.twibbon_proof_public_id` (older members only; no new uploads since 2026-11-08): `authenticated` delivery type in `14th-nplc/twibbon-proofs`. Only admins can view these, through signed links on the registration detail page.
 - `registrations.payment_proof_public_id`: `authenticated` delivery type in `14th-nplc/payment-proofs`. Viewing one needs a signed link from a server action that checks the viewer is an admin or on that team.

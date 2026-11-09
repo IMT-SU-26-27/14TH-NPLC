@@ -2,6 +2,7 @@ import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Competition } from "@/types/competition";
 import type {
+  AdminCompetition,
   AdminTeam,
   CompetitionOption,
   CompetitionStats,
@@ -28,17 +29,37 @@ export async function listCompetitionOptions(): Promise<CompetitionOption[]> {
   return data;
 }
 
-export async function listCompetitions(): Promise<Competition[]> {
+// Every column the API can read: wa_group_url is left out on purpose (see migration 20261109120000).
+const ADMIN_COMPETITION_COLUMNS =
+  "id, slug, name, type, description, description_en, min_members, max_members, max_teams, fee, qris_public_id, twibbon_url, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at, is_active, sort_order, created_at, updated_at";
+
+export async function listCompetitions(): Promise<AdminCompetition[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.from("competitions").select("*").order("created_at");
+  const { data, error } = await supabase.from("competitions").select(ADMIN_COMPETITION_COLUMNS).order("created_at");
   if (error) throw new Error(`Could not load competitions: ${error.message}`);
   return data;
 }
 
+// Teams that take a place (not rejected), by competition id, inactive competitions included.
+export async function getTeamCounts(): Promise<Record<string, number>> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("competition_team_counts");
+  if (error) throw new Error(`Could not load team counts: ${error.message}`);
+  return Object.fromEntries(data.map((row) => [row.competition_id, row.team_count]));
+}
+
+// The WhatsApp group link is not readable through the table (column privileges); admin_competition_wa_group_url()
+// returns it after checking is_admin(). If that call fails the page fails too, rather than showing an empty link
+// field that would erase the saved link on the next save.
 export async function getCompetition(id: string): Promise<Competition | null> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.from("competitions").select("*").eq("id", id).maybeSingle();
-  return data;
+  const [{ data, error }, { data: waGroupUrl, error: waError }] = await Promise.all([
+    supabase.from("competitions").select(ADMIN_COMPETITION_COLUMNS).eq("id", id).maybeSingle(),
+    supabase.rpc("admin_competition_wa_group_url", { p_competition_id: id }),
+  ]);
+  if (error) throw new Error(`Could not load the competition: ${error.message}`);
+  if (waError) throw new Error(`Could not load the WhatsApp group link: ${waError.message}`);
+  return data ? { ...data, wa_group_url: waGroupUrl ?? null } : null;
 }
 
 export async function listRegistrations(filters: RegistrationFilters): Promise<RegistrationList> {
@@ -56,7 +77,7 @@ export async function listRegistrations(filters: RegistrationFilters): Promise<R
   if (filters.q) {
     const like = `%${filters.q}%`;
     query = query.or(
-      ["team_name", "leader_name", "leader_email", "leader_nisn", "leader_phone", "referral_code"]
+      ["team_name", "school", "leader_name", "leader_email", "leader_nisn", "leader_phone", "referral_code"]
         .map((column) => `${column}.ilike.${like}`)
         .join(","),
     );
@@ -72,10 +93,10 @@ export async function getRegistrationDetail(id: string): Promise<AdminTeam | nul
   const { data } = await supabase
     .from("registrations")
     .select(
-      `id, team_name, referral_code, status, leader_id, payment_proof_public_id, payment_proof_format, payment_submitted_at,
+      `id, team_name, school, line_id, referral_code, rally_qr_token, status, leader_id, payment_proof_public_id, payment_proof_format, payment_submitted_at,
        rejection_reason, reviewed_at, created_at,
        competition:competitions ( id, slug, name, type, min_members, max_members, fee, qris_public_id, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at ),
-       members:registration_members ( id, user_id, full_name, email, phone, nisn, is_leader, created_at ),
+       members:registration_members ( id, user_id, full_name, email, phone, nisn, is_leader, created_at, twibbon_proof_public_id, twibbon_proof_format, twibbon_post_url ),
        events:registration_events ( id, status, note, created_at )`,
     )
     .eq("id", id)

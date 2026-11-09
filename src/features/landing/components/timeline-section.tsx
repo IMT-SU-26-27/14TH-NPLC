@@ -3,11 +3,17 @@ import { CalendarIcon } from "lucide-react";
 import { CONTENT_TAG, getTimelineEvents } from "@/lib/data/content";
 import { formatDateRange } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { sectionId } from "@/lib/home-sections";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { GridBackdrop } from "@/features/landing/components/grid-backdrop";
+import { SectionHeading } from "@/features/landing/components/section-heading";
+import { todayInWib } from "@/lib/timeline";
 import type { TimelineSectionProps } from "@/types/content";
 
+// "04 // Timeline": the admin's timeline events (Admin > Content), the running phase highlighted.
 export async function TimelineSection({ lang }: TimelineSectionProps) {
   "use cache";
   cacheLife("hours");
@@ -15,39 +21,75 @@ export async function TimelineSection({ lang }: TimelineSectionProps) {
 
   const t = getT(lang);
   const events = await getTimelineEvents();
-
-  if (events.length === 0) {
-    return (
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <CalendarIcon />
-          </EmptyMedia>
-          <EmptyTitle>{t("landing.timelineEmpty")}</EmptyTitle>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
+  const today = todayInWib();
 
   return (
-    <ItemGroup className="gap-3">
-        {events.map((event) => {
-          const description = lang === "id" ? event.description_id : event.description_en;
-          return (
-              <Item key={event.id} variant="outline" className="bg-card items-start">
-                <ItemMedia variant="icon">
-                  <CalendarIcon />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>{lang === "id" ? event.title_id : event.title_en}</ItemTitle>
-                  {description && <ItemDescription className="line-clamp-none">{description}</ItemDescription>}
-                </ItemContent>
-                <Badge variant="secondary" className="shrink-0">
-                  {formatDateRange(event.starts_on, event.ends_on, lang)}
-                </Badge>
-              </Item>
-          );
-        })}
-    </ItemGroup>
+    <section
+      id={sectionId(lang, "timeline")}
+      className="bg-band relative isolate scroll-mt-14 py-24 [clip-path:polygon(0_3rem,100%_0,100%_calc(100%_-_3rem),0_100%)] sm:py-32"
+    >
+      <GridBackdrop />
+      <div className="mx-auto max-w-6xl space-y-10 px-4">
+        <SectionHeading
+          index="04"
+          label={t("landing.timeline.label")}
+          title={t("landing.timelineTitle")}
+          lead={t("landing.timelineLead")}
+          tone="dark"
+        />
+
+        {events.length === 0 ? (
+          <Empty className="border-band-line text-band-foreground border">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <CalendarIcon />
+              </EmptyMedia>
+              <EmptyTitle>{t("landing.timelineEmpty")}</EmptyTitle>
+            </EmptyHeader>
+          </Empty>
+        ) : (
+          <ol className="grid gap-8 md:grid-flow-col md:auto-cols-fr md:gap-4">
+            {events.map((event, i) => {
+              const n = String(i + 1).padStart(2, "0");
+              const active = event.starts_on <= today && today <= (event.ends_on ?? event.starts_on);
+              const description = lang === "id" ? event.description_id : event.description_en;
+              return (
+                <li key={event.id} className="relative flex flex-col gap-3">
+                  {i < events.length - 1 && (
+                    <span aria-hidden className="bg-brand-sky/40 absolute top-4 right-[-1rem] left-9 hidden h-px md:block" />
+                  )}
+                  <span
+                    className={cn(
+                      "relative flex size-8 items-center justify-center rounded-full border font-mono text-xs",
+                      active ? "bg-highlight text-highlight-foreground border-highlight shadow-band-glow-lime" : "bg-band-raised border-brand-sky text-brand-sky",
+                    )}
+                  >
+                    {n}
+                  </span>
+                  <p className="text-brand-sky font-mono text-xs tracking-[0.2em] uppercase">{t("landing.timeline.phase", { n })}</p>
+                  {/* Every card stretches to the tallest one in the row and keeps the same border; the running
+                      phase shows through its lime number and badge. */}
+                  <Card className="bg-band-card text-band-foreground ring-band-line flex-1 rounded-[12px]">
+                    <CardHeader className="gap-1.5">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-brand-sky font-mono text-xs tracking-wider">{formatDateRange(event.starts_on, event.ends_on, lang)}</p>
+                        {active && (
+                          <Badge variant="outline" className="border-band-line bg-band-card text-band-foreground font-mono text-xs tracking-[0.15em] uppercase">
+                            <span aria-hidden className="bg-highlight size-1.5 rounded-full" />
+                            {t("landing.timeline.active")}
+                          </Badge>
+                        )}
+                      </div>
+                      <CardTitle className="text-band-foreground text-lg font-bold">{lang === "id" ? event.title_id : event.title_en}</CardTitle>
+                      {description && <CardDescription className="text-band-muted">{description}</CardDescription>}
+                    </CardHeader>
+                  </Card>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </div>
+    </section>
   );
 }

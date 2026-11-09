@@ -8,7 +8,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { CompetitionsTableProps } from "@/types/admin";
 
-export function CompetitionsTable({ competitions, lang }: CompetitionsTableProps) {
+export function CompetitionsTable({ competitions, teamCounts, lang }: CompetitionsTableProps) {
   const t = getT(lang);
 
   if (competitions.length === 0) {
@@ -33,7 +33,8 @@ export function CompetitionsTable({ competitions, lang }: CompetitionsTableProps
             <TableHead>{t("admin.competitions.name")}</TableHead>
             <TableHead>{t("admin.competitions.type")}</TableHead>
             <TableHead>{t("admin.registrations.members")}</TableHead>
-            <TableHead className="text-right">{t("admin.competitions.fee")}</TableHead>
+            <TableHead className="text-right">{t("admin.competitions.quota")}</TableHead>
+            <TableHead className="text-right">{t("competition.normalPrice")}</TableHead>
             <TableHead>{t("admin.competitions.registration")}</TableHead>
             <TableHead>{t("admin.competitions.qris")}</TableHead>
             <TableHead>{t("admin.registrations.status")}</TableHead>
@@ -50,6 +51,11 @@ export function CompetitionsTable({ competitions, lang }: CompetitionsTableProps
               </TableCell>
               <TableCell>{t(`competition.type.${c.type}`)}</TableCell>
               <TableCell>{formatTeamSize(c.min_members, c.max_members, lang)}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                {c.max_teams === null
+                  ? t("admin.competitions.quotaUnlimited", { count: teamCounts[c.id] ?? 0 })
+                  : t("admin.competitions.quotaValue", { count: teamCounts[c.id] ?? 0, max: c.max_teams })}
+              </TableCell>
               <TableCell className="text-right">{formatRupiah(c.fee, lang)}</TableCell>
               <TableCell className="text-muted-foreground text-xs">
                 {formatDateTime(c.registration_opens_at, lang)} – {formatDateTime(c.registration_closes_at, lang)}

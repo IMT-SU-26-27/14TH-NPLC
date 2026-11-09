@@ -10,7 +10,17 @@ export type CloudinaryUploadSignature = {
   folder: string;
   type: CloudinaryDeliveryType;
   allowedFormats: string;
+  // Signed too: puts the folder in front of the public_id on dynamic-folder accounts (see signUpload).
+  useAssetFolderAsPublicIdPrefix: true;
 };
+
+export type UploadRules = {
+  maxBytes: number;
+  formats: readonly string[];
+};
+
+// The server's verdict on an uploaded file, read back from Cloudinary.
+export type UploadCheck = { ok: true; format: string; bytes: number } | { ok: false; reason: "missing" | "tooLarge" | "format" };
 
 export type CloudinaryUploadResult = {
   publicId: string;

@@ -40,6 +40,7 @@ export function useCloudinaryUpload({ getSignature, maxBytes, accept }: UseCloud
       body.append("folder", s.folder);
       body.append("type", s.type);
       body.append("allowed_formats", s.allowedFormats);
+      body.append("use_asset_folder_as_public_id_prefix", String(s.useAssetFolderAsPublicIdPrefix));
 
       return await new Promise<CloudinaryUploadResult | null>((resolve) => {
         const xhr = new XMLHttpRequest();

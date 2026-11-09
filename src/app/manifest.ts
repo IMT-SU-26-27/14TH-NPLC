@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Registration and online competitive programming contest for the 14th NPLC.",
     start_url: "/",
     display: "standalone",
-    background_color: "#fafafa",
-    theme_color: "#fafafa",
+    background_color: "#F4F7FD",
+    theme_color: "#F4F7FD",
   };
 }

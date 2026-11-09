@@ -34,7 +34,25 @@ const RAISED: [string, string][] = [
   ["Only an admin can", "errors.adminOnly"],
   ["Admins only", "errors.adminOnly"],
   ["Upload the payment proof before submitting", "errors.proofRequired"],
+  ["School is required", "validation.fixFields"],
+  ["Add the twibbon post link before submitting", "errors.twibbonRequired"],
+  ["LO accounts cannot join a team", "errors.loCannotJoin"],
+  ["You are not assigned to this post", "rally.errors.notAssigned"],
+  ["The Rally session is not open", "rally.errors.sessionNotOpen"],
+  ["This post is not active", "rally.errors.postInactive"],
+  ["No team matches this code", "rally.errors.teamNotFound"],
+  ["This team is not in this competition", "rally.errors.wrongCompetition"],
+  ["This team has not been accepted", "rally.errors.notAccepted"],
+  ["This post does not allow a draw", "rally.errors.noDraw"],
+  ["This team already has a result at this post", "rally.errors.duplicate"],
+  ["Only the LO who recorded a result can undo it", "rally.errors.notOwner"],
+  ["This result was already cancelled", "rally.errors.alreadyCancelled"],
+  ["The undo window has passed", "rally.errors.undoExpired"],
+  ["A reason is required", "rally.errors.reasonRequired"],
+  ["The new result is the same as the old one", "rally.errors.sameOutcome"],
+  ["Only LO accounts can be assigned to a post", "errors.invalidRequest"],
   ["This competition needs", "errors.teamSize"],
+  ["The team quota for this competition is full", "errors.quotaFull"],
   ["A team needs exactly one leader", "errors.teamSize"],
   ["The team leader cannot be removed", "errors.leaderProtected"],
   ["Sign in to", "errors.signInAgain"],
@@ -42,6 +60,14 @@ const RAISED: [string, string][] = [
 
 // Maps Postgres errors (RAISE EXCEPTION, constraints) to a dictionary key.
 // Unknown messages pass through unchanged and are shown as-is.
+// A database error as form state. A message that belongs to one field (a NISN already used, ...) is shown on that
+// field, with the usual "fix the marked fields" alert under the form.
+export function databaseErrorState(error: { code?: string; message: string }, fieldFor: Record<string, string> = {}): FormState {
+  const message = databaseErrorMessage(error);
+  const field = fieldFor[message];
+  return field ? { status: "error", message: "validation.fixFields", fieldErrors: { [field]: [{ message }] } } : errorState(message);
+}
+
 export function databaseErrorMessage(error: { code?: string; message: string }): string {
   const raised = RAISED.find(([prefix]) => error.message.startsWith(prefix));
   if (raised) return raised[1];
@@ -51,7 +77,8 @@ export function databaseErrorMessage(error: { code?: string; message: string }):
     if (error.message.includes("team_name")) return "errors.duplicateTeamName";
     if (error.message.includes("competition_level")) return "errors.duplicateLevel";
     if (error.message.includes("slug")) return "errors.duplicateSlug";
-    if (error.message.includes("competition_user") || error.message.includes("competition_leader")) return "errors.alreadyOnTeam";
+    if (error.message.includes("rally_posts_competition_name")) return "errors.duplicateRallyPost";
+    if (error.message.includes("members_user") || error.message.includes("competition_leader")) return "errors.alreadyOnTeam";
   }
   if (error.code === "42501") return "errors.permission";
   return error.message;

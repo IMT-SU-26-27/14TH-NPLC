@@ -99,7 +99,7 @@ export function LeaderboardTable({ initialRows, competitionId, highlightRegistra
                 </TableCell>
                 <TableCell className="text-right tabular-nums">{row.solved}</TableCell>
                 <TableCell className="text-right font-semibold tabular-nums">{formatScore(Number(row.total_points), lang)}</TableCell>
-                <TableCell className="text-muted-foreground text-xs max-sm:hidden">{formatDateTime(row.last_improved_at, lang)}</TableCell>
+                <TableCell className="text-muted-foreground max-sm:hidden">{formatDateTime(row.last_improved_at, lang)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

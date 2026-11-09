@@ -5,6 +5,7 @@ import { resolveLang } from "@/lib/i18n/server";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContestProblem } from "@/features/cp/components/cp-sections";
 import type { CpProblemPageProps } from "@/types/cp";
+import "@/features/cp/styles/problem.css";
 
 export async function generateMetadata({ params }: CpProblemPageProps): Promise<Metadata> {
   const t = getT(await resolveLang(params));

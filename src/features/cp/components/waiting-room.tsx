@@ -42,7 +42,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
     return (
       <Empty className="border">
         <EmptyHeader>
-          <EmptyMedia variant="icon">
+          <EmptyMedia variant="icon" className="bg-accent text-accent-foreground">
             <PauseIcon />
           </EmptyMedia>
           <EmptyTitle>{t("cp.waiting.pausedTitle")}</EmptyTitle>
@@ -50,7 +50,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
         </EmptyHeader>
         <EmptyContent>
           {teamName && <p className="text-sm font-medium">{t("cp.waiting.team", { team: teamName })}</p>}
-          <Link href={href("/cp/leaderboard")} className={buttonVariants({ variant: "outline" })}>
+          <Link href={href("/cp/leaderboard")} className={buttonVariants({ variant: "ghost" })}>
             {t("cp.leaderboard")}
           </Link>
         </EmptyContent>
@@ -62,7 +62,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
     return (
       <Empty className="border">
         <EmptyHeader>
-          <EmptyMedia variant="icon">
+          <EmptyMedia variant="icon" className="bg-accent text-accent-foreground">
             <TrophyIcon />
           </EmptyMedia>
           <EmptyTitle>{t("cp.waiting.endedTitle")}</EmptyTitle>
@@ -80,7 +80,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
   return (
     <Empty className="border">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
+        <EmptyMedia variant="icon" className="bg-accent text-accent-foreground">
           <HourglassIcon />
         </EmptyMedia>
         <EmptyTitle>{t("cp.waiting.scheduledTitle")}</EmptyTitle>
@@ -90,11 +90,11 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
         {teamName && <p className="text-sm font-medium">{t("cp.waiting.team", { team: teamName })}</p>}
         {scheduledStartAt ? (
           <div className="space-y-1">
-            <p className="text-muted-foreground text-xs">{t("cp.waiting.startsIn")}</p>
-            <p className="font-heading text-4xl font-semibold tabular-nums" aria-live="polite">
+            <p className="text-muted-foreground text-sm">{t("cp.waiting.startsIn")}</p>
+            <p className="font-mono text-4xl font-semibold tabular-nums" aria-live="polite">
               {left === null ? "--:--:--" : clock(left, t("cp.daySuffix"))}
             </p>
-            <p className="text-muted-foreground text-xs">{t("cp.waiting.startsAt", { date: formatDateTime(scheduledStartAt, lang) })}</p>
+            <p className="text-muted-foreground text-sm">{t("cp.waiting.startsAt", { date: formatDateTime(scheduledStartAt, lang) })}</p>
           </div>
         ) : (
           <p className="text-muted-foreground text-sm">{t("cp.waiting.noSchedule")}</p>

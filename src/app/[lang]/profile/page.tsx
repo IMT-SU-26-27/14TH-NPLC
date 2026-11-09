@@ -2,7 +2,9 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
+import { PARTICIPANT_PUSH_ENABLED } from "@/lib/push/config";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageBand } from "@/components/shared/page-band";
 import { ProfileContent } from "@/features/profile/components/profile-content";
 import type { LangPageProps } from "@/types/i18n";
 
@@ -16,21 +18,20 @@ export default async function ProfilePage({ params }: LangPageProps) {
   const t = getT(lang);
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 space-y-6 px-4 py-10">
-      <div className="space-y-1">
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">{t("profile.title")}</h1>
-        <p className="text-muted-foreground">{t("profile.lead")}</p>
+    <main className="flex-1">
+      <PageBand index="12" label={t("profile.label")} title={t("profile.title")} lead={t(PARTICIPANT_PUSH_ENABLED ? "profile.lead" : "profile.leadAccount")} mascot={{ src: "/auth/maskot-2.webp" }} />
+      <div className="mx-auto w-full max-w-160 space-y-4 px-4 pt-8 pb-12 sm:space-y-5 sm:pt-12 sm:pb-16">
+        <Suspense
+          fallback={
+            <div className="space-y-5">
+              <Skeleton className="h-80 rounded-[12px]" />
+              <Skeleton className="h-96 rounded-[12px]" />
+            </div>
+          }
+        >
+          <ProfileContent />
+        </Suspense>
       </div>
-      <Suspense
-        fallback={
-          <div className="space-y-6">
-            <Skeleton className="h-72" />
-            <Skeleton className="h-96" />
-          </div>
-        }
-      >
-        <ProfileContent />
-      </Suspense>
     </main>
   );
 }

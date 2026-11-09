@@ -1,56 +1,32 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/data/auth";
+import { homeSectionLinks } from "@/lib/home-sections";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
-import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LanguageSwitcher } from "@/components/shared/language-switcher";
-import { UserMenu } from "@/components/shared/user-menu";
+import { HeaderActions } from "@/components/shared/header-actions";
 import type { LangProps } from "@/types/i18n";
 
-async function HeaderActions({ lang }: LangProps) {
-  const t = getT(lang);
-  const user = await getCurrentUser();
-
-  return (
-    <div className="flex items-center gap-1">
-      <LanguageSwitcher />
-      {user ? (
-        <>
-          <Link href={localePath(lang, "/dashboard")} className={buttonVariants({ variant: "ghost", className: "max-sm:hidden" })}>
-            {t("nav.dashboard")}
-          </Link>
-          {user.role === "admin" && (
-            <Link href={localePath(lang, "/admin")} className={buttonVariants({ variant: "ghost", className: "max-sm:hidden" })}>
-              {t("nav.admin")}
-            </Link>
-          )}
-          <UserMenu user={user} />
-        </>
-      ) : (
-        <>
-          <Link href={localePath(lang, "/login")} className={buttonVariants({ variant: "ghost" })}>
-            {t("nav.signIn")}
-          </Link>
-          <Link href={localePath(lang, "/signup")} className={buttonVariants()}>
-            {t("nav.register")}
-          </Link>
-        </>
-      )}
-    </div>
-  );
-}
-
 export function SiteHeader({ lang }: LangProps) {
+  const t = getT(lang);
+
   return (
     <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href={localePath(lang, "/")} className="font-heading font-semibold tracking-tight">
-          14th NPLC
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 min-[360px]:gap-4">
+        <Link href={localePath(lang, "/")} className="inline-flex shrink-0 items-center gap-2">
+          <Image src="/shared/logo-star.webp" alt="" aria-hidden width={21} height={26} preload className="h-[22px] w-auto sm:h-[26px]" />
+          <Image
+            src="/shared/logo-nplc-xiv.webp"
+            alt={t("meta.siteName")}
+            width={128}
+            height={26}
+            preload
+            className="h-5 w-auto min-[360px]:h-6.5"
+          />
         </Link>
         <Suspense fallback={<Skeleton className="h-8 w-48" />}>
-          <HeaderActions lang={lang} />
+          <HeaderActions lang={lang} sections={homeSectionLinks(lang, t)} />
         </Suspense>
       </div>
     </header>

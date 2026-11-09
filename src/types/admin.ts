@@ -86,6 +86,9 @@ export type ReviewFormProps = {
   registrationId: string;
   status: RegistrationStatus;
   rejectionReason: string | null;
+  memberCount: number;
+  minMembers: number;
+  maxMembers: number;
 };
 
 export type TeamNameFormProps = {
@@ -110,7 +113,9 @@ export type CompetitionEditSectionProps = {
 };
 
 export type CompetitionsTableProps = {
-  competitions: Competition[];
+  competitions: AdminCompetition[];
+  // Teams that take a place (not rejected), by competition id.
+  teamCounts: Record<string, number>;
   lang: Locale;
 };
 
@@ -122,7 +127,7 @@ export type QrisUploaderProps = {
 export type AdminDeleteButtonProps = {
   id: string;
   label: string;
-  target: "registration" | "competition";
+  target: "registration" | "competition" | "rallyPost" | "loAccount";
 };
 
 export type AdminRemoveMemberButtonProps = {
@@ -136,12 +141,20 @@ export type PaymentProofButtonProps = {
 
 export type QrisInput = z.infer<typeof qrisSchema>;
 
+// Admin list: every column but the WhatsApp group link, which only the admin form reads (through a function).
+export type AdminCompetition = Omit<Competition, "wa_group_url">;
+
 export type PaymentSettingsCardProps = {
-  competitions: Competition[];
+  competitions: AdminCompetition[];
   lang: Locale;
 };
 
 export type PaymentSettingsDialogProps = {
-  competition: Competition;
+  competition: AdminCompetition;
   qrisUrl: string | null;
+};
+
+export type AdminTwibbonProofsProps = {
+  team: AdminTeam;
+  lang: Locale;
 };

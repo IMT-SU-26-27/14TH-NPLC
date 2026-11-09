@@ -1,9 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { redirectWithCookies, updateSession } from "@/lib/supabase/proxy";
 import { DEFAULT_LOCALE, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
+import { rallyLeaderboardOpen } from "@/lib/rally/session-visibility";
 
-const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/reset-password", "/profile"];
-const SIGNED_OUT_ONLY = ["/login", "/signup", "/forgot-password"];
+const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/lo", "/rally", "/reset-password", "/profile"];
+// LO accounts run posts only: they never register, compete or administer.
+const NOT_FOR_LO = ["/dashboard", "/register", "/join", "/admin", "/cp", "/rally"];
+// /forgot-password stays open when signed in: the profile links to it for someone who forgot their current password.
+const SIGNED_OUT_ONLY = ["/login", "/signup"];
 
 function matches(path: string, prefixes: string[]) {
   return prefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
@@ -49,13 +53,17 @@ export async function proxy(request: NextRequest) {
 
   if (matches(path, SIGNED_OUT_ONLY)) return to("/dashboard");
 
-  if (matches(path, ["/admin", "/cp"])) {
+  if (matches(path, [...NOT_FOR_LO, "/lo"])) {
     const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
     const isAdmin = profile?.role === "admin";
+    const isLo = profile?.role === "lo";
 
+    if (isLo && matches(path, NOT_FOR_LO)) return to("/lo");
+    if (matches(path, ["/lo"]) && !isLo && !isAdmin) return to("/dashboard");
     if (matches(path, ["/admin"]) && !isAdmin) return to("/dashboard");
 
     // /cp: accepted competitive programming teams only, and only while the admin has the contest live.
+    // Scheduled (not started yet): the contest pages stay closed and send participants back to the dashboard.
     // Paused: waiting room and leaderboard only, until the admin resumes.
     // Ended: waiting room only; the final standings are not shown to participants.
     if (matches(path, ["/cp"]) && !isAdmin) {
@@ -75,7 +83,14 @@ export async function proxy(request: NextRequest) {
       if (status === "live" && onWaiting) return to("/cp");
       if (status === "paused" && !onWaiting && !onLeaderboard) return to("/cp/waiting");
       if (status === "ended" && !onWaiting) return to("/cp/waiting");
-      if (status === "scheduled" && !onWaiting) return to("/cp/waiting");
+      if (status === "scheduled") return to("/dashboard");
+    }
+
+    // /rally (the participant leaderboard): closed until the admin starts the Rally session. LOs never get here
+    // (NOT_FOR_LO), admins are not affected.
+    if (matches(path, ["/rally"]) && !isAdmin) {
+      const { data: sessions } = await supabase.from("rally_sessions").select("status");
+      if (!sessions?.some((session) => rallyLeaderboardOpen(session.status))) return to("/dashboard");
     }
   }
 
@@ -84,5 +99,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // sw.js and the manifest must be served at the root, without a language prefix.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm)$).*)"],
 };

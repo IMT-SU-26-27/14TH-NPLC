@@ -10,10 +10,18 @@ import type {
   SubmissionFilters,
   ContestContext,
   ContestProblemListItem,
+  CpSessionStatus,
   LeaderboardRow,
   ProblemView,
   RecentSubmission,
 } from "@/types/cp";
+
+// The contest state of one CP competition, for the dashboard's contest button. Null when there is no session yet.
+export async function getCpSessionStatus(competitionId: string): Promise<CpSessionStatus | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.from("cp_sessions").select("status").eq("competition_id", competitionId).maybeSingle();
+  return data?.status ?? null;
+}
 
 // The CP competition the signed-in user plays in (participants), or the first CP competition (admins).
 // RLS keeps participants to their own accepted team and its competition.

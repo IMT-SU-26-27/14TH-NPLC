@@ -1,10 +1,12 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { refresh, updateTag } from "next/cache";
+import { COMPETITIONS_TAG } from "@/lib/data/competitions";
 import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
+import { hasRegistration } from "@/lib/data/registrations";
 import { deleteAsset, privateAssetUrl } from "@/lib/cloudinary/server";
 import { notifyRegistrationReviewed } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
@@ -42,6 +44,7 @@ export async function reviewRegistration(_prev: FormState, formData: FormData): 
   if (error) return errorState(databaseErrorMessage(error));
 
   if (status === "accepted" || status === "rejected") after(() => notifyRegistrationReviewed(registrationId));
+  updateTag(COMPETITIONS_TAG);
   refresh();
   return successState(
     status === "accepted" ? "admin.detail.accepted" : status === "rejected" ? "admin.detail.rejected" : "admin.detail.statusUpdated",
@@ -78,10 +81,13 @@ export async function adminCreateRegistration(_prev: FormState, formData: FormDa
   if (!leader) {
     return { status: "error", fieldErrors: { leaderEmail: [{ message: "admin.create.noLeaderAccount" }] } };
   }
+  if (await hasRegistration(leader.id)) {
+    return { status: "error", fieldErrors: { leaderEmail: [{ message: "admin.create.leaderAlreadyRegistered" }] } };
+  }
 
   const { data: registration, error } = await supabase
     .from("registrations")
-    .insert({ competition_id: input.competitionId, leader_id: leader.id, team_name: input.teamName })
+    .insert({ competition_id: input.competitionId, leader_id: leader.id, team_name: input.teamName, school: input.school })
     .select("id")
     .single();
   if (error) return errorState(databaseErrorMessage(error));
@@ -101,6 +107,7 @@ export async function adminCreateRegistration(_prev: FormState, formData: FormDa
     return errorState(databaseErrorMessage(memberError));
   }
 
+  updateTag(COMPETITIONS_TAG);
   redirect(localePath(await getRequestLocale(), `/admin/registrations/${registration.id}`));
 }
 
@@ -110,8 +117,9 @@ export async function adminRemoveMember(memberId: string): Promise<ActionResult>
   if (!id.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.from("registration_members").delete().eq("id", id.data);
+  const { data, error } = await supabase.from("registration_members").delete().eq("id", id.data).select("twibbon_proof_public_id");
   if (error) return { ok: false, message: databaseErrorMessage(error) };
+  if (data?.[0]?.twibbon_proof_public_id) await deleteAsset(data[0].twibbon_proof_public_id, "authenticated");
 
   refresh();
   return { ok: true, data: undefined };
@@ -123,10 +131,16 @@ export async function adminDeleteRegistration(registrationId: string): Promise<A
   if (!id.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
+  // Read before deleting: members go with the registration.
+  const { data: members } = await supabase.from("registration_members").select("twibbon_proof_public_id").eq("registration_id", id.data);
   const { data, error } = await supabase.from("registrations").delete().eq("id", id.data).select("payment_proof_public_id");
-  if (error) return { ok: false, message: databaseErrorMessage(error) };
+  if (error) return { ok: false, message: error.code === "23503" ? "rally.errors.teamHasResults" : databaseErrorMessage(error) };
   if (data?.[0]?.payment_proof_public_id) await deleteAsset(data[0].payment_proof_public_id, "authenticated");
+  for (const member of members ?? []) {
+    if (member.twibbon_proof_public_id) await deleteAsset(member.twibbon_proof_public_id, "authenticated");
+  }
 
+  updateTag(COMPETITIONS_TAG);
   redirect(localePath(await getRequestLocale(), "/admin/registrations"));
 }
 

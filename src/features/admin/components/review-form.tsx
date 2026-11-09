@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { OctagonXIcon } from "lucide-react";
+import { InfoIcon, OctagonXIcon } from "lucide-react";
 import { toast } from "sonner";
 import { reviewRegistration } from "@/lib/actions/admin-registrations";
 import { initialFormState } from "@/lib/form";
+import { memberRange } from "@/lib/format";
 import { useI18n } from "@/hooks/use-i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -15,13 +16,14 @@ import { Textarea } from "@/components/ui/textarea";
 import type { RegistrationStatus } from "@/types/registration";
 import type { ReviewFormProps } from "@/types/admin";
 
-export function ReviewForm({ registrationId, status, rejectionReason }: ReviewFormProps) {
+export function ReviewForm({ registrationId, status, rejectionReason, memberCount, minMembers, maxMembers }: ReviewFormProps) {
   const [state, action, pending] = useActionState(reviewRegistration, initialFormState);
-  const [next, setNext] = useState<RegistrationStatus>(status === "under_review" ? "accepted" : status);
+  const canAccept = memberCount >= minMembers && memberCount <= maxMembers;
+  const [next, setNext] = useState<RegistrationStatus>(status === "under_review" && canAccept ? "accepted" : status);
   const { t, fieldErrors } = useI18n();
   const errors = state.fieldErrors ?? {};
-  const statusItems: { value: RegistrationStatus; label: string }[] = [
-    { value: "accepted", label: t("admin.detail.accept") },
+  const statusItems: { value: RegistrationStatus; label: string; disabled?: boolean }[] = [
+    { value: "accepted", label: t("admin.detail.accept"), disabled: !canAccept && status !== "accepted" },
     { value: "rejected", label: t("admin.detail.reject") },
     { value: "under_review", label: t("admin.detail.backToReview") },
     { value: "pending_payment", label: t("admin.detail.backToPayment") },
@@ -49,12 +51,18 @@ export function ReviewForm({ registrationId, status, rejectionReason }: ReviewFo
             </SelectTrigger>
             <SelectContent>
               {statusItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
+                <SelectItem key={item.value} value={item.value} disabled={item.disabled}>
                   {item.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {!canAccept && status !== "accepted" && (
+            <Alert>
+              <InfoIcon />
+              <AlertDescription>{t("admin.detail.cannotAccept", { count: memberCount, range: memberRange(minMembers, maxMembers) })}</AlertDescription>
+            </Alert>
+          )}
         </Field>
         {next === "rejected" && (
           <Field data-invalid={!!errors.rejectionReason}>
