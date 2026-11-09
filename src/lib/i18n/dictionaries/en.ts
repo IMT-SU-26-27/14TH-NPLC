@@ -1373,6 +1373,8 @@ export const en: Dictionary = {
     deleteOnlyUnpaid: "Only the leader can delete a team before payment is submitted",
     paymentAlreadySubmitted: "Payment was already submitted for this team",
     uploadMissing: "We couldn't find that upload. Try uploading again.",
+    uploadTooLarge: "The file is larger than 5 MB, so it was rejected and deleted. Upload a smaller file.",
+    uploadFormat: "That file type isn't accepted, so it was rejected and deleted. Use JPG, PNG, WEBP or PDF.",
     uploadAgain: "Upload the payment proof again",
     uploadFailed: "Upload failed. Try again.",
     uploadConnection: "Upload failed. Check your connection and try again.",

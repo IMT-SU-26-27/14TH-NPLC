@@ -1372,6 +1372,8 @@ export const id = {
     deleteOnlyUnpaid: "Hanya ketua yang bisa menghapus tim sebelum pembayaran dikirim",
     paymentAlreadySubmitted: "Pembayaran tim ini sudah dikirim",
     uploadMissing: "Unggahan tidak ditemukan. Coba unggah ulang.",
+    uploadTooLarge: "File lebih dari 5 MB, jadi ditolak dan dihapus. Unggah file yang lebih kecil.",
+    uploadFormat: "Format file tidak diterima, jadi ditolak dan dihapus. Gunakan JPG, PNG, WEBP, atau PDF.",
     uploadAgain: "Unggah bukti pembayaran lagi",
     uploadFailed: "Gagal mengunggah. Coba lagi.",
     uploadConnection: "Gagal mengunggah. Periksa koneksi lalu coba lagi.",
