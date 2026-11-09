@@ -18,6 +18,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261109120000_team_quota_and_wa_group.sql` | `competitions.max_teams` (team quota, null = no limit; every team that is not rejected counts) enforced in `create_registration` and when a rejected team comes back, with the competition row locked; `competitions.wa_group_url` (participants' WhatsApp group), hidden from the API by column privileges; `competition_team_counts()`, `my_wa_group()`, `admin_competition_wa_group_url()` |
 | `20261109140000_timeline_event_competition.sql` | `timeline_events.competition_type` (null = every competition): which competition an event is for, so an accepted team's dashboard shows its own next date |
 | `20261110090000_lock_accepted_team_members.sql` | Only admins delete a registration (the leader no longer can, in any status). Leaving a team or removing a member is closed once the team is `accepted` (`private.registration_accepted`); admins can still change members |
+| `20261110220000_auto_freeze_leaderboards.sql` | The participants' leaderboard (CP and Rally) closes on its own `private.leaderboard_freeze_minutes()` (60, FREEZE_MINUTES) before the end: `cp_sessions.scheduled_end_at`, and the new `rally_sessions.scheduled_end_at` set in Admin → Rally. New columns `leaderboard_frozen_auto` and `leaderboard_released_at` on both session tables; `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` for the pages |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -57,7 +58,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | `rally_posts` | One post of the competition of type `logic` (Category 2): `name`, `kind` (`physical` or `digital`, recorded the same way), `location`, `points_win`, `points_lose`, `points_draw` (placeholders 100, 25 and 50 until the Divisi Event sets them), `allow_draw`, `is_active`. Names are unique per competition. |
 | `rally_post_assignments` | Which LO runs which post. A trigger accepts only accounts with the role `lo`. |
 | `rally_results` | One team's result at one post: `outcome` (`win`, `lose`, `draw`), `points` copied from the post when recorded, who recorded it and, after an admin correction, who corrected it (`corrected_by`, `corrected_at`; the original `recorded_by` and `recorded_at` stay). Never deleted: undo and admin changes fill `voided_at`. For now one active result per team per post (`rally_results_one_active`); replays would change this index. |
-| `rally_sessions` | One per Rally competition: `status` (`not_open`, `open`, `closed`) and `leaderboard_frozen_at`. LOs can look up, record and undo only while `open`; admins can correct at any time. |
+| `rally_sessions` | One per Rally competition: `status` (`not_open`, `open`, `closed`), `leaderboard_frozen_at`, `scheduled_end_at` (when the Rally ends, set by an admin; only used for the last-hour freeze), `leaderboard_frozen_auto` and `leaderboard_released_at` (see "Last-hour freeze"). LOs can look up, record and undo only while `open`; admins can correct at any time. |
 | `rally_scores` | One row per accepted team with `total_points`, `posts_finished` and `last_result_at`, kept up to date by triggers from active results only. The order is defined in `src/lib/rally/ranking.ts`. |
 | `rally_leaderboard_snapshots` | Copy of `rally_scores` taken when an admin freezes the leaderboard. Participants read this while frozen; admins always read the live scores. |
 | `rally_result_log` | Append-only audit log: action, who, when, team, post, old and new outcome and points, reason. Admins read it; nobody can change it. |
@@ -100,7 +101,7 @@ All changes to results go through these functions, and direct writes are refused
 | `cp_submission_results` | The result of each test case in a submission. Never stores the expected output of hidden tests. |
 | `cp_problem_scores` | A team's best score on each problem, and whether it solved it. |
 | `cp_scores` | The leaderboard: one row per accepted CP team, with total points, problems solved and `last_improved_at` for tie-breaks. |
-| `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when an admin freezes the leaderboard (`cp_sessions.leaderboard_frozen_at` set), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
+| `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when the leaderboard is frozen (`cp_sessions.leaderboard_frozen_at` set, by an admin or by the last-hour cut-off), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
 
 ### Views and functions
 
@@ -176,6 +177,16 @@ score = points × (passed / total) × efficiency
 - Judge0 can't measure time or space complexity directly. Big test cases are what catch the wrong complexity: a slow solution hits Time Limit Exceeded and loses that test case.
 - Only a team's best submission per problem counts, so a worse later submission never lowers the score.
 - Leaderboard order: `total_points` descending, then `last_improved_at` ascending (whoever got there first).
+
+## Last-hour freeze
+
+Participants stop seeing live standings `private.leaderboard_freeze_minutes()` minutes (60) before the end of the CP contest (`cp_sessions.scheduled_end_at`) and of the Rally Games (`rally_sessions.scheduled_end_at`). Admins always see live scores.
+
+- There is no scheduler. The first score change after the cut-off freezes the leaderboard **before** it is applied (`cp_scores_auto_freeze` / `rally_scores_auto_freeze`), and every leaderboard page calls `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` when it loads. Either way the snapshot holds the standings exactly as they were at the cut-off.
+- The freeze is the normal one (`leaderboard_frozen_at` = the cut-off, snapshot table, RLS, participant realtime off), with `leaderboard_frozen_auto = true` so participants read "closed for the last hour".
+- An open page reloads itself at the cut-off (`use-refresh-at`).
+- An admin can unfreeze as usual. Unfreezing after the cut-off sets `leaderboard_released_at`, so it is not frozen again until a new run (a new start of the CP contest, opening the Rally again, or a new Rally end time).
+- Applies while the CP contest is `live`/`paused` and while the Rally session is `open`. Resuming a paused CP contest moves `scheduled_end_at`, and the cut-off with it.
 
 ## Realtime
 
