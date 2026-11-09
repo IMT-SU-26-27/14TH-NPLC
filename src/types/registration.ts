@@ -253,10 +253,6 @@ export type TeamStatusPillProps = {
 };
 
 
-export type RegistrationRealtimeProps = {
-  registrationIds: string[];
-};
-
 export type RegisterSummaryProps = {
   competition: PublicCompetition;
   lang: Locale;

@@ -19,6 +19,7 @@ export const id = {
   common: {
     cancel: "Batal",
     save: "Simpan",
+    reload: "Muat ulang",
     delete: "Hapus",
     back: "Kembali",
     copied: "Tersalin",
@@ -625,8 +626,6 @@ export const id = {
     memberRemoved: "Anggota dikeluarkan",
     youLeft: "Kamu keluar dari tim",
     membersLocked: "Perubahan anggota setelah diterima lewat contact person.",
-    accepted: "Pendaftaran kamu diterima",
-    rejected: "Pendaftaran kamu ditolak. Lihat alasannya di dasbor.",
   },
   timeline: {
     created: "Tim dibuat",

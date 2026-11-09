@@ -7,6 +7,7 @@ import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RefreshButton } from "@/components/shared/refresh-button";
 import { RegistrationsSection } from "@/features/admin/components/registrations-section";
 import type { AdminRegistrationsPageProps } from "@/types/admin";
 
@@ -26,10 +27,13 @@ export default async function AdminRegistrationsPage({ params, searchParams }: A
           <h1 className="font-heading text-2xl font-semibold tracking-tight">{t("admin.registrations.title")}</h1>
           <p className="text-muted-foreground">{t("admin.registrations.lead")}</p>
         </div>
-        <Link href={localePath(lang, "/admin/registrations/new")} className={buttonVariants()}>
-          <PlusIcon />
-          {t("admin.registrations.new")}
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <RefreshButton />
+          <Link href={localePath(lang, "/admin/registrations/new")} className={buttonVariants()}>
+            <PlusIcon />
+            {t("admin.registrations.new")}
+          </Link>
+        </div>
       </div>
       <Suspense fallback={<Skeleton className="h-96" />}>
         <RegistrationsSection lang={lang} searchParams={searchParams} />
