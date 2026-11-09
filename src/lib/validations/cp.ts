@@ -2,6 +2,11 @@ import { z } from "zod";
 import { Constants } from "@/types/database";
 
 export const CP_LANGUAGES = ["python", "cpp", "java"] as const;
+
+// Every test case is a separate Judge0 submission, so this is what multiplies the
+// judge's load. A problem that needs more cases should pack several of them into one
+// input (a leading `T`), which costs one job instead of ten.
+export const CP_MAX_TEST_CASES = 10;
 export const CP_DIFFICULTIES = ["easy", "medium", "hard"] as const;
 
 export const codeSubmissionSchema = z.object({
@@ -33,7 +38,7 @@ export const problemSchema = z.object({
   memoryLimitKb: z.coerce.number().int().min(16384, "validation.memoryLimit").max(512000, "validation.memoryLimit"),
   points: z.coerce.number().int().min(1, "validation.atLeastOne").max(100000),
   isPublished: z.boolean(),
-  testCases: z.array(testCaseSchema).min(1, "validation.testCasesMin").max(100),
+  testCases: z.array(testCaseSchema).min(1, "validation.testCasesMin").max(CP_MAX_TEST_CASES, "validation.testCasesMax"),
 });
 
 export const sessionSchema = z

@@ -961,7 +961,8 @@ export const id = {
         publish: "Publikasikan",
         publishHint: "Terlihat oleh peserta saat kontes berlangsung.",
         testCases: "Test case",
-        testCasesLead: "Test contoh terlihat oleh peserta. Test tersembunyi hanya dipakai untuk menilai.",
+        testCasesLead:
+          "Test contoh terlihat oleh peserta. Test tersembunyi hanya dipakai untuk menilai. Maksimal 10 per soal: setiap test dinilai terpisah, jadi gabungkan beberapa kasus dalam satu input kalau butuh lebih banyak.",
         addTest: "Tambah test case",
         removeTest: "Hapus test {n}",
         input: "Input",
@@ -1327,6 +1328,7 @@ export const id = {
     timeLimit: "Antara 100 dan 15000 ms",
     memoryLimit: "Antara 16384 dan 512000 KB",
     testCasesMin: "Tambahkan minimal satu test case",
+    testCasesMax: "Maksimal 10 test case per soal",
     expectedOutput: "Masukkan output yang diharapkan",
     cooldownMax: "Maksimal 600 detik",
     durationRequired: "Isi durasi lebih dari 0, maksimal 48 jam",

@@ -167,7 +167,7 @@ export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
           <CardTitle>{t("admin.cp.form.testCases")}</CardTitle>
           <CardDescription>{t("admin.cp.form.testCasesLead")}</CardDescription>
           <CardAction>
-            <Button type="button" variant="outline" size="sm" onClick={tests.add}>
+            <Button type="button" variant="outline" size="sm" onClick={tests.add} disabled={tests.full}>
               <PlusIcon />
               {t("admin.cp.form.addTest")}
             </Button>
