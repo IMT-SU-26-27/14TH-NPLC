@@ -210,12 +210,6 @@ export type TeamTimelineProps = {
 export type TeamMembersProps = {
   team: Team;
   userId: string;
-  canEdit: boolean;
-};
-
-export type MemberActionProps = {
-  member: TeamMember;
-  isSelf: boolean;
 };
 
 export type PaymentPanelProps = {
@@ -252,10 +246,6 @@ export type TeamStatusPillProps = {
   lang: Locale;
 };
 
-
-export type RegistrationRealtimeProps = {
-  registrationIds: string[];
-};
 
 export type RegisterSummaryProps = {
   competition: PublicCompetition;
