@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { InfoIcon, OctagonXIcon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 import { getPaymentUploadSignature, submitPayment } from "@/lib/actions/registration";
+import { PAYMENT_PROOF_MAX_BYTES } from "@/lib/upload-limits";
 import { memberRange } from "@/lib/format";
 import { currentFee } from "@/lib/pricing";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
@@ -19,7 +20,8 @@ import { PaymentInstructions } from "@/features/registration/components/payment-
 import type { PaymentPanelProps, PaymentProofFormat } from "@/types/registration";
 
 const ACCEPT = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-const MAX_BYTES = 5 * 1024 * 1024;
+// Early feedback only: the server checks the uploaded file again (verifyUpload).
+const MAX_BYTES = PAYMENT_PROOF_MAX_BYTES;
 
 export function PaymentPanel({ team, qrisUrl }: PaymentPanelProps) {
   const [file, setFile] = useState<File | null>(null);

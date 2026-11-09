@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { COMPETITIONS_TAG } from "@/lib/data/competitions";
-import { assetExists, deleteAsset, QRIS_FOLDER, signUpload } from "@/lib/cloudinary/server";
+import { deleteAsset, QRIS_FOLDER, signUpload, uploadErrorKey, verifyUpload } from "@/lib/cloudinary/server";
+import { QRIS_FORMATS_ALLOWED, QRIS_MAX_BYTES } from "@/lib/upload-limits";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
 import { localePath } from "@/lib/i18n/config";
 import { getRequestLocale } from "@/lib/i18n/server";
@@ -131,9 +132,8 @@ export async function setCompetitionQris(input: QrisInput): Promise<ActionResult
   if (!parsed.success) return { ok: false, message: "errors.uploadFailed" };
   const { competitionId, publicId } = parsed.data;
 
-  if (!publicId.startsWith(`${QRIS_FOLDER}/`) || !(await assetExists(publicId, "upload"))) {
-    return { ok: false, message: "errors.uploadMissing" };
-  }
+  const qris = await verifyUpload(publicId, "upload", QRIS_FOLDER, { maxBytes: QRIS_MAX_BYTES, formats: QRIS_FORMATS_ALLOWED });
+  if (!qris.ok) return { ok: false, message: uploadErrorKey(qris.reason) };
 
   const supabase = await createSupabaseServerClient();
   const { data: previous } = await supabase.from("competitions").select("qris_public_id").eq("id", competitionId).single();

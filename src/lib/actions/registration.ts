@@ -7,7 +7,8 @@ import { after } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { hasRegistration } from "@/lib/data/registrations";
-import { assetExists, deleteAsset, newRegistrationProofFolder, paymentProofFolder, signUpload } from "@/lib/cloudinary/server";
+import { deleteAsset, newRegistrationProofFolder, paymentProofFolder, signUpload, uploadErrorKey, verifyUpload } from "@/lib/cloudinary/server";
+import { PAYMENT_PROOF_FORMATS_ALLOWED, PAYMENT_PROOF_MAX_BYTES } from "@/lib/upload-limits";
 import { databaseErrorMessage, databaseErrorState, errorState, fieldErrorState } from "@/lib/form";
 import { notifyAdminsPaymentToReview, notifyLeaderMemberJoined } from "@/lib/push/notify";
 import { localePath } from "@/lib/i18n/config";
@@ -22,6 +23,8 @@ import {
 import type { ActionResult, FormState } from "@/types";
 import type { CloudinaryUploadSignature } from "@/types/cloudinary";
 import type { SubmitPaymentInput } from "@/types/registration";
+
+const PROOF_RULES = { maxBytes: PAYMENT_PROOF_MAX_BYTES, formats: PAYMENT_PROOF_FORMATS_ALLOWED };
 
 export async function createRegistration(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = createRegistrationSchema.safeParse({
@@ -39,14 +42,15 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
 
   const user = await getCurrentUser();
   if (!user) return errorState("errors.signInAgain");
-  const { paymentProofPublicId: publicId, paymentProofFormat: format } = parsed.data;
+  const { paymentProofPublicId: publicId } = parsed.data;
+  // Read back from Cloudinary: in this user's folder, at most 5 MB, an allowed format. Rejected files are deleted.
+  const proof = await verifyUpload(publicId, "authenticated", newRegistrationProofFolder(user.id), PROOF_RULES);
   if (await hasRegistration(user.id)) {
-    if (publicId.startsWith(`${newRegistrationProofFolder(user.id)}/`)) await deleteAsset(publicId, "authenticated");
+    if (proof.ok) await deleteAsset(publicId, "authenticated");
     return errorState("errors.alreadyOnTeam");
   }
-  if (!publicId.startsWith(`${newRegistrationProofFolder(user.id)}/`) || !(await assetExists(publicId, "authenticated"))) {
-    return errorState("errors.uploadMissing");
-  }
+  if (!proof.ok) return errorState(uploadErrorKey(proof.reason));
+  const format = proof.format;
 
   const supabase = await createSupabaseServerClient();
   const { data: registrationId, error } = await supabase.rpc("create_registration", {
@@ -175,10 +179,10 @@ export async function submitPayment(input: SubmitPaymentInput): Promise<ActionRe
   const parsed = submitPaymentSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: "errors.uploadAgain" };
 
-  const { registrationId, publicId, format } = parsed.data;
-  if (!publicId.startsWith(`${paymentProofFolder(registrationId)}/`) || !(await assetExists(publicId, "authenticated"))) {
-    return { ok: false, message: "errors.uploadMissing" };
-  }
+  const { registrationId, publicId } = parsed.data;
+  const proof = await verifyUpload(publicId, "authenticated", paymentProofFolder(registrationId), PROOF_RULES);
+  if (!proof.ok) return { ok: false, message: uploadErrorKey(proof.reason) };
+  const format = proof.format;
 
   const supabase = await createSupabaseServerClient();
   const { data: previous } = await supabase

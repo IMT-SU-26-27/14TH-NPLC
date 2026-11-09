@@ -3,6 +3,7 @@
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { ArrowRightIcon, IdCardIcon, MailIcon, MessageCircleIcon, OctagonXIcon, SchoolIcon, TriangleAlertIcon, UserIcon, UsersIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature } from "@/lib/actions/registration";
+import { PAYMENT_PROOF_MAX_BYTES } from "@/lib/upload-limits";
 import { fieldErrorState, initialFormState } from "@/lib/form";
 import { isPaymentReady } from "@/lib/payment";
 import { createRegistrationSchema } from "@/lib/validations/registration";
@@ -25,7 +26,8 @@ import type { FieldErrors } from "@/types";
 import type { RegisterTeamFormProps } from "@/types/registration";
 
 const ACCEPT = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-const MAX_BYTES = 5 * 1024 * 1024;
+// Early feedback only: the server checks the uploaded file again (verifyUpload).
+const MAX_BYTES = PAYMENT_PROOF_MAX_BYTES;
 
 // The typed fields, checked in the browser before anything is uploaded. The Server Action checks them again.
 const typedFieldsSchema = createRegistrationSchema.pick({

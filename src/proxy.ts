@@ -6,7 +6,8 @@ import { rallyLeaderboardOpen } from "@/lib/rally/session-visibility";
 const SIGNED_IN_ONLY = ["/dashboard", "/register", "/join", "/admin", "/cp", "/lo", "/rally", "/reset-password", "/profile"];
 // LO accounts run posts only: they never register, compete or administer.
 const NOT_FOR_LO = ["/dashboard", "/register", "/join", "/admin", "/cp", "/rally"];
-const SIGNED_OUT_ONLY = ["/login", "/signup", "/forgot-password"];
+// /forgot-password stays open when signed in: the profile links to it for someone who forgot their current password.
+const SIGNED_OUT_ONLY = ["/login", "/signup"];
 
 function matches(path: string, prefixes: string[]) {
   return prefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
