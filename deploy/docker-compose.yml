@@ -1,0 +1,31 @@
+# Lives on the VPS at /var/www/websites/panit/su/nplc/14th-nplc/docker-compose.yml
+# Values come from the .env the deploy workflow writes next to it (mode 600).
+#
+# No ports are published: Nginx Proxy Manager reaches this container by name
+# over the external `proxy` network. Point the NPM proxy host for the public
+# hostname at  nplc-web : 3000.
+
+services:
+  web:
+    image: ${IMAGE}:${IMAGE_TAG}
+    container_name: nplc-web
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - default
+      - proxy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: "3"
+
+networks:
+  proxy:
+    external: true

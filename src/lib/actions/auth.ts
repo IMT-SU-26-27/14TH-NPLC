@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { forgotPasswordSchema, newPasswordSchema, nextPathSchema, signInSchema, signUpSchema } from "@/lib/validations/auth";
 import { errorState, fieldErrorState, successState } from "@/lib/form";
 import { localePath } from "@/lib/i18n/config";
+import { originFromHeaders } from "@/lib/request-origin";
 import { getRequestLocale } from "@/lib/i18n/server";
 import type { FormState } from "@/types";
 
@@ -70,7 +71,10 @@ export async function requestPasswordReset(_prev: FormState, formData: FormData)
   const parsed = forgotPasswordSchema.safeParse({ email: formData.get("email") });
   if (!parsed.success) return fieldErrorState(parsed.error);
 
-  const origin = (await headers()).get("origin") ?? "";
+  // The browser sends Origin on the action POST; the Host header is the fallback
+  // when it is absent, so the reset link never points at the container's address.
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin") || originFromHeaders(requestHeaders);
   const next = localePath(await getRequestLocale(), "/reset-password");
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {

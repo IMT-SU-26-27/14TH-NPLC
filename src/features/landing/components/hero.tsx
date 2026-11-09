@@ -7,6 +7,7 @@ import { HeroCube } from "@/features/landing/components/hero-cube";
 import { HeroCubeFragments } from "@/features/landing/components/hero-cube-fragments";
 import { useHeroAnimation } from "@/hooks/use-hero-animation";
 import { useI18n } from "@/hooks/use-i18n";
+import { useParallax } from "@/hooks/use-parallax";
 import { sectionHref } from "@/lib/home-sections";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,20 +18,25 @@ const SLASH_COLORS = ["text-primary", "text-highlight", "text-brand-purple"];
 
 export function Hero({ status }: HeroProps) {
   const scope = useHeroAnimation<HTMLElement>();
+  const waveScope = useParallax<HTMLDivElement>();
   const { t, href, lang } = useI18n();
   const motto = [t("landing.hero.analyze"), t("landing.hero.think"), t("landing.hero.solve")];
 
   return (
     <section ref={scope} className="relative isolate overflow-hidden">
-      {/* Static wave along the bottom, as in the design (45% opacity). */}
-      <Image
-        src="/landing/hero-wave.webp"
-        alt=""
-        width={2000}
-        height={575}
-        sizes="100vw"
-        className="pointer-events-none absolute inset-x-0 bottom-8 -z-10 h-[170px] w-full object-cover opacity-45 sm:bottom-10 sm:h-60"
-      />
+      {/* The wave along the bottom, as in the design (45% opacity). It drifts a little slower than the page,
+          so the hero copy scrolls over it. Its own scope: the hero's ref already carries the cube animation. */}
+      <div ref={waveScope} aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <Image
+          data-parallax={0.22}
+          src="/landing/hero-wave.webp"
+          alt=""
+          width={2000}
+          height={575}
+          sizes="100vw"
+          className="absolute inset-x-0 bottom-8 h-[170px] w-full object-cover opacity-45 sm:bottom-10 sm:h-60"
+        />
+      </div>
 
       <div className="mx-auto max-w-7xl px-4 pt-6 pb-24 sm:pt-12 lg:pb-32">
         <div data-hero-item className="text-primary flex items-start justify-between gap-4 font-mono text-xs tracking-[0.2em] uppercase">
