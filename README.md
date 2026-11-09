@@ -166,6 +166,7 @@ Untuk yang ingin database **sendiri**, misalnya untuk mencoba panel Admin. Kamu 
 
 Catatan:
 - `pnpm sb link` menyimpan ref project di `supabase/.temp` (tidak ikut di-commit). Jangan pernah me-*link* ke project tim.
+- CLI akan menampilkan *"A new version of Supabase CLI is available"*. Abaikan saja: tim memakai 2.101.0, dan `pnpm sb` memang dikunci ke versi itu.
 - Punya Docker Desktop? Supabase lokal juga bisa dipakai: `pnpm sb start` menjalankan migration dan seed otomatis, lalu ambil URL dan key dari `pnpm sb status`.
 
 ---
