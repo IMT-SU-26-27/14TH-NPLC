@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLinkIcon, LogOutIcon, UserMinusIcon } from "lucide-react";
+import { contactFor, whatsappUrl } from "@/lib/event-info";
 import { removeMember } from "@/lib/actions/registration";
 import { useConfirmAction } from "@/hooks/use-confirm-action";
 import { useI18n } from "@/hooks/use-i18n";
@@ -18,6 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { WhatsappIcon } from "@/components/shared/whatsapp-icon";
 import type { MemberActionProps, TeamMembersProps } from "@/types/registration";
 
 function MemberAction({ member, isSelf }: MemberActionProps) {
@@ -60,12 +62,15 @@ const dataLabel = "text-muted-foreground font-mono text-[11px] font-medium track
 export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
   const { t } = useI18n();
   const isLeader = team.leader_id === userId;
+  // Members are fixed once an admin accepts the team; changes go through the competition's contact person.
+  const locked = team.status === "accepted";
+  const contact = contactFor(team.competition.type);
 
   return (
     <ul className="space-y-2.5">
       {team.members.map((member) => {
         const isSelf = member.user_id === userId;
-        const canAct = canEdit && !member.is_leader && (isLeader || isSelf);
+        const canAct = canEdit && !locked && !member.is_leader && (isLeader || isSelf);
         return (
           <li key={member.id} className="bg-card ring-border flex items-start justify-between gap-3 rounded-[12px] px-3.5 py-3 ring-1">
             <div className="min-w-0 space-y-1 text-sm">
@@ -103,6 +108,22 @@ export function TeamMembers({ team, userId, canEdit }: TeamMembersProps) {
           </li>
         );
       })}
+      {locked && canEdit && (
+        <li className="text-muted-foreground text-sm">
+          {t("dashboard.membersLocked")}{" "}
+          {contact && (
+            <a
+              href={whatsappUrl(contact.whatsapp)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary focus-visible:ring-ring/50 inline-flex items-center gap-1 rounded-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-3"
+            >
+              <WhatsappIcon aria-hidden className="size-3.5" />
+              {`${contact.label} · ${contact.name}`}
+            </a>
+          )}
+        </li>
+      )}
     </ul>
   );
 }

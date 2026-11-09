@@ -9,7 +9,6 @@ import { TeamTimeline } from "@/features/dashboard/components/team-timeline";
 import { TeamMembers } from "@/features/dashboard/components/team-members";
 import { PaymentPanel } from "@/features/dashboard/components/payment-panel";
 import { ReferralCode } from "@/features/dashboard/components/referral-code";
-import { DeleteTeamButton } from "@/features/dashboard/components/delete-team-button";
 import { RallyTeamQr } from "@/features/rally/components/rally-team-qr";
 import { RallySessionRefresh } from "@/features/dashboard/components/rally-session-refresh";
 import { NextUpCard } from "@/features/dashboard/components/next-up-card";
@@ -121,11 +120,6 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStat
         </>
       )}
 
-      {isLeader && team.status === "pending_payment" && (
-        <div className="flex justify-end">
-          <DeleteTeamButton registrationId={team.id} />
-        </div>
-      )}
     </article>
   );
 }

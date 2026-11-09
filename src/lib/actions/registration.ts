@@ -111,35 +111,14 @@ export async function removeMember(memberId: string): Promise<ActionResult> {
   if (!id.success) return { ok: false, message: "errors.invalidRequest" };
 
   const supabase = await createSupabaseServerClient();
+  // Members are fixed once the team is accepted (changes go through the contact person). RLS enforces the same.
+  const { data: member } = await supabase.from("registration_members").select("registration:registrations ( status )").eq("id", id.data).maybeSingle();
+  if (member?.registration?.status === "accepted") return { ok: false, message: "errors.membersLocked" };
   const { data, error } = await supabase.from("registration_members").delete().eq("id", id.data).select("twibbon_proof_public_id");
   if (error) return { ok: false, message: databaseErrorMessage(error) };
   if (!data?.length) return { ok: false, message: "errors.cannotRemoveMember" };
   if (data[0].twibbon_proof_public_id) await deleteAsset(data[0].twibbon_proof_public_id, "authenticated");
 
-  refresh();
-  return { ok: true, data: undefined };
-}
-
-export async function deleteRegistration(registrationId: string): Promise<ActionResult> {
-  const id = registrationIdSchema.safeParse(registrationId);
-  if (!id.success) return { ok: false, message: "errors.invalidRequest" };
-
-  const supabase = await createSupabaseServerClient();
-  // Read before deleting: members go with the registration.
-  const { data: members } = await supabase.from("registration_members").select("twibbon_proof_public_id").eq("registration_id", id.data);
-  const { data, error } = await supabase
-    .from("registrations")
-    .delete()
-    .eq("id", id.data)
-    .select("payment_proof_public_id");
-  if (error) return { ok: false, message: databaseErrorMessage(error) };
-  if (!data?.length) return { ok: false, message: "errors.deleteOnlyUnpaid" };
-
-  if (data[0].payment_proof_public_id) await deleteAsset(data[0].payment_proof_public_id, "authenticated");
-  for (const member of members ?? []) {
-    if (member.twibbon_proof_public_id) await deleteAsset(member.twibbon_proof_public_id, "authenticated");
-  }
-  updateTag(COMPETITIONS_TAG);
   refresh();
   return { ok: true, data: undefined };
 }
