@@ -17,6 +17,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261109100000_competition_description_en.sql` | `competitions.description_en`: the English description for the `/en` pages; empty means the Indonesian `description` is shown |
 | `20261109120000_team_quota_and_wa_group.sql` | `competitions.max_teams` (team quota, null = no limit; every team that is not rejected counts) enforced in `create_registration` and when a rejected team comes back, with the competition row locked; `competitions.wa_group_url` (participants' WhatsApp group), hidden from the API by column privileges; `competition_team_counts()`, `my_wa_group()`, `admin_competition_wa_group_url()` |
 | `20261109140000_timeline_event_competition.sql` | `timeline_events.competition_type` (null = every competition): which competition an event is for, so an accepted team's dashboard shows its own next date |
+| `20261110090000_lock_accepted_team_members.sql` | Only admins delete a registration (the leader no longer can, in any status). Leaving a team or removing a member is closed once the team is `accepted` (`private.registration_accepted`); admins can still change members |
 
 Both migrations and the seed are applied to the self-hosted Supabase on the VPS (`supabase-db` container) and recorded in `supabase_migrations.schema_migrations`. To apply a new migration there:
 
@@ -145,7 +146,7 @@ members join with the referral code at any point while the competition's registr
 |---|---|---|
 | Active competitions | Everyone, including logged-out visitors, every column except `wa_group_url` | All columns except `wa_group_url` (read it with `admin_competition_wa_group_url`) |
 | Competition WhatsApp group link | Members of an accepted team of that competition, through `my_wa_group()` | Through `admin_competition_wa_group_url()`; edited in the competition form |
-| Registrations, members, timeline | Only their own team | All, full edit |
+| Registrations, members, timeline | Only their own team. They cannot delete their team; members can leave (or be removed by the leader) only until the team is accepted | All, full edit, including deleting teams and changing members of accepted teams |
 | CP session status | Members of accepted CP teams | All, start/end |
 | CP problems | Members of accepted CP teams, **only while the contest is live** | All |
 | CP test cases | Sample cases only, only while live | All |
