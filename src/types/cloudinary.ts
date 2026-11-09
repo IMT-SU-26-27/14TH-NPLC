@@ -10,6 +10,8 @@ export type CloudinaryUploadSignature = {
   folder: string;
   type: CloudinaryDeliveryType;
   allowedFormats: string;
+  // Signed too: puts the folder in front of the public_id on dynamic-folder accounts (see signUpload).
+  useAssetFolderAsPublicIdPrefix: true;
 };
 
 export type CloudinaryUploadResult = {

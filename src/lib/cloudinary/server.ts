@@ -20,12 +20,15 @@ function client() {
   return cloudinary;
 }
 
-// Signs a direct browser upload. folder/type/allowed_formats are part of the signature,
-// so the browser cannot change where the file goes or what it is.
+// Signs a direct browser upload. folder/type/allowed_formats are part of the signature, so the browser cannot change
+// where the file goes or what it is. Accounts differ in what `folder` does: on fixed-folder accounts (and older
+// dynamic ones) it is the public_id prefix; on newer dynamic-folder accounts it only sets the asset folder and the
+// public_id comes back as a bare random string. use_asset_folder_as_public_id_prefix asks those accounts for the
+// prefix as well.
 export function signUpload(folder: string, type: CloudinaryDeliveryType, allowedFormats: string): CloudinaryUploadSignature {
   const env = getServerEnv();
   const timestamp = Math.round(Date.now() / 1000);
-  const params = { folder, type, allowed_formats: allowedFormats, timestamp };
+  const params = { folder, type, allowed_formats: allowedFormats, use_asset_folder_as_public_id_prefix: true, timestamp };
   const signature = client().utils.api_sign_request(params, env.CLOUDINARY_API_SECRET);
   return {
     cloudName: env.CLOUDINARY_CLOUD_NAME,
@@ -35,6 +38,7 @@ export function signUpload(folder: string, type: CloudinaryDeliveryType, allowed
     folder,
     type,
     allowedFormats,
+    useAssetFolderAsPublicIdPrefix: true,
   };
 }
 
