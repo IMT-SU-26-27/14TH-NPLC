@@ -1300,7 +1300,7 @@ export const id = {
     install: "Pasang aplikasi",
     installed: "14th NPLC sudah terpasang.",
     installedTitle: "Sudah terpasang",
-    installedBody: "Kamu sedang membuka 14th NPLC sebagai aplikasi di perangkat ini.",
+    installedBody: "14th NPLC sudah terpasang di perangkat ini. Buka dari Layar Utama, menu Start, atau daftar aplikasi.",
     iosTitle: "Pasang lewat Bagikan",
     ios: "Di Safari, ketuk Bagikan, lalu pilih Tambah ke Layar Utama.",
     manualTitle: "Pasang lewat menu browser",

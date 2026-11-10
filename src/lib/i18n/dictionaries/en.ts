@@ -1299,7 +1299,7 @@ export const en: Dictionary = {
     install: "Install app",
     installed: "14th NPLC is installed.",
     installedTitle: "Installed",
-    installedBody: "You are using 14th NPLC as an app on this device.",
+    installedBody: "14th NPLC is installed on this device. Open it from your Home Screen, Start menu or app list.",
     iosTitle: "Install through Share",
     ios: "In Safari, tap Share, then choose Add to Home Screen.",
     manualTitle: "Install from the browser menu",
