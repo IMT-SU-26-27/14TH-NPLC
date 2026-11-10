@@ -43,7 +43,6 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   return {
     title: { default: t("meta.siteName"), template: `%s · ${t("meta.siteName")}` },
     description: t("meta.siteDescription"),
-    alternates: { languages: { id: "/id", en: "/en" } },
   };
 }
 

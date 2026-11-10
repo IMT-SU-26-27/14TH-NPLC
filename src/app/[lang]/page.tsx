@@ -1,3 +1,4 @@
+import { languageAlternates } from "@/lib/i18n/alternates";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -18,7 +19,7 @@ import type { LangPageProps } from "@/types/i18n";
 
 export async function generateMetadata({ params }: LangPageProps): Promise<Metadata> {
   const t = getT(await resolveLang(params));
-  return { title: { absolute: t("meta.homeTitle") }, description: t("meta.homeDescription") };
+  return { title: { absolute: t("meta.homeTitle") }, description: t("meta.homeDescription"), alternates: languageAlternates("") };
 }
 
 export default async function HomePage({ params }: LangPageProps) {
