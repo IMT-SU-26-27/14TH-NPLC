@@ -1,9 +1,9 @@
 # Rencana Rally Games
 
-Status: **disetujui, dikerjakan bertahap.** Rute dan main ulang ditunda sampai ada jawaban Divisi Event.
-Sumber: Website Request Guidelines NPLC 14th, Brief Fitur Rally Games, dan keputusan Tech per 31 Oktober 2026.
+Status: **disetujui, dikerjakan bertahap.** Main ulang ditunda sampai ada jawaban Divisi Event. Aturan rute, kehadiran, registrasi ulang, dan final mengikuti guidebook (bagian 9).
+Sumber: Website Request Guidelines NPLC 14th, Brief Fitur Rally Games, keputusan Tech per 31 Oktober 2026, dan Guidebook Kategori 2 (Canva "GUIDE BOOOOOKKK KAT2").
 
-Kalau brief dan dokumen ini berbeda, yang berlaku dokumen ini. Contohnya undo oleh LO: brief hanya menyebut koreksi oleh admin.
+Kalau brief dan dokumen ini berbeda, yang berlaku dokumen ini. Kalau guidebook dan dokumen ini berbeda, yang berlaku guidebook, **kecuali nilai poin per pos** yang masih memakai angka sementara (100/25/50) sampai Divisi Event memutuskan. Contoh undo oleh LO: brief hanya menyebut koreksi oleh admin.
 
 ## 1. Ringkasan
 
@@ -70,7 +70,7 @@ create table public.rally_post_assignments (
 );
 create index on public.rally_post_assignments (lo_id);
 
--- Rute per tim. Kosong berarti tim bebas memilih pos (menunggu keputusan Event).
+-- Rute per tim, wajib diikuti (guidebook: "Tim wajib mengikuti alur pos rally games sesuai arahan panitia"). Diatur admin.
 create table public.rally_team_routes (
   registration_id uuid not null references public.registrations (id) on delete cascade,
   post_id uuid not null references public.rally_posts (id) on delete cascade,
@@ -95,6 +95,7 @@ create table public.rally_results (
   unique (client_request_id)
 );
 -- Satu hasil aktif per tim per pos. Dihapus atau diubah kalau Event mengizinkan main ulang.
+-- Tim yang didiskualifikasi tidak menerima hasil baru (dicek di rally_record_result).
 create unique index rally_results_one_active on public.rally_results (registration_id, post_id) where voided_at is null;
 create index on public.rally_results (post_id, recorded_at desc);
 
@@ -127,6 +128,28 @@ create index on public.rally_scores (competition_id, total_points desc);
 create table public.rally_leaderboard_snapshots (like public.rally_scores including defaults);
 ```
 
+Registrasi ulang dan diskualifikasi (guidebook: registrasi ulang sebelum babak rally, ketiga anggota wajib hadir di setiap babak, tim tidak lengkap atau melanggar peraturan didiskualifikasi):
+
+```sql
+-- Dicatat saat registrasi ulang, per anggota.
+create table public.rally_checkins (
+  registration_id uuid not null references public.registrations (id) on delete cascade,
+  user_id uuid not null references public.profiles (id) on delete cascade,
+  stage text not null default 'rally' check (stage in ('rally', 'final')),
+  checked_in_at timestamptz not null default now(),
+  checked_in_by uuid not null references public.profiles (id),
+  primary key (registration_id, user_id, stage)
+);
+
+-- Diskualifikasi diputuskan admin dan tercatat; tidak menghapus hasil.
+create table public.rally_disqualifications (
+  registration_id uuid primary key references public.registrations (id) on delete cascade,
+  reason text not null,
+  disqualified_by uuid not null references public.profiles (id),
+  disqualified_at timestamptz not null default now()
+);
+```
+
 Token QR ditambahkan ke tim:
 
 ```sql
@@ -140,8 +163,10 @@ Token dibuat terpisah dari `referral_code` supaya bisa diganti tanpa mengubah ko
 
 | Fungsi | Dipanggil oleh | Validasi |
 |---|---|---|
-| `rally_lookup_team(post_id, code)` | LO | LO memegang pos itu. Menerima token atau kode tim, dan tim harus `accepted`. Mengembalikan nama tim, status di pos ini, dan apakah pos ada di rutenya. Tidak mengembalikan NISN, HP, atau email |
-| `rally_record_result(post_id, code, outcome, client_request_id)` | LO | Pemeriksaan di atas, kontes `live`, pos aktif, `draw` hanya kalau `allow_draw`, belum ada hasil aktif. Poin diambil dari pos |
+| `rally_lookup_team(post_id, code)` | LO | LO memegang pos itu. Menerima token atau kode tim, dan tim harus `accepted`. Mengembalikan nama tim, status di pos ini, apakah pos ini giliran tim menurut rutenya, apakah semua anggota sudah registrasi ulang, dan apakah tim didiskualifikasi. Tidak mengembalikan NISN, HP, atau email |
+| `rally_record_result(post_id, code, outcome, client_request_id)` | LO | Pemeriksaan di atas, kontes `live`, pos aktif, `draw` hanya kalau `allow_draw`, belum ada hasil aktif. Tim harus punya rute, pos ini harus pos berikutnya di rute, ketiga anggota sudah registrasi ulang, dan tim tidak didiskualifikasi; kalau tidak, ditolak dengan pesan yang jelas. Poin diambil dari pos |
+| `rally_check_in(registration_id, user_id, stage)` | Admin, LO | Mencatat kehadiran satu anggota saat registrasi ulang |
+| `rally_disqualify_team(registration_id, reason)` | Admin | Alasan wajib. Dicatat di `rally_disqualifications` |
 | `rally_undo_result(result_id)` | LO | Hanya hasil miliknya, dan masih dalam `undo_window_seconds`. Setelah itu lewat admin |
 | `rally_correct_result(result_id, outcome, reason)` | Admin | Alasan wajib. Membatalkan hasil lama dan membuat yang baru dalam satu transaksi |
 | `rally_void_result(result_id, reason)` | Admin | Alasan wajib |
@@ -155,6 +180,7 @@ Token dibuat terpisah dari `referral_code` supaya bisa diganti tanpa mengubah ko
 | `rally_posts` | Baca | Baca | Semua |
 | `rally_post_assignments` | Tidak | Baca miliknya | Semua |
 | `rally_team_routes` | Baca rute timnya | Tidak; dicek di RPC | Semua |
+| `rally_checkins`, `rally_disqualifications` | Baca milik timnya | Tidak; dicek di RPC | Semua |
 | `rally_results` | Baca hasil timnya | Baca hasil di posnya | Baca; ubah lewat RPC |
 | `rally_result_log` | Tidak | Tidak | Baca saja |
 | `rally_scores` | Lewat fungsi leaderboard yang menghormati freeze | Sama dengan peserta | Baca langsung |
@@ -166,7 +192,8 @@ Token dibuat terpisah dari `referral_code` supaya bisa diganti tanpa mengubah ko
 ### Peserta
 
 - **Dasbor tim:** kartu "Rally Games" berisi QR besar, kode tim sebagai cadangan, dan petunjuk menaikkan kecerahan layar.
-- **Rute:** daftar pos berurutan dengan status sudah atau belum. Hasil terbaru tiba lewat Realtime.
+- **Rute:** daftar pos berurutan yang wajib diikuti, dengan status sudah atau belum dan pos berikutnya. Hasil terbaru tiba lewat Realtime.
+- **Registrasi ulang:** status kehadiran tiga anggota, dan peringatan kalau ada yang belum.
 - **`/rally/leaderboard`:** ranking realtime dengan label "Tim kamu". Saat dibekukan menampilkan snapshot.
 - **Opsional:** notifikasi masuk 4 besar atau final, memakai web push yang sudah ada.
 
@@ -174,7 +201,7 @@ Token dibuat terpisah dari `referral_code` supaya bisa diganti tanpa mengubah ko
 
 1. **`/lo`:** daftar pos miliknya. Kalau hanya satu, langsung masuk.
 2. **`/lo/posts/[id]`:** kamera menyala. Ada input kode manual kalau kamera gagal atau QR rusak.
-3. **Setelah scan:** nama tim tampil besar supaya LO memastikan orangnya benar, lalu tombol besar **Menang**, **Kalah**, dan **Seri** (kalau pos mengizinkan). Tombol Batal kembali ke kamera.
+3. **Setelah scan:** nama tim tampil besar supaya LO memastikan orangnya benar, lalu tombol besar **Menang**, **Kalah**, dan **Seri** (kalau pos mengizinkan). Kalau pos ini bukan giliran tim, anggotanya belum lengkap, atau tim didiskualifikasi, tombol terkunci dengan alasan yang jelas. Tombol Batal kembali ke kamera.
 4. **Setelah menyimpan:** hasil dan poin tampil, dengan tombol **Batalkan** dan hitung mundur. Kamera siap lagi untuk tim berikutnya.
 5. **Riwayat:** 10 input terakhir di pos ini, dengan undo selama masih dalam batas waktu.
 
@@ -187,7 +214,9 @@ Pesan penting ditulis sebagai kalimat lengkap, misalnya "Tim ini sudah punya has
 - **Kendali:** mulai, jeda, akhiri, bekukan, batas waktu undo.
 - **Pos:** tambah dan ubah pos, poin, toggle seri, penugasan LO.
 - **Akun LO:** admin membuat akun lewat server action dengan service role. LO mengganti password saat login pertama.
-- **Rute:** atur per tim, kalau Event memakainya.
+- **Rute:** atur per tim (wajib).
+- **Registrasi ulang:** catat kehadiran tiga anggota per tim sebelum babak rally dimulai, dan sebelum final.
+- **Diskualifikasi:** tandai tim dengan alasan wajib, misalnya anggota tidak hadir atau melanggar peraturan.
 - **Hasil:** filter per pos dan tim, koreksi dan batalkan dengan alasan wajib.
 - **Log:** riwayat lengkap, hanya baca.
 - **Leaderboard:** skor terbaru dan snapshot.
@@ -223,7 +252,7 @@ Rekomendasi ini **belum diuji di HP sungguhan**, jadi harus dibuktikan di fase 0
 | LO salah tim | Nama tim harus tampil dan dikonfirmasi sebelum tombol hasil |
 | LO salah tombol | Undo dalam batas waktu, lalu koreksi admin. Semua tercatat di log |
 | QR dibagikan ke tim lain | LO mencocokkan nama tim. Admin bisa mengganti token |
-| HP peserta mati atau tertinggal | Setiap anggota punya QR yang sama, dan LO bisa mengetik kode tim |
+| HP peserta mati atau tertinggal | Setiap anggota punya QR yang sama, dan LO bisa mengetik kode tim. Ketiga anggota tetap wajib hadir menurut guidebook |
 | Kamera ditolak di HP LO | Input kode manual |
 | Nilai poin berubah setelah kegiatan berjalan | Hasil menyimpan salinan poin. Hitung ulang hanya lewat aksi admin yang tercatat |
 
@@ -236,12 +265,14 @@ Setiap fase dikerjakan lewat PR kecil ke `staging`.
 | 1 | Halaman uji scan QR di HP | Sudah disetujui |
 | 2 | Role LO, penugasan LO ke pos, pengaturan poin per pos | Sudah disetujui |
 | 3 | QR tim, layar LO (scan lalu Menang/Kalah/Seri), undo, log, koreksi admin | Library lolos uji HP di fase 1 |
+| 3b | Rute wajib per tim dengan validasi urutan, registrasi ulang, dan diskualifikasi | Aturan guidebook; fase 3 |
 | 4 | Leaderboard rally | Fase 3 dan pertanyaan 6-8 |
-| Ditunda | Rute per tim dan main ulang | Jawaban pertanyaan 1-3 |
+| 5 | Final: master games dan leaderboard final dari 4 besar rally | Fase 4; nilai poin master games dari Event |
+| Ditunda | Main ulang | Jawaban pertanyaan 3 |
 | Opsional | Notifikasi 4 besar atau final | Pertanyaan 9 |
 | Sebelum acara | Gladi dengan LO sungguhan | VPS UC, domain, dan SSL |
 
-Rute dan main ulang belum dibuat. Skema dirancang agar keduanya mudah ditambah: rute cukup tabel baru, dan main ulang cukup mengubah indeks unik hasil aktif.
+Rute, registrasi ulang, final, dan main ulang belum dibuat. Rute wajib sudah ditetapkan (tabel `rally_team_routes`); main ulang cukup mengubah indeks unik hasil aktif.
 
 ## 7. Pertanyaan terbuka untuk Divisi Event
 
@@ -249,17 +280,17 @@ Kolom "Asumsi sementara" dipakai kalau pengembangan harus jalan sebelum ada jawa
 
 | # | Pertanyaan | Asumsi sementara | Dampak kalau berbeda |
 |---|---|---|---|
-| 1 | Siapa yang menentukan rute? Tetap untuk semua, diacak, atau bebas? | Bebas, rute opsional | Tabel rute dan penugasan massal |
-| 2 | Apakah tim wajib mengikuti urutan? Bagaimana kalau tim datang ke pos di luar rute? | Hanya peringatan ke LO | Validasi di `rally_record_result` |
+| 1 | Siapa yang menentukan rute? Tetap untuk semua atau diacak? | **Dijawab guidebook:** alur ditentukan panitia. Tetap atau diacak belum jelas; admin mengatur per tim | Tabel rute dan penugasan massal |
+| 2 | Apakah tim wajib mengikuti urutan? Bagaimana kalau tim datang ke pos di luar rute? | **Dijawab guidebook:** wajib, pelanggaran peraturan berarti diskualifikasi. Hasil di luar giliran ditolak | Validasi di `rally_record_result` |
 | 3 | Boleh main ulang di pos yang sama? Kalau boleh, poin mana yang dihitung? | Tidak boleh | Indeks unik dan rumus skor |
 | 4 | Format hasil cukup Menang/Kalah/Seri, atau ada pos dengan skor angka? | Tanpa skor angka | Kolom dan UI input |
 | 5 | Lawan di pos: tim lain, AI, atau panitia? Kalau antar tim, satu input untuk dua tim? | Satu input per tim | Alur LO jadi dua kali scan |
 | 6 | Tie-break leaderboard kalau poin sama? | Menang terbanyak, lalu yang lebih dulu mencapai poin itu | Urutan leaderboard |
 | 7 | Kapan leaderboard dibekukan? | Admin menekan manual | Otomatis berdasarkan waktu |
-| 8 | Kapan batas waktu rally? Input setelah waktu habis diterima? | Admin mengakhiri manual | Akhir otomatis, seperti CP |
-| 9 | Siapa yang masuk final? 4 besar keseluruhan atau ada aturan lain? Finalnya memakai sistem ini? | 4 besar dari leaderboard, final di luar sistem | Fitur notifikasi dan alur final |
+| 8 | Kapan batas waktu rally? Input setelah waktu habis diterima? | Admin mengakhiri manual. Guidebook: rally dan final di hari yang sama | Akhir otomatis, seperti CP |
+| 9 | Siapa yang masuk final? 4 besar keseluruhan atau ada aturan lain? Finalnya memakai sistem ini? | **Dijawab guidebook:** 4 tim dengan poin rally tertinggi. Pemenang dari total poin master games, jadi final dicatat di sistem (fase 5). Nilai poin master games belum ada | Fitur notifikasi dan alur final |
 | 10 | Berapa jumlah pos fisik, pos digital, LO, dan tim? | Belum ada | Ukuran VPS dan jumlah akun |
-| 11 | QR per tim atau per anggota? Apakah semua anggota harus hadir di pos? | Per tim | Token dan alur scan |
+| 11 | QR per tim atau per anggota? Apakah semua anggota harus hadir di pos? | QR per tim. **Dijawab guidebook:** ketiga anggota wajib hadir di setiap babak, kalau tidak tim didiskualifikasi | Token dan alur scan |
 | 12 | Apakah semua lokasi pos punya sinyal yang stabil? | Ya, atau ada Wi-Fi panitia | Perlu antrean offline di HP LO |
 | 13 | Berapa menit batas undo oleh LO? | 5 menit, bisa diubah admin | Hanya pengaturan |
 | 14 | Berapa poin final per pos, dan kapan aturan dikunci? | 100/25/50 | Hanya data, selama sebelum kegiatan |
@@ -274,3 +305,18 @@ Disetujui pada 31 Oktober 2026:
 2. `@yudiel/react-qr-scanner`, dengan syarat lolos uji di HP.
 3. Token QR terpisah dari kode tim, dan kode tim sebagai input manual cadangan.
 4. Lomba Rally memakai `competition_type` `logic` yang sudah ada (Category 2), bukan tipe baru.
+
+## 9. Aturan dari guidebook
+
+Guidebook Kategori 2 (diperiksa 10 November 2026) menjadi acuan. Pengecualian: nilai poin per pos (100/25/50) tetap sementara sampai Divisi Event memutuskan, karena guidebook tidak menyebut angkanya.
+
+| Aturan guidebook | Dampak di sistem |
+|---|---|
+| Tim wajib mengikuti alur pos sesuai arahan panitia | Rute wajib per tim; hasil di luar giliran ditolak |
+| Registrasi ulang sebelum babak rally dimulai | Tabel `rally_checkins`, tab Registrasi ulang di admin |
+| Ketiga anggota wajib hadir di setiap babak; tim yang tidak lengkap didiskualifikasi | Pencatatan kehadiran per anggota; admin memutuskan diskualifikasi |
+| Tim tidak boleh mengganti anggota, termasuk kalau ada yang berhalangan | Perlu dicek di aplikasi bahwa anggota tidak bisa diganti setelah tim diterima |
+| Tim yang melanggar peraturan didiskualifikasi otomatis | Diskualifikasi tercatat dengan alasan; hasil tidak dihapus |
+| 4 tim poin rally tertinggi masuk final; final berisi master games dengan poin lebih besar; pemenang dari total poin master games | Fase 5: pos master games, leaderboard final terpisah |
+| Rally dan final di hari yang sama, offline di Universitas Ciputra Surabaya | Tidak ada perubahan skema; admin membekukan leaderboard rally sebelum final |
+| Dilarang bekerja sama dengan tim lain | Aturan lapangan, tidak ada fitur |
