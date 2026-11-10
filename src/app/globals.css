@@ -203,6 +203,27 @@
   }
 }
 
+/* Outside @layer so they outrank Tailwind's h-8 and shadow-none on the input.
+   An input inside an input group fills the whole box (the forms make the group h-12, the input stays h-8), so the
+   click target, caret and autofill area match the field you see. */
+[data-slot="input-group"] > input[data-slot="input-group-control"] {
+  align-self: stretch;
+  height: auto;
+  border-radius: inherit; /* the autofill fill stays inside the rounded border */
+}
+/* Chrome paints autofilled inputs light blue as a strip inside the field. Keep the field's own colours instead. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--foreground);
+  caret-color: var(--foreground);
+  box-shadow: 0 0 0 1000px var(--card) inset;
+  transition: background-color 600000s 0s;
+}
+[data-slot="input-group"].bg-muted input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px var(--muted) inset;
+}
+
 /* Toast descriptions use the theme's secondary text colour instead of Sonner's built-in grey.
    Outside @layer so it outranks Sonner's own (unlayered) styles. */
 [data-sonner-toaster] [data-sonner-toast].cn-toast [data-description] {
