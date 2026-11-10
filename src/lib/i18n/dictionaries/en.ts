@@ -216,6 +216,10 @@ export const en: Dictionary = {
       title: "Frequently asked questions",
       items: [
         {
+          q: "What is Competitive Programming?",
+          a: "The 14th NPLC's programming competition, for individuals or teams of up to 3. Participants solve algorithmic problems, and their answers are judged automatically.",
+        },
+        {
           q: "What is Logic Rally Games?",
           a: "The 14th NPLC's second competition category: logic games for senior high school students (SMA/SMK/MA or equivalent). Each team plays at several rally posts, and the four teams with the most points go on to the final.",
         },
@@ -230,6 +234,18 @@ export const en: Dictionary = {
         {
           q: "When and where is the Rally Games held?",
           a: "In person at Universitas Ciputra Surabaya, on 29 January 2027.",
+        },
+        {
+          q: "When is the Competitive Programming round held?",
+          a: "The schedule is in the Timeline section on this page. Technical details are shared with participants in the competition group.",
+        },
+        {
+          q: "Which programming languages can I use in Competitive Programming?",
+          a: "Python (3.8), C++ (GCC 9.2) and Java (OpenJDK 13). In Java, the class must be named Main.",
+        },
+        {
+          q: "How are Competitive Programming answers judged?",
+          a: "Your code runs automatically against several test cases. The score depends on how many test cases pass, and you see the result right after you submit.",
         },
         {
           q: "Can a participant join more than one team or competition?",

@@ -214,8 +214,12 @@ export const id = {
       label: "FAQ",
       title: "Pertanyaan umum",
       // One list for both competitions, shown as Q.1, Q.2, ... in this order. Add or remove an item here and in en.ts.
-      // TODO: FAQ CP dari Kenneth — digabung, ambil yang umum.
+      // CP items are general for now (HOD); replace them with Kenneth's CP FAQ when it is final.
       items: [
+        {
+          q: "Apa itu Competitive Programming?",
+          a: "Lomba pemrograman NPLC 14th yang bisa diikuti secara individu atau tim hingga 3 orang. Peserta menyelesaikan soal algoritmik, dan jawabannya dinilai otomatis oleh sistem.",
+        },
         {
           q: "Apa itu Logic Rally Games?",
           a: "Lomba Kategori 2 NPLC 14th berupa permainan logika untuk siswa/siswi SMA/SMK/MA sederajat. Setiap tim bermain di beberapa pos rally games. Empat tim dengan poin tertinggi lanjut ke babak final.",
@@ -231,6 +235,18 @@ export const id = {
         {
           q: "Kapan dan di mana Rally Games diadakan?",
           a: "Secara offline di Universitas Ciputra Surabaya pada 29 Januari 2027.",
+        },
+        {
+          q: "Kapan babak Competitive Programming diadakan?",
+          a: "Jadwalnya ada di bagian Timeline di halaman ini. Detail teknis diumumkan kepada peserta melalui grup lomba.",
+        },
+        {
+          q: "Bahasa pemrograman apa yang bisa dipakai di Competitive Programming?",
+          a: "Python (3.8), C++ (GCC 9.2), dan Java (OpenJDK 13). Untuk Java, nama class wajib Main.",
+        },
+        {
+          q: "Bagaimana jawaban Competitive Programming dinilai?",
+          a: "Kode dijalankan otomatis dengan beberapa test case. Nilai dihitung dari jumlah test case yang lolos, dan hasilnya langsung terlihat setelah submit.",
         },
         {
           q: "Apakah peserta boleh mengikuti lebih dari satu tim atau lomba?",
