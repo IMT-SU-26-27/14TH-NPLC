@@ -150,7 +150,7 @@ export const id = {
       theme: "Decode the Unknown",
       guidebookLabel: "Guidebook",
       guidebookTitle: "Guidebook",
-      guidebookBody: "Aturan lomba, alur pendaftaran, dan ketentuan tim dalam satu dokumen.",
+      guidebookBody: "Guidebook Competitive Programming dan Logic Rally Games (PDF): aturan lomba, alur pendaftaran, dan ketentuan tim.",
       guidebookOpen: "Buka guidebook",
       guidebookSoon: "Segera tersedia",
       registerLabel: "Daftar",

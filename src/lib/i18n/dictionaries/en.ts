@@ -151,7 +151,7 @@ export const en: Dictionary = {
       theme: "Decode the Unknown",
       guidebookLabel: "Guidebook",
       guidebookTitle: "Guidebook",
-      guidebookBody: "Competition rules, the registration flow and team requirements in one document.",
+      guidebookBody: "The Competitive Programming and Logic Rally Games guidebooks (PDF): competition rules, the registration flow and team requirements.",
       guidebookOpen: "Open the guidebook",
       guidebookSoon: "Coming soon",
       registerLabel: "Register",
