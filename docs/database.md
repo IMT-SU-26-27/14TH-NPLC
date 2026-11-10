@@ -1,6 +1,6 @@
 # Database
 
-The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Starting data is in [`supabase/seed.sql`](../supabase/seed.sql): the two competitions, the CP session, and 10 easy CP problems (levels 1-10, 100 points, 2 sample + 4 hidden tests each, published). Re-running the seed skips levels that already exist.
+The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Starting data is in [`supabase/seed.sql`](../supabase/seed.sql): the two competitions, the timeline, and the CP and Rally sessions, with the real values. It is safe to re-run and contains no CP problems; create those in Admin.
 
 | Migration | What it does |
 |---|---|
@@ -29,7 +29,7 @@ Where migrations are applied, and how each database keeps track:
 | DEV (supabase.com) | `pnpm sb db push --linked` | `supabase_migrations.schema_migrations` |
 | Production (self-hosted, `supabase-db` container on the VPS) | **By hand with psql**, one file at a time in file-name order, each in its own transaction | **None**: production has no `supabase_migrations` schema. To see whether a migration is applied, check for the objects it creates (a column, function or policy). |
 
-Production gets `supabase/production-content.sql` for its public content, not `seed.sql` (see `docs/deploy.md`). To apply a new migration there, take a backup first, then:
+Production gets the same `supabase/seed.sql` (see `docs/deploy.md`). To apply a new migration there, take a backup first, then:
 
 ```bash
 docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 --single-transaction < supabase/migrations/<file>.sql
