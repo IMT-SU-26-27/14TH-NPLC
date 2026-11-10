@@ -6,6 +6,7 @@ import { resolveLang } from "@/lib/i18n/server";
 import { I18nProvider } from "@/components/shared/i18n-provider";
 import { SiteHeader } from "@/components/shared/site-header";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { InstallPromptListener } from "@/components/shared/install-prompt-listener";
 import { Toaster } from "@/components/ui/sonner";
 import "../globals.css";
 
@@ -56,6 +57,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           <SiteHeader lang={lang} />
           {children}
           <SiteFooter lang={lang} />
+          <InstallPromptListener />
           {/* Light only, like the rest of the app: following the OS theme gave near-white text on the white card. */}
           <Toaster position="top-right" theme="light" />
         </I18nProvider>

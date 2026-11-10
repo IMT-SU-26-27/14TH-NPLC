@@ -3,6 +3,7 @@ import { pushEnabledFor } from "@/lib/push/config";
 import { ProfileForm } from "@/features/profile/components/profile-form";
 import { ChangePasswordForm } from "@/features/profile/components/change-password-form";
 import { NotificationSettings } from "@/features/profile/components/notification-settings";
+import { InstallAppCard } from "@/features/profile/components/install-app-card";
 
 // Reads the session (request data), so the page renders it inside <Suspense>.
 export async function ProfileContent() {
@@ -13,6 +14,7 @@ export async function ProfileContent() {
       <ProfileForm user={user} />
       <ChangePasswordForm />
       {pushEnabledFor(user.role) && <NotificationSettings />}
+      <InstallAppCard />
     </div>
   );
 }

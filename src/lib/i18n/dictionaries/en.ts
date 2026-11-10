@@ -1285,6 +1285,18 @@ export const en: Dictionary = {
     passwordChanged: "Password changed. Use the new one the next time you sign in.",
     wrongCurrentPassword: "Your current password is wrong",
   },
+  pwa: {
+    title: "App",
+    lead: "Install 14th NPLC on this device to open it straight from your Home Screen, without typing the address. It is the same website.",
+    install: "Install app",
+    installed: "14th NPLC is installed.",
+    installedTitle: "Installed",
+    installedBody: "14th NPLC is installed on this device. Open it from your Home Screen, Start menu or app list.",
+    iosTitle: "Install through Share",
+    ios: "In Safari, tap Share, then choose Add to Home Screen.",
+    manualTitle: "Install from the browser menu",
+    manual: "Open the browser menu and choose Install app or Add to Home Screen. If neither is there, this browser does not support installing; try Chrome or Edge.",
+  },
   push: {
     settingsTitle: "Notifications",
     settingsLead: "Get a notification on this device when your team's registration is accepted or rejected, when someone joins your team, and when the contest starts, pauses or ends. Admins are also told when a payment proof needs review.",
