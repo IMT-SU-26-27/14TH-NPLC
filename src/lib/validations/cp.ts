@@ -2,8 +2,12 @@ import { z } from "zod";
 import { Constants } from "@/types/database";
 
 export const CP_LANGUAGES = ["python", "cpp", "java"] as const;
-export const CP_DIFFICULTIES = ["easy", "medium", "hard"] as const;
+
+// Every test case is a separate Judge0 submission, so this is what multiplies the
+// judge's load. A problem that needs more cases should pack several of them into one
+// input (a leading `T`), which costs one job instead of ten.
 export const CP_MAX_TEST_CASES = 10;
+export const CP_DIFFICULTIES = ["easy", "medium", "hard"] as const;
 
 export const codeSubmissionSchema = z.object({
   problemId: z.uuid(),
