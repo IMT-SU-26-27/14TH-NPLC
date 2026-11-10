@@ -18,7 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Markdown } from "@/components/shared/markdown";
-import { CP_DIFFICULTIES } from "@/lib/validations/cp";
+import { CP_DIFFICULTIES, CP_MAX_TEST_CASES } from "@/lib/validations/cp";
 import type { FieldErrors } from "@/types";
 import type { CpDifficulty, ProblemFormProps } from "@/types/cp";
 
@@ -167,7 +167,7 @@ export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
           <CardTitle>{t("admin.cp.form.testCases")}</CardTitle>
           <CardDescription>{t("admin.cp.form.testCasesLead")}</CardDescription>
           <CardAction>
-            <Button type="button" variant="outline" size="sm" onClick={tests.add}>
+            <Button type="button" variant="outline" size="sm" onClick={tests.add} disabled={tests.cases.length >= CP_MAX_TEST_CASES}>
               <PlusIcon />
               {t("admin.cp.form.addTest")}
             </Button>
