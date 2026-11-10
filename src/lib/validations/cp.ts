@@ -3,6 +3,7 @@ import { Constants } from "@/types/database";
 
 export const CP_LANGUAGES = ["python", "cpp", "java"] as const;
 export const CP_DIFFICULTIES = ["easy", "medium", "hard"] as const;
+export const CP_MAX_TEST_CASES = 10;
 
 export const codeSubmissionSchema = z.object({
   problemId: z.uuid(),
@@ -33,7 +34,7 @@ export const problemSchema = z.object({
   memoryLimitKb: z.coerce.number().int().min(16384, "validation.memoryLimit").max(512000, "validation.memoryLimit"),
   points: z.coerce.number().int().min(1, "validation.atLeastOne").max(100000),
   isPublished: z.boolean(),
-  testCases: z.array(testCaseSchema).min(1, "validation.testCasesMin").max(100),
+  testCases: z.array(testCaseSchema).min(1, "validation.testCasesMin").max(CP_MAX_TEST_CASES, "validation.testCasesMax"),
 });
 
 export const sessionSchema = z
