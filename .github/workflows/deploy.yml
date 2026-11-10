@@ -113,6 +113,7 @@ jobs:
           VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
         run: |
           umask 077
           {
@@ -121,7 +122,8 @@ jobs:
             for k in SUPABASE_SERVICE_ROLE_KEY CLOUDINARY_CLOUD_NAME CLOUDINARY_API_KEY \
                      CLOUDINARY_API_SECRET JUDGE0_URL JUDGE0_AUTH_TOKEN \
                      VAPID_PRIVATE_KEY VAPID_SUBJECT \
-                     NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY; do
+                     NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY \
+                     NEXT_PUBLIC_VAPID_PUBLIC_KEY; do
               printf '%s=%s\n' "$k" "${!k}"
             done
           } > runtime.env
