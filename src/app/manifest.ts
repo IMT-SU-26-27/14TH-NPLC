@@ -11,5 +11,10 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     background_color: "#F4F7FD",
     theme_color: "#F4F7FD",
+    // Same files as src/app/icon.png and src/app/apple-icon.png (the star), so the Home Screen icon matches the tab.
+    icons: [
+      { src: "/icon.png", sizes: "512x512", type: "image/png" },
+      { src: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   };
 }

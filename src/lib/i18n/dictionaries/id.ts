@@ -150,7 +150,7 @@ export const id = {
       theme: "Decode the Unknown",
       guidebookLabel: "Guidebook",
       guidebookTitle: "Guidebook",
-      guidebookBody: "Aturan lomba, alur pendaftaran, dan ketentuan tim dalam satu dokumen.",
+      guidebookBody: "Guidebook Competitive Programming dan Logic Rally Games (PDF): aturan lomba, alur pendaftaran, dan ketentuan tim.",
       guidebookOpen: "Buka guidebook",
       guidebookSoon: "Segera tersedia",
       registerLabel: "Daftar",
@@ -214,8 +214,12 @@ export const id = {
       label: "FAQ",
       title: "Pertanyaan umum",
       // One list for both competitions, shown as Q.1, Q.2, ... in this order. Add or remove an item here and in en.ts.
-      // TODO: FAQ CP dari Kenneth — digabung, ambil yang umum.
+      // CP items are general for now (HOD); replace them with Kenneth's CP FAQ when it is final.
       items: [
+        {
+          q: "Apa itu Competitive Programming?",
+          a: "Lomba pemrograman NPLC 14th yang bisa diikuti secara individu atau tim hingga 3 orang. Peserta menyelesaikan soal algoritmik, dan jawabannya dinilai otomatis oleh sistem.",
+        },
         {
           q: "Apa itu Logic Rally Games?",
           a: "Lomba Kategori 2 NPLC 14th berupa permainan logika untuk siswa/siswi SMA/SMK/MA sederajat. Setiap tim bermain di beberapa pos rally games. Empat tim dengan poin tertinggi lanjut ke babak final.",
@@ -229,8 +233,8 @@ export const id = {
           a: "Pendaftaran dibuka 10 November 2026 dan ditutup 10 Januari 2027. Early bird berlaku hingga 23 November 2026.",
         },
         {
-          q: "Kapan dan di mana Rally Games diadakan?",
-          a: "Secara offline di Universitas Ciputra Surabaya pada 29 Januari 2027.",
+          q: "Kapan babak Competitive Programming diadakan?",
+          a: "Jadwalnya ada di bagian Timeline di halaman ini. Detail teknis diumumkan kepada peserta melalui grup lomba.",
         },
         {
           q: "Apakah peserta boleh mengikuti lebih dari satu tim atau lomba?",
@@ -241,24 +245,12 @@ export const id = {
           a: "Seluruh anggota tim (3 orang) wajib hadir. Anggota tidak dapat diganti dengan peserta lain. Apabila ada anggota yang tidak hadir, tim akan didiskualifikasi.",
         },
         {
-          q: "Apakah ada Technical Meeting Rally Games?",
-          a: "Ada. Technical Meeting diadakan secara online pada 25 Januari 2027, dan minimal 1 peserta dari setiap tim wajib mengikutinya.",
-        },
-        {
-          q: "Apa dresscode Rally Games?",
-          a: "Seragam olahraga SMA/SMK masing-masing. Celana wajib minimal sepanjang lutut. Apabila celana seragam olahraga tidak sepanjang lutut, peserta boleh menggunakan celana lain yang sopan dengan panjang minimal selutut.",
-        },
-        {
           q: "Bagaimana cara masuk grup peserta?",
           a: "Link grup peserta diberikan di website NPLC setelah pendaftaran diverifikasi admin.",
         },
         {
           q: "Bagaimana anggota bergabung ke tim?",
           a: "Setiap anggota membuat akun sendiri, lalu bergabung memakai kode tim atau tautan undangan yang ada di dasbor ketua.",
-        },
-        {
-          q: "Bagaimana cara membayar biaya pendaftaran?",
-          a: "Ketua tim mentransfer biaya pendaftaran ke rekening blu by BCA 003202798281 a.n. Angga Dhammika Jaya, lalu mengunggah bukti transfernya di form pendaftaran. Satu tim cukup membayar satu kali.",
         },
       ],
     },
@@ -1293,6 +1285,18 @@ export const id = {
     passwordNoDraft: "Kata sandi tidak disimpan sebagai draf.",
     passwordChanged: "Kata sandi diganti. Gunakan kata sandi baru saat masuk berikutnya.",
     wrongCurrentPassword: "Kata sandi sekarang salah",
+  },
+  pwa: {
+    title: "Aplikasi",
+    lead: "Pasang 14th NPLC di perangkat ini supaya bisa dibuka langsung dari Layar Utama, tanpa mengetik alamat. Isinya sama dengan website ini.",
+    install: "Pasang aplikasi",
+    installed: "14th NPLC sudah terpasang.",
+    installedTitle: "Sudah terpasang",
+    installedBody: "14th NPLC sudah terpasang di perangkat ini. Buka dari Layar Utama, menu Start, atau daftar aplikasi.",
+    iosTitle: "Pasang lewat Bagikan",
+    ios: "Di Safari, ketuk Bagikan, lalu pilih Tambah ke Layar Utama.",
+    manualTitle: "Pasang lewat menu browser",
+    manual: "Buka menu browser, lalu pilih Pasang aplikasi atau Tambahkan ke Layar Utama. Kalau pilihan itu tidak ada, browser ini belum mendukung pemasangan; coba Chrome atau Edge.",
   },
   push: {
     settingsTitle: "Notifikasi",
