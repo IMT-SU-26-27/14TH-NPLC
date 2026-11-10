@@ -209,6 +209,43 @@
   color: var(--muted-foreground);
 }
 
+/* Contact mascot (home, "Masih ada pertanyaan?"): the arm waves twice and rests, the body bobs gently with it.
+   Used only behind motion-safe:, so a reduced-motion preference shows the still mascot. */
+@theme {
+  --animate-mascot-wave: mascot-wave 2.6s ease-in-out infinite;
+  --animate-mascot-bob: mascot-bob 2.6s ease-in-out infinite;
+
+  @keyframes mascot-wave {
+    0%,
+    55%,
+    100% {
+      transform: rotate(0deg);
+    }
+    10% {
+      transform: rotate(-10deg);
+    }
+    22% {
+      transform: rotate(7deg);
+    }
+    34% {
+      transform: rotate(-9deg);
+    }
+    45% {
+      transform: rotate(5deg);
+    }
+  }
+
+  @keyframes mascot-bob {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-4px) rotate(-1deg);
+    }
+  }
+}
+
 /* Hero cube art (640px and up, motion only): hidden until the hero script has set every layer to its start. If
    the script fails or runs more than 2 s late, this reveals the art as it is in the markup, at its final state. */
 @keyframes hero-art-failsafe {

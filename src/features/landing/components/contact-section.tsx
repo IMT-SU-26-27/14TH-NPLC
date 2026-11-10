@@ -7,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { WhatsappIcon } from "@/components/shared/whatsapp-icon";
 import type { LangProps } from "@/types/i18n";
 
-// "07 // Kontak": blue band with the waving mascot and one WhatsApp button per competition's contact person.
+// "07 // Kontak": blue band with the waving mascot (animated arm) and one WhatsApp button per competition's contact person.
 export function ContactSection({ lang }: LangProps) {
   const t = getT(lang);
 
@@ -40,7 +40,18 @@ export function ContactSection({ lang }: LangProps) {
         </div>
         <div aria-hidden className="relative mx-auto w-56 sm:w-72">
           <div className="bg-primary-foreground/20 absolute inset-6 -z-10 rounded-full blur-3xl" />
-          <Image src="/shared/maskot-4.webp" alt="" width={446} height={446} sizes="(min-width: 640px) 288px, 224px" className="h-auto w-full" />
+          {/* Two layers of maskot-4 cut at the elbow: the arm waves around that joint (67.7% 44.4% of the image). */}
+          <div className="motion-safe:animate-mascot-bob relative origin-bottom">
+            <Image src="/landing/maskot-wave-body.webp" alt="" width={446} height={446} sizes="(min-width: 640px) 288px, 224px" className="h-auto w-full" />
+            <Image
+              src="/landing/maskot-wave-arm.webp"
+              alt=""
+              width={446}
+              height={446}
+              sizes="(min-width: 640px) 288px, 224px"
+              className="motion-safe:animate-mascot-wave absolute inset-0 h-auto w-full origin-[67.7%_44.4%]"
+            />
+          </div>
         </div>
       </div>
     </section>

@@ -10,7 +10,8 @@ export const EARLY_BIRD = {
   endsOn: "2026-11-23",
 } as const;
 
-export const GUIDEBOOK_URL: string | null = null;
+// Google Drive folder with the CP and Rally guidebook PDFs.
+export const GUIDEBOOK_URL: string | null = "https://drive.google.com/drive/folders/1o5FjYFLwN_h9JUkGkA3IZOHUB1lXlJnk";
 
 // One contact person per competition. `label` is the short competition name shown in every language;
 // `whatsapp` is the international format without "+" or spaces.
