@@ -47,7 +47,7 @@ export const adminCreateRegistrationSchema = z.object({
 });
 
 // <input type="datetime-local"> values are entered in WIB (UTC+7).
-const wibDateTime = z
+export const wibDateTime = z
   .string()
   .trim()
   .transform((v) => (v === "" ? null : new Date(`${v}:00+07:00`).toISOString()))

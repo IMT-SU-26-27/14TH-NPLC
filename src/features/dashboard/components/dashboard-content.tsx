@@ -9,12 +9,11 @@ import { publicImageUrl } from "@/lib/cloudinary/server";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { pushEnabledFor } from "@/lib/push/config";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { RefreshButton } from "@/components/shared/refresh-button";
 import { AccountCard } from "@/features/dashboard/components/account-card";
 import { AccountNote } from "@/features/dashboard/components/account-note";
-import { WaGroupCard } from "@/features/dashboard/components/wa-group-card";
 import { DashboardEmptyCard } from "@/features/dashboard/components/dashboard-empty-card";
 import { TeamCard } from "@/features/dashboard/components/team-card";
-import { RegistrationRealtime } from "@/features/dashboard/components/registration-realtime";
 import { PushPrompt } from "@/features/dashboard/components/push-prompt";
 import type { DashboardContentProps } from "@/types/registration";
 
@@ -57,6 +56,13 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
 
       {pushEnabledFor(user.role) && <PushPrompt hasTeams={teams.length > 0} />}
 
+      {/* No realtime here (the server has 2 cores): the page refreshes when the tab is opened again, or by hand. */}
+      {teams.length > 0 && (
+        <div className="flex justify-end">
+          <RefreshButton />
+        </div>
+      )}
+
       {/* Design 07: the team takes two thirds, the account sits beside it. */}
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[2fr_1fr]">
         <div className="space-y-5">
@@ -73,7 +79,7 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
                 rallyStatus={item.id === rallyTeam?.id ? rallyStatus : null}
                 nextEvent={item.status === "accepted" ? nextEventFor(events, item.competition.type, today) : null}
                 mainEvent={item.status === "accepted" ? lastEventFor(events, item.competition.type) : null}
-                waGroupAvailable={item.status === "accepted" && waGroup !== null}
+                waGroup={item.status === "accepted" ? waGroup : null}
                 qrisUrl={item.competition.qris_public_id ? publicImageUrl(item.competition.qris_public_id) : null}
               />
             ))
@@ -83,11 +89,8 @@ export async function DashboardContent({ lang, searchParams }: DashboardContentP
         <div className="space-y-5">
           <AccountCard user={user} lang={lang} />
           {team && <AccountNote teamName={team.team_name} lang={lang} />}
-          {waGroup && <WaGroupCard group={waGroup} lang={lang} />}
         </div>
       </div>
-
-      <RegistrationRealtime registrationIds={teams.map((item) => item.id)} />
     </div>
   );
 }

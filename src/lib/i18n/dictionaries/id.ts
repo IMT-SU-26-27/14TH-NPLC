@@ -19,6 +19,7 @@ export const id = {
   common: {
     cancel: "Batal",
     save: "Simpan",
+    reload: "Muat ulang",
     delete: "Hapus",
     back: "Kembali",
     copied: "Tersalin",
@@ -212,12 +213,54 @@ export const id = {
     faq: {
       label: "FAQ",
       title: "Pertanyaan umum",
-      oneCompetitionQ: "Apakah satu akun bisa ikut dua lomba?",
-      oneCompetitionA: "Tidak. Satu akun hanya bisa terdaftar di satu lomba, jadi pastikan pilihan lombamu sebelum mendaftar.",
-      joinTeamQ: "Bagaimana anggota bergabung ke tim?",
-      joinTeamA: "Setiap anggota membuat akun sendiri, lalu bergabung memakai kode tim yang ada di dasbor ketua.",
-      paymentQ: "Bagaimana cara membayar biaya pendaftaran?",
-      paymentA: "Pembayaran hanya lewat blu by BCA. Nomor rekening tampil di form pendaftaran, dan bukti pembayarannya diunggah di form yang sama.",
+      // One list for both competitions, shown as Q.1, Q.2, ... in this order. Add or remove an item here and in en.ts.
+      // TODO: FAQ CP dari Kenneth — digabung, ambil yang umum.
+      items: [
+        {
+          q: "Apa itu Logic Rally Games?",
+          a: "Lomba Kategori 2 NPLC 14th berupa permainan logika untuk siswa/siswi SMA/SMK/MA sederajat. Setiap tim bermain di beberapa pos rally games. Empat tim dengan poin tertinggi lanjut ke babak final.",
+        },
+        {
+          q: "Berapa jumlah anggota dalam satu tim?",
+          a: "Competitive Programming: 1–3 orang. Logic Rally Games: 3 peserta dari sekolah yang sama. Satu sekolah boleh mengirimkan lebih dari satu tim.",
+        },
+        {
+          q: "Kapan pendaftaran dibuka dan ditutup?",
+          a: "Pendaftaran dibuka 10 November 2026 dan ditutup 10 Januari 2027. Early bird berlaku hingga 23 November 2026.",
+        },
+        {
+          q: "Kapan dan di mana Rally Games diadakan?",
+          a: "Secara offline di Universitas Ciputra Surabaya pada 29 Januari 2027.",
+        },
+        {
+          q: "Apakah peserta boleh mengikuti lebih dari satu tim atau lomba?",
+          a: "Tidak. Satu peserta hanya boleh tergabung dalam satu tim dan satu lomba di NPLC 14th.",
+        },
+        {
+          q: "Bagaimana jika ada anggota tim Rally Games yang berhalangan hadir?",
+          a: "Seluruh anggota tim (3 orang) wajib hadir. Anggota tidak dapat diganti dengan peserta lain. Apabila ada anggota yang tidak hadir, tim akan didiskualifikasi.",
+        },
+        {
+          q: "Apakah ada Technical Meeting Rally Games?",
+          a: "Ada. Technical Meeting diadakan secara online pada 25 Januari 2027, dan minimal 1 peserta dari setiap tim wajib mengikutinya.",
+        },
+        {
+          q: "Apa dresscode Rally Games?",
+          a: "Seragam olahraga SMA/SMK masing-masing. Celana wajib minimal sepanjang lutut. Apabila celana seragam olahraga tidak sepanjang lutut, peserta boleh menggunakan celana lain yang sopan dengan panjang minimal selutut.",
+        },
+        {
+          q: "Bagaimana cara masuk grup peserta?",
+          a: "Link grup peserta diberikan di website NPLC setelah pendaftaran diverifikasi admin.",
+        },
+        {
+          q: "Bagaimana anggota bergabung ke tim?",
+          a: "Setiap anggota membuat akun sendiri, lalu bergabung memakai kode tim atau tautan undangan yang ada di dasbor ketua.",
+        },
+        {
+          q: "Bagaimana cara membayar biaya pendaftaran?",
+          a: "Ketua tim mentransfer biaya pendaftaran ke rekening blu by BCA 003202798281 a.n. Angga Dhammika Jaya, lalu mengunggah bukti transfernya di form pendaftaran. Satu tim cukup membayar satu kali.",
+        },
+      ],
     },
     contact: {
       label: "Kontak",
@@ -316,6 +359,9 @@ export const id = {
   rally: {
     session: {
       title: "Sesi Rally",
+      endLabel: "Waktu selesai Rally Games (WIB)",
+      endHint: "Papan peringkat peserta ditutup otomatis 1 jam sebelum waktu ini. Kosongkan kalau tidak perlu.",
+      endSaved: "Waktu selesai disimpan",
       lead: "LO hanya bisa mencatat dan membatalkan hasil saat sesi dibuka. Admin tetap bisa mengoreksi kapan saja.",
       status: {
         not_open: "Belum dibuka",
@@ -362,6 +408,9 @@ export const id = {
       frozen: "Peringkat ini adalah posisi saat dibekukan pada {date}. Skor tetap dihitung.",
       frozenAdminTitle: "Dibekukan untuk peserta",
       frozenAdmin: "Peserta melihat peringkat saat dibekukan pada {date}. Kamu melihat skor terbaru.",
+      frozenAutoTitle: "Papan peringkat ditutup",
+      frozenAuto: "Papan peringkat ditutup 1 jam terakhir. Hasil diumumkan saat penutupan.",
+      autoFreezeAdmin: "Untuk peserta, papan peringkat ditutup otomatis pada {date} (1 jam sebelum selesai). Kamu tetap melihat skor terbaru.",
       freeze: "Bekukan",
       unfreeze: "Buka pembekuan",
       freezeTitle: "Bekukan papan peringkat?",
@@ -616,17 +665,7 @@ export const id = {
     inviteLink: "Tautan undangan",
     inviteCopied: "Tautan undangan tersalin",
     remove: "Keluarkan",
-    leave: "Keluar",
-    removeTitle: "Keluarkan {name}?",
-    removeDescription: "Mereka bisa bergabung lagi dengan kode tim selama tim masih terbuka.",
-    leaveTitle: "Keluar dari tim ini?",
-    leaveDescription: "Kamu bisa bergabung lagi dengan kode tim selama tim masih terbuka.",
-    leaveConfirm: "Keluar dari tim",
-    memberRemoved: "Anggota dikeluarkan",
-    youLeft: "Kamu keluar dari tim",
-    membersLocked: "Perubahan anggota setelah diterima lewat contact person.",
-    accepted: "Pendaftaran kamu diterima",
-    rejected: "Pendaftaran kamu ditolak. Lihat alasannya di dasbor.",
+    membersViaContact: "Butuh ganti anggota? Hubungi contact person lomba.",
   },
   timeline: {
     created: "Tim dibuat",
@@ -720,6 +759,8 @@ export const id = {
     },
     registrations: {
       title: "Pendaftaran",
+      reviewAction: "Ubah status",
+      reviewTeam: "Ubah status pendaftaran {team}",
       lead: "Buka tim untuk meninjau pembayaran dan anggotanya.",
       new: "Pendaftaran baru",
       search: "Cari",
@@ -1043,6 +1084,9 @@ export const id = {
     frozen: "Peringkat ini adalah posisi saat dibekukan pada {date}. Skor tetap dihitung untuk setiap kiriman; peringkat terbaru muncul setelah panitia membukanya kembali.",
     frozenAdminTitle: "Dibekukan untuk peserta",
     frozenAdmin: "Peserta melihat peringkat saat dibekukan pada {date}. Kamu melihat skor terbaru.",
+    frozenAutoTitle: "Papan peringkat ditutup",
+    frozenAuto: "Papan peringkat ditutup 1 jam terakhir. Hasil diumumkan saat penutupan.",
+    autoFreezeAdmin: "Untuk peserta, papan peringkat ditutup otomatis pada {date} (1 jam sebelum selesai). Kamu tetap melihat skor terbaru.",
     noScores: "Belum ada tim di papan peringkat.",
     timePaused: "Dijeda, sisa",
     timeUp: "Waktu habis",
@@ -1369,8 +1413,7 @@ export const id = {
     leaderProtected: "Ketua tim tidak bisa dikeluarkan",
     teamSize: "Jumlah anggota belum sesuai ketentuan lomba",
     proofRequired: "Unggah bukti pembayaran sebelum mengirim",
-    cannotRemoveMember: "Anggota ini tidak bisa dikeluarkan sekarang",
-    membersLocked: "Tim sudah diterima, jadi anggotanya tidak bisa diubah sendiri. Hubungi contact person lomba.",
+    membersViaContact: "Perubahan anggota lewat contact person lomba.",
     paymentAlreadySubmitted: "Pembayaran tim ini sudah dikirim",
     uploadMissing: "Unggahan tidak ditemukan. Coba unggah ulang.",
     uploadTooLarge: "File lebih dari 5 MB, jadi ditolak dan dihapus. Unggah file yang lebih kecil.",

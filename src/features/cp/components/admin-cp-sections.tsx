@@ -73,6 +73,8 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
             highlightRegistrationId={null}
             viewer="admin"
             frozenAt={contest.session.leaderboard_frozen_at}
+            frozenAuto={contest.session.leaderboard_frozen_auto}
+            autoFreezeAt={contest.autoFreezeAt}
           />
         </CardContent>
       </Card>

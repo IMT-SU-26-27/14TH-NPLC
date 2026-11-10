@@ -1,0 +1,181 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # IMAGE is computed per job: GHCR requires a lowercase repository name and
+  # github.repository preserves the owner/repo casing.
+  SITE_DIR: /var/www/websites/panit/su/nplc/14th-nplc
+
+jobs:
+  check:
+    name: Typecheck and lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # LayoutProps/PageProps are generated globals; without this tsc fails on a
+      # clean checkout because .next/types does not exist yet.
+      - run: pnpm exec next typegen
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm lint
+
+  build:
+    name: Build and push image
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        run: |
+          echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      # NEXT_PUBLIC_* are inlined into the browser bundle at build time, so an
+      # empty one would ship a broken app rather than fail. Stop here instead.
+      - name: Require build-time public env
+        env:
+          URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          ANON: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          [ -n "$URL" ]  || { echo "::error::NEXT_PUBLIC_SUPABASE_URL secret is empty"; exit 1; }
+          [ -n "$ANON" ] || { echo "::error::NEXT_PUBLIC_SUPABASE_ANON_KEY secret is empty"; exit 1; }
+          case "$URL" in https://*) ;; *) echo "::error::NEXT_PUBLIC_SUPABASE_URL must be an https URL"; exit 1;; esac
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.image }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_VAPID_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${{ secrets.VPS_PORT || 22 }}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      # Built on the runner, then copied up. Never echoed, never in the logs.
+      - name: Compose runtime env file
+        env:
+          TAG: ${{ needs.build.outputs.tag }}
+          IMAGE: ${{ needs.build.outputs.image }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          JUDGE0_URL: ${{ secrets.JUDGE0_URL }}
+          JUDGE0_AUTH_TOKEN: ${{ secrets.JUDGE0_AUTH_TOKEN }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
+        run: |
+          umask 077
+          {
+            echo "IMAGE=$IMAGE"
+            echo "IMAGE_TAG=$TAG"
+            for k in SUPABASE_SERVICE_ROLE_KEY CLOUDINARY_CLOUD_NAME CLOUDINARY_API_KEY \
+                     CLOUDINARY_API_SECRET JUDGE0_URL JUDGE0_AUTH_TOKEN \
+                     VAPID_PRIVATE_KEY VAPID_SUBJECT \
+                     NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY \
+                     NEXT_PUBLIC_VAPID_PUBLIC_KEY; do
+              printf '%s=%s\n' "$k" "${!k}"
+            done
+          } > runtime.env
+
+      - name: Upload env file
+        run: |
+          scp -P "${{ secrets.VPS_PORT || 22 }}" runtime.env \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:$SITE_DIR/.env.incoming"
+          rm -f runtime.env
+
+      - name: Pull, restart, health-gate
+        env:
+          TAG: ${{ needs.build.outputs.tag }}
+        run: |
+          ssh -p "${{ secrets.VPS_PORT || 22 }}" \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "SITE_DIR='$SITE_DIR' GHCR_USER='${{ github.actor }}' GHCR_TOKEN='${{ secrets.GHCR_PULL_TOKEN }}' bash -s" <<'REMOTE'
+          set -euo pipefail
+          umask 077
+          cd "$SITE_DIR"
+
+          # Keep the currently live tag so a failed rollout can go back to it.
+          PREV=$(grep -m1 '^IMAGE_TAG=' .env 2>/dev/null | cut -d= -f2- || true)
+          [ -f .env ] && cp -a .env .env.prev
+          mv .env.incoming .env
+          chmod 600 .env
+
+          echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+          docker compose pull
+          docker compose up -d --remove-orphans
+
+          ok=0
+          for i in $(seq 1 30); do
+            if docker compose exec -T web wget -q -O /dev/null http://127.0.0.1:3000/ 2>/dev/null; then
+              ok=1; echo "healthy after ${i}s"; break
+            fi
+            sleep 2
+          done
+
+          if [ "$ok" = 1 ]; then
+            docker image prune -f >/dev/null
+            docker logout ghcr.io >/dev/null
+            exit 0
+          fi
+
+          echo "!! health check failed"
+          docker compose logs --tail=80 web || true
+          if [ -n "${PREV:-}" ]; then
+            echo "rolling back to $PREV"
+            sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=$PREV|" .env
+            docker compose up -d
+          fi
+          docker logout ghcr.io >/dev/null
+          exit 1
+          REMOTE

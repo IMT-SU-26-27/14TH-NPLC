@@ -165,8 +165,8 @@ export type TeamCardProps = {
   nextEvent: TimelineEvent | null;
   // The competition's main day (the Rally day for a Rally team), for "the QR appears here on the day".
   mainEvent: TimelineEvent | null;
-  // The competition's WhatsApp group card is on the page (accepted team, link set).
-  waGroupAvailable: boolean;
+  // The competition's WhatsApp group (accepted team, link set), shown under the status history; null otherwise.
+  waGroup: WaGroup | null;
 };
 
 export type NextUpCardProps = {
@@ -210,12 +210,6 @@ export type TeamTimelineProps = {
 export type TeamMembersProps = {
   team: Team;
   userId: string;
-  canEdit: boolean;
-};
-
-export type MemberActionProps = {
-  member: TeamMember;
-  isSelf: boolean;
 };
 
 export type PaymentPanelProps = {
@@ -252,10 +246,6 @@ export type TeamStatusPillProps = {
   lang: Locale;
 };
 
-
-export type RegistrationRealtimeProps = {
-  registrationIds: string[];
-};
 
 export type RegisterSummaryProps = {
   competition: PublicCompetition;

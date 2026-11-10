@@ -9,3 +9,13 @@ export type RouteErrorProps = {
 export type CatchAllPageProps = {
   params: Promise<{ lang: string; rest: string[] }>;
 };
+
+export type RefreshOnFocus = {
+  // Re-render the page with fresh server data now.
+  refresh: () => void;
+  pending: boolean;
+};
+
+export type RefreshButtonProps = {
+  className?: string;
+};

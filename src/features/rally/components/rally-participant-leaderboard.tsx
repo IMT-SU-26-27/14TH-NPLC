@@ -36,6 +36,8 @@ export async function RallyParticipantLeaderboard({ lang }: LangProps) {
       initialRows={rows}
       viewer="participant"
       frozenAt={session.leaderboard_frozen_at}
+      frozenAuto={session.leaderboard_frozen_auto}
+      autoFreezeAt={session.autoFreezeAt}
       highlightRegistrationId={team.id}
     />
   );

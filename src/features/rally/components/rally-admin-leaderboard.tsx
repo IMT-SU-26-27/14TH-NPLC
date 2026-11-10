@@ -16,7 +16,14 @@ export async function RallyAdminLeaderboard() {
       <div className="flex justify-end">
         <RallyFreezeButton competitionId={competition.id} frozen={!!session.leaderboard_frozen_at} />
       </div>
-      <RallyLeaderboardTable competitionId={competition.id} initialRows={rows} viewer="admin" frozenAt={session.leaderboard_frozen_at} />
+      <RallyLeaderboardTable
+        competitionId={competition.id}
+        initialRows={rows}
+        viewer="admin"
+        frozenAt={session.leaderboard_frozen_at}
+        frozenAuto={session.leaderboard_frozen_auto}
+        autoFreezeAt={session.autoFreezeAt}
+      />
     </div>
   );
 }
