@@ -10,7 +10,10 @@ export const JUDGE0_LANGUAGE_ID: Record<CpLanguage, number> = {
 };
 
 const BATCH_SIZE = 20; // max_submission_batch_size on the server
-const POLL_INTERVAL_MS = 500;
+// One poll per second per in-flight submission. Judge0 serves only
+// RAILS_SERVER_PROCESSES * RAILS_MAX_THREADS requests at a time (4 on a 2-core host),
+// so polling twice a second starved the API once a dozen teams submitted together.
+const POLL_INTERVAL_MS = 1000;
 const POLL_TIMEOUT_MS = 90_000;
 
 // Judge0 status id -> our verdict (see docs/judge0-errors.md).

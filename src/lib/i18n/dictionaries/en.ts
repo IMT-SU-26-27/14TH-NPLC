@@ -1001,7 +1001,8 @@ export const en: Dictionary = {
         publish: "Publish",
         publishHint: "Visible to participants while the contest is live.",
         testCases: "Test cases",
-        testCasesLead: "Sample tests are shown to participants. Hidden tests are only used for judging. Up to 10 tests per problem.",
+        testCasesLead:
+          "Sample tests are shown to participants. Hidden tests are only used for judging. At most 10 per problem: each one is judged separately, so pack several cases into one input when you need more.",
         addTest: "Add test case",
         removeTest: "Remove test {n}",
         input: "Input",
@@ -1370,7 +1371,7 @@ export const en: Dictionary = {
     timeLimit: "Between 100 and 15000 ms",
     memoryLimit: "Between 16384 and 512000 KB",
     testCasesMin: "Add at least one test case",
-    testCasesMax: "A problem can have at most 10 test cases",
+    testCasesMax: "At most 10 test cases per problem",
     expectedOutput: "Enter the expected output",
     cooldownMax: "At most 600 seconds",
     durationRequired: "Enter a duration above 0, up to 48 hours",

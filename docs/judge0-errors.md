@@ -57,6 +57,19 @@ score      = points × (passed / total) × efficiency
 
 `time` is the slowest test's CPU time and `memory` the highest memory use. A submission with no passing test scores 0. Only a team's best score per problem counts toward the leaderboard.
 
+## Load limits
+
+Every test case is sent to Judge0 as its own submission, so one click on **Submit** costs as many jobs as the problem has test cases. That is why a problem may hold at most **10 test cases** (`CP_MAX_TEST_CASES` in `src/lib/validations/cp.ts`, enforced in the admin form and again on the server). A problem that needs more coverage should pack several cases into one input (a leading `T`): one job instead of ten.
+
+The judge runs on the same 2-core host as the web app and Supabase, so the server side is tuned to match:
+
+| Setting | Value | Why |
+|---|---|---|
+| `COUNT` (`judge0.conf`) | 2 | One worker per core. The default is `2 × nproc`, and four programs fighting over two cores inflates the measured CPU time, which shows up as false *Time Limit Exceeded* and unfair `efficiency` scores. |
+| `MAX_QUEUE_SIZE` (`judge0.conf`) | 5000 | The default 100 is reached by ten teams submitting a 10-case problem at once; Judge0 then rejects submissions and the player sees "the judge is not available right now". |
+| `POLL_INTERVAL_MS` (`server.ts`) | 1000 | Judge0 serves only `RAILS_SERVER_PROCESSES × RAILS_MAX_THREADS` requests at a time (4 on this host). Polling every 500 ms starved the API once a dozen teams submitted together. |
+| `submission_cooldown_seconds` (`cp_sessions`) | 15 | Caps how fast the field can fill the queue. |
+
 ## Server requirement: cgroup v1
 
 Judge0 1.13 runs code inside `isolate`, which needs **cgroup v1**. On a host using cgroup v2 (the default on recent Ubuntu/Debian), every submission returns **Internal Error** with the message `No such file or directory @ rb_sysopen - /box/script.py`.
