@@ -232,20 +232,8 @@ export const en: Dictionary = {
           a: "Registration opens on 10 November 2026 and closes on 10 January 2027. The early-bird price applies until 23 November 2026.",
         },
         {
-          q: "When and where is the Rally Games held?",
-          a: "In person at Universitas Ciputra Surabaya, on 29 January 2027.",
-        },
-        {
           q: "When is the Competitive Programming round held?",
           a: "The schedule is in the Timeline section on this page. Technical details are shared with participants in the competition group.",
-        },
-        {
-          q: "Which programming languages can I use in Competitive Programming?",
-          a: "Python (3.8), C++ (GCC 9.2) and Java (OpenJDK 13). In Java, the class must be named Main.",
-        },
-        {
-          q: "How are Competitive Programming answers judged?",
-          a: "Your code runs automatically against several test cases. The score depends on how many test cases pass, and you see the result right after you submit.",
         },
         {
           q: "Can a participant join more than one team or competition?",
@@ -256,24 +244,12 @@ export const en: Dictionary = {
           a: "All three team members must attend. Members can't be replaced by someone else, and a team with a member missing is disqualified.",
         },
         {
-          q: "Is there a Rally Games technical meeting?",
-          a: "Yes. The technical meeting is held online on 25 January 2027, and at least one member of every team must attend.",
-        },
-        {
-          q: "What is the Rally Games dress code?",
-          a: "Your own school's PE uniform. Trousers must reach at least the knee; if your PE trousers are shorter, wear other modest trousers that reach the knee.",
-        },
-        {
           q: "How do I join the participants' group?",
           a: "The group link appears on the NPLC website once an admin has verified your registration.",
         },
         {
           q: "How do members join a team?",
           a: "Each member creates their own account, then joins with the team code or the invite link shown on the leader's dashboard.",
-        },
-        {
-          q: "How do I pay the registration fee?",
-          a: "The team leader transfers the fee to the blu by BCA account 003202798281 (Angga Dhammika Jaya), then uploads the transfer receipt on the registration form. Each team pays once.",
         },
       ],
     },
