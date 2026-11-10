@@ -1294,6 +1294,18 @@ export const id = {
     passwordChanged: "Kata sandi diganti. Gunakan kata sandi baru saat masuk berikutnya.",
     wrongCurrentPassword: "Kata sandi sekarang salah",
   },
+  pwa: {
+    title: "Aplikasi",
+    lead: "Pasang 14th NPLC di perangkat ini supaya bisa dibuka langsung dari Layar Utama, tanpa mengetik alamat. Isinya sama dengan website ini.",
+    install: "Pasang aplikasi",
+    installed: "14th NPLC sudah terpasang.",
+    installedTitle: "Sudah terpasang",
+    installedBody: "Kamu sedang membuka 14th NPLC sebagai aplikasi di perangkat ini.",
+    iosTitle: "Pasang lewat Bagikan",
+    ios: "Di Safari, ketuk Bagikan, lalu pilih Tambah ke Layar Utama.",
+    manualTitle: "Pasang lewat menu browser",
+    manual: "Buka menu browser, lalu pilih Pasang aplikasi atau Tambahkan ke Layar Utama. Kalau pilihan itu tidak ada, browser ini belum mendukung pemasangan; coba Chrome atau Edge.",
+  },
   push: {
     settingsTitle: "Notifikasi",
     settingsLead: "Dapatkan notifikasi di perangkat ini saat pendaftaran timmu diterima atau ditolak, saat ada anggota yang bergabung, dan saat lomba dimulai, dijeda, atau selesai. Admin juga diberi tahu saat ada bukti pembayaran yang perlu diperiksa.",
