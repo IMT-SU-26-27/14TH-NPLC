@@ -102,7 +102,7 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
         </div>
 
         <div className="space-y-6">
-          <Card>
+          <Card id="review" className="scroll-mt-20">
             <CardHeader>
               <CardTitle>{t("admin.detail.review")}</CardTitle>
               <CardDescription>{t("admin.detail.reviewLead")}</CardDescription>
