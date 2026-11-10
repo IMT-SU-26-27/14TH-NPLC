@@ -25,7 +25,7 @@ Production **tidak punya riwayat migration** (`supabase_migrations.schema_migrat
 
 Kalau ada satu file gagal, berhenti dan perbaiki dulu. Jangan lompati file.
 
-### 2. Isi konten publik: `supabase/production-content.sql`
+### 2. Isi konten publik: `supabase/seed.sql`
 
 Isinya:
 - lomba (CP dan Rally: biaya, kuota, rekening, twibbon, jendela pendaftaran 10 Nov 2026 – 10 Jan 2027 23:59 WIB);
@@ -40,7 +40,7 @@ File ini aman dijalankan berulang:
 
 Jalankan dengan salah satu cara:
 - Studio → SQL Editor: tempel seluruh isi file, lalu Run;
-- `docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/production-content.sql`.
+- `docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/seed.sql`.
 
 Bagian akhir file berisi query verifikasi. Hasil yang diharapkan:
 - 2 lomba;

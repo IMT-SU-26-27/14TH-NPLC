@@ -148,13 +148,12 @@ Untuk yang ingin database **sendiri**, misalnya untuk mencoba panel Admin. Kamu 
    pnpm sb db push
    ```
 
-3. Isi data contoh: buka **SQL Editor** di dashboard, tempel seluruh isi [`supabase/seed.sql`](supabase/seed.sql), lalu **Run**. Isinya:
-   - 2 lomba (rekening contoh);
+3. Isi konten awal: buka **SQL Editor** di dashboard, tempel seluruh isi [`supabase/seed.sql`](supabase/seed.sql), lalu **Run**. Isinya data asli:
+   - 2 lomba;
    - timeline;
-   - sesi CP dan Rally;
-   - 10 soal CP.
+   - sesi CP dan Rally.
 
-   Seed ini tidak membuat akun apa pun.
+   Seed ini tidak membuat akun atau soal CP. Buat soal lewat Admin.
 4. **Authentication → Sign In / Providers → Email:** matikan **Confirm email**.
 5. Buat admin di **Authentication → Users → Add user** (centang *Auto Confirm User*). Login sekali di web, lalu jalankan di SQL Editor:
 
@@ -227,7 +226,7 @@ supabase db push
 
 **Option B: SQL editor** (works for self-hosted Supabase too)
 
-Open Supabase Studio → SQL Editor and run each file in `supabase/migrations/` **in filename order**, then run [`supabase/seed.sql`](supabase/seed.sql). The seed is **sample data** (example competitions with a dummy bank account, timeline, sessions and 10 CP problems, no accounts): on a real deployment set the competitions up in Admin instead and keep only its CP problems part.
+Open Supabase Studio → SQL Editor and run each file in `supabase/migrations/` **in filename order**, then run [`supabase/seed.sql`](supabase/seed.sql). The seed holds the real public content (competitions, timeline, CP and Rally sessions; no accounts, no CP problems) and is safe to re-run.
 
 Then regenerate the TypeScript types if you changed the schema (self-hosted, with Supabase running in Docker on the same machine):
 
@@ -295,7 +294,7 @@ As an admin:
 1. **Admin → Competitions:** set each competition's team size, fee and registration window.
 2. **Admin → Registrations → Payment:** for each competition choose **QRIS** (upload the QRIS image) or **BCA transfer** (account number and holder name). Teams can't register until this is set.
 3. **Admin → Content:** write the About NPLC text and add the timeline dates (both languages).
-4. **Admin → CP contest:** the seed already adds 10 easy problems (levels 1-10). Add more with test cases and a difficulty (easy / medium / hard), set the schedule and submission cooldown, and press **Start** when the contest begins. **Pause** hides the problems and sends teams back to the waiting room; **Resume** brings them back and moves the scheduled end back by the length of the pause.
+4. **Admin → CP contest:** add problems with test cases and a difficulty (easy / medium / hard), set the schedule and submission cooldown, and press **Start** when the contest begins. **Pause** hides the problems and sends teams back to the waiting room; **Resume** brings them back and moves the scheduled end back by the length of the pause.
 
 ---
 
