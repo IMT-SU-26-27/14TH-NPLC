@@ -758,6 +758,8 @@ export const en: Dictionary = {
     },
     registrations: {
       title: "Registrations",
+      reviewAction: "Review status",
+      reviewTeam: "Review status for {team}",
       lead: "Open a team to review its payment and members.",
       new: "New registration",
       search: "Search",

@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { InboxIcon } from "lucide-react";
+import { ChevronRightIcon, InboxIcon } from "lucide-react";
 import { formatDateTime } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
+import { buttonVariants } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TablePagination } from "@/components/shared/table-pagination";
@@ -68,13 +69,20 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
               <TableHead className="text-right">{t("admin.registrations.members")}</TableHead>
               <TableHead>{t("admin.registrations.status")}</TableHead>
               <TableHead>{t("admin.registrations.paymentSubmitted")}</TableHead>
+              <TableHead>
+                <span className="sr-only">{t("admin.registrations.reviewAction")}</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {list.rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} className="relative">
                 <TableCell>
-                  <Link href={localePath(lang, `/admin/registrations/${row.id}`)} className="font-medium underline-offset-4 hover:underline">
+                  {/* The name's link stretches over the row, so a click anywhere opens the team. */}
+                  <Link
+                    href={localePath(lang, `/admin/registrations/${row.id}`)}
+                    className="font-medium underline-offset-4 after:absolute after:inset-0 hover:underline"
+                  >
                     {row.team_name}
                   </Link>
                   <div className="text-muted-foreground font-mono text-xs">{row.referral_code}</div>
@@ -90,6 +98,16 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
                 <TableCell className="text-right tabular-nums">{row.member_count}</TableCell>
                 <TableCell>{row.status && <RegistrationStatusBadge status={row.status} />}</TableCell>
                 <TableCell className="text-muted-foreground text-xs">{formatDateTime(row.payment_submitted_at, lang)}</TableCell>
+                <TableCell className="text-right">
+                  <Link
+                    href={localePath(lang, `/admin/registrations/${row.id}#review`)}
+                    aria-label={t("admin.registrations.reviewTeam", { team: row.team_name ?? "" })}
+                    className={buttonVariants({ variant: "outline", size: "sm", className: "relative z-10" })}
+                  >
+                    {t("admin.registrations.reviewAction")}
+                    <ChevronRightIcon />
+                  </Link>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

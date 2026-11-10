@@ -759,6 +759,8 @@ export const id = {
     },
     registrations: {
       title: "Pendaftaran",
+      reviewAction: "Ubah status",
+      reviewTeam: "Ubah status pendaftaran {team}",
       lead: "Buka tim untuk meninjau pembayaran dan anggotanya.",
       new: "Pendaftaran baru",
       search: "Cari",
