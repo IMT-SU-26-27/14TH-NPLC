@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutDashboardIcon, LogOutIcon, MapPinIcon, ShieldIcon, UserRoundIcon, UsersIcon } from "lucide-react";
+import { LayoutDashboardIcon, LogOutIcon, MapPinIcon, MenuIcon, ShieldIcon, UserRoundIcon, UsersIcon } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 import { removeAllDrafts } from "@/lib/form-draft";
 import { useI18n } from "@/hooks/use-i18n";
@@ -23,7 +23,11 @@ export function UserMenu({ user }: UserMenuProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>{name.split(" ")[0]}</DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={<Button variant="outline" size="icon-lg" className="border-primary rounded-[8px]" aria-label={t("nav.openMenu")} />}
+      >
+        <MenuIcon />
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuGroup>
           <DropdownMenuLabel>
