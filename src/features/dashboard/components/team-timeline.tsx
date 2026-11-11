@@ -1,8 +1,7 @@
 import { HistoryIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatDateTime, memberRange } from "@/lib/format";
+import { formatDateTime, formatDateTimeParts, memberRange } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { StepMarker } from "@/features/dashboard/components/step-marker";
@@ -105,17 +104,24 @@ export function TeamTimeline({ team, lang }: TeamTimelineProps) {
             {t("timeline.history", { count: team.events.length })}
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <ul className="mt-3 space-y-2">
-              {team.events.map((event) => (
-                <li key={event.id} className="flex flex-wrap items-center gap-2 text-sm">
-                  <RegistrationStatusBadge status={event.status} />
-                  {event.note && <span>{EVENT_NOTE[event.note] ? t(EVENT_NOTE[event.note]) : event.note}</span>}
-                  <Badge variant="outline" className="ml-auto">
-                    {formatDateTime(event.created_at, lang)}
-                  </Badge>
-                </li>
-              ))}
-            </ul>
+            {/* When on the left, what happened on the right: reads like a log, oldest first. */}
+            <ol className="mt-3 divide-y rounded-lg border text-sm">
+              {team.events.map((event) => {
+                const at = formatDateTimeParts(event.created_at, lang);
+                return (
+                  <li key={event.id} className="grid grid-cols-[6.5rem_1fr] gap-3 px-3 py-2.5">
+                    <time dateTime={event.created_at} className="text-muted-foreground font-mono text-xs leading-5 tabular-nums">
+                      <span className="block">{at.date}</span>
+                      <span className="block">{at.time}</span>
+                    </time>
+                    <div className="min-w-0 space-y-1">
+                      <RegistrationStatusBadge status={event.status} />
+                      {event.note && <p className="text-foreground leading-snug">{EVENT_NOTE[event.note] ? t(EVENT_NOTE[event.note]) : event.note}</p>}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
           </CollapsibleContent>
         </Collapsible>
       )}
