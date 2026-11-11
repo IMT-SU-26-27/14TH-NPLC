@@ -1,3 +1,4 @@
+import { languageAlternates } from "@/lib/i18n/alternates";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -10,7 +11,7 @@ import type { AuthPageProps } from "@/types/auth";
 
 export async function generateMetadata({ params }: AuthPageProps): Promise<Metadata> {
   const t = getT(await resolveLang(params));
-  return { title: t("auth.signupTitle"), description: t("meta.signupDescription") };
+  return { title: t("auth.signupTitle"), description: t("meta.signupDescription"), alternates: languageAlternates("/signup") };
 }
 
 export default async function SignupPage({ params, searchParams }: AuthPageProps) {

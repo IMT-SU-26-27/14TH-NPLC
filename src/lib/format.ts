@@ -18,6 +18,14 @@ export function formatDateTime(value: string | null, lang: Locale): string {
   return `${formatted} WIB`;
 }
 
+// Date and time of an event on two lines, e.g. "10 Nov 2026" and "14.32 WIB".
+export function formatDateTimeParts(value: string, lang: Locale): { date: string; time: string } {
+  const at = new Date(value);
+  const date = new Intl.DateTimeFormat(INTL_LOCALE[lang], { dateStyle: "medium", timeZone: "Asia/Jakarta" }).format(at);
+  const time = new Intl.DateTimeFormat(INTL_LOCALE[lang], { timeStyle: "short", timeZone: "Asia/Jakarta" }).format(at);
+  return { date, time: `${time} WIB` };
+}
+
 // Hours and minutes on the device clock, e.g. "14.32" in Indonesian.
 export function formatTimeOfDay(ms: number, lang: Locale): string {
   return new Intl.DateTimeFormat(INTL_LOCALE[lang], { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(ms));
