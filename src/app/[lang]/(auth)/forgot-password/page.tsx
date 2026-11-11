@@ -1,3 +1,4 @@
+import { languageAlternates } from "@/lib/i18n/alternates";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -12,7 +13,7 @@ import type { AuthPageProps } from "@/types/auth";
 
 export async function generateMetadata({ params }: AuthPageProps): Promise<Metadata> {
   const t = getT(await resolveLang(params));
-  return { title: t("auth.forgotTitle"), description: t("meta.forgotPasswordDescription") };
+  return { title: t("auth.forgotTitle"), description: t("meta.forgotPasswordDescription"), alternates: languageAlternates("/forgot-password") };
 }
 
 export default async function ForgotPasswordPage({ params, searchParams }: AuthPageProps) {
