@@ -103,3 +103,9 @@ export function formatDuration(seconds: number, lang: Locale): string {
   ].filter(Boolean);
   return parts.join(" ");
 }
+
+// Time spent away from the contest page: "< 1 detik", "12 detik", "2 menit 5 detik".
+export function formatAwayDuration(ms: number, lang: Locale): string {
+  if (ms < 1000) return getT(lang)("cp.focus.underSecond");
+  return formatDuration(Math.round(ms / 1000), lang);
+}

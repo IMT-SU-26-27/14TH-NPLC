@@ -102,6 +102,7 @@ export function WaitingRoom({ competitionId, status, scheduledStartAt, durationS
         {durationSeconds ? (
           <p className="text-muted-foreground text-sm">{t("cp.waiting.duration", { duration: formatDuration(durationSeconds, lang) })}</p>
         ) : null}
+        <p className="text-muted-foreground max-w-md text-sm">{t("cp.focus.recordedNote")}</p>
       </EmptyContent>
     </Empty>
   );

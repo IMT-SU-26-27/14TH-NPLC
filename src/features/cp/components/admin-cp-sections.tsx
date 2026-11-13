@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, FileCodeIcon, ListChecksIcon, PlusIcon } from "lucide-react";
+import { ArrowLeftIcon, EyeOffIcon, FileCodeIcon, ListChecksIcon, PlusIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
 import { getAdminContest, getAdminProblem, getLeaderboard, listCpCompetitions } from "@/lib/data/cp";
 import { localePath } from "@/lib/i18n/config";
@@ -86,6 +86,10 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
             <Link href={`${localePath(lang, "/admin/cp/submissions")}?competition=${contest.competitionId}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
               <ListChecksIcon />
               {t("admin.submissions.title")}
+            </Link>
+            <Link href={`${localePath(lang, "/admin/cp/activity")}?competition=${contest.competitionId}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+              <EyeOffIcon />
+              {t("admin.focus.title")}
             </Link>
             <Link href={`${localePath(lang, "/admin/cp/problems/new")}?competition=${contest.competitionId}`} className={buttonVariants({ size: "sm" })}>
               <PlusIcon />

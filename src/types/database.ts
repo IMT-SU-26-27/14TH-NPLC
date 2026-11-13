@@ -172,6 +172,74 @@ export type Database = {
         }
         Relationships: []
       }
+      cp_focus_events: {
+        Row: {
+          competition_id: string
+          duration_ms: number | null
+          id: string
+          kind: Database["public"]["Enums"]["cp_focus_kind"]
+          left_at: string
+          problem_id: string | null
+          registration_id: string
+          returned_at: string | null
+          returned_by_reload: boolean
+          user_id: string | null
+        }
+        Insert: {
+          competition_id: string
+          duration_ms?: never
+          id?: string
+          kind: Database["public"]["Enums"]["cp_focus_kind"]
+          left_at?: string
+          problem_id?: string | null
+          registration_id: string
+          returned_at?: string | null
+          returned_by_reload?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          competition_id?: string
+          duration_ms?: never
+          id?: string
+          kind?: Database["public"]["Enums"]["cp_focus_kind"]
+          left_at?: string
+          problem_id?: string | null
+          registration_id?: string
+          returned_at?: string | null
+          returned_by_reload?: boolean
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cp_focus_events_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cp_focus_events_problem_id_fkey"
+            columns: ["problem_id"]
+            isOneToOne: false
+            referencedRelation: "cp_problems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cp_focus_events_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cp_focus_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cp_leaderboard_snapshots: {
         Row: {
           competition_id: string
@@ -1419,6 +1487,25 @@ export type Database = {
         Args: { p_competition_id: string }
         Returns: string
       }
+      admin_cp_focus_summary: {
+        Args: {
+          p_competition_id: string
+          p_kind: Database["public"]["Enums"]["cp_focus_kind"] | null
+          p_min_ms: number
+        }
+        Returns: {
+          events: number
+          fullscreen_exit: number
+          last_left_at: string
+          longest_ms: number | null
+          open_events: number
+          registration_id: string
+          tab_hidden: number
+          team_name: string
+          total_ms: number
+          window_blur: number
+        }[]
+      }
       admin_save_problem: {
         Args: { p_problem: Json; p_test_cases: Json }
         Returns: string
@@ -1553,6 +1640,7 @@ export type Database = {
     Enums: {
       competition_type: "competitive_programming" | "logic"
       cp_difficulty: "easy" | "medium" | "hard"
+      cp_focus_kind: "tab_hidden" | "window_blur" | "fullscreen_exit"
       cp_language: "python" | "cpp" | "java"
       cp_session_status: "scheduled" | "live" | "paused" | "ended"
       cp_verdict:
@@ -2254,6 +2342,7 @@ export const Constants = {
     Enums: {
       competition_type: ["competitive_programming", "logic"],
       cp_difficulty: ["easy", "medium", "hard"],
+      cp_focus_kind: ["tab_hidden", "window_blur", "fullscreen_exit"],
       cp_language: ["python", "cpp", "java"],
       cp_session_status: ["scheduled", "live", "paused", "ended"],
       cp_verdict: [
