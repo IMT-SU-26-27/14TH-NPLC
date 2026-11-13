@@ -51,6 +51,8 @@ export type Team = Pick<
   | "payment_proof_public_id"
   | "payment_submitted_at"
   | "rejection_reason"
+  | "disqualified_at"
+  | "disqualification_reason"
   | "created_at"
 > & {
   competition: TeamCompetition;

@@ -127,3 +127,9 @@ export const qrisSchema = z.object({
 });
 
 export const uuidSchema = z.uuid();
+
+// Disqualifying a team always needs a reason the team will read on its dashboard.
+export const disqualifySchema = z.object({
+  registrationId: z.uuid(),
+  reason: z.string().trim().min(3, "validation.disqualifyReason").max(500, "validation.disqualifyReasonLong"),
+});

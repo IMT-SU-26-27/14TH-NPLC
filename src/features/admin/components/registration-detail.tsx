@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, ListChecksIcon, ReceiptIcon } from "lucide-react";
+import { ArrowLeftIcon, BanIcon, ListChecksIcon, ReceiptIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
 import { getRegistrationDetail } from "@/lib/data/admin";
 import { formatDateTime } from "@/lib/format";
@@ -11,6 +11,7 @@ import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { uuidSchema } from "@/lib/validations/admin";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
@@ -21,6 +22,7 @@ import { AdminMembersTable } from "@/features/admin/components/admin-members-tab
 import { AdminTwibbonProofs } from "@/features/admin/components/admin-twibbon-proofs";
 import { RallyQrRegenerateButton } from "@/features/rally/components/rally-qr-regenerate-button";
 import { AdminDeleteButton } from "@/features/admin/components/admin-delete-button";
+import { DisqualificationForm } from "@/features/admin/components/disqualification-form";
 import { PaymentProofButton } from "@/features/admin/components/payment-proof-button";
 import { ReviewForm } from "@/features/admin/components/review-form";
 import { TeamNameForm } from "@/features/admin/components/team-name-form";
@@ -61,6 +63,12 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
             </Link>
           )}
           <RegistrationStatusBadge status={team.status} />
+          {team.disqualified_at && (
+            <Badge variant="destructive">
+              <BanIcon />
+              {t("admin.detail.disqualifiedBadge")}
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -165,6 +173,22 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
               />
             </CardContent>
           </Card>
+
+          {(team.status === "accepted" || team.disqualified_at) && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("admin.detail.disqualification")}</CardTitle>
+                <CardDescription>{t("admin.detail.disqualificationLead")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DisqualificationForm
+                  registrationId={team.id}
+                  disqualifiedAt={team.disqualified_at}
+                  reason={team.disqualification_reason}
+                />
+              </CardContent>
+            </Card>
+          )}
 
           {team.competition.type === "logic" && (
             <Card>
