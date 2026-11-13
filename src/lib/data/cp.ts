@@ -10,6 +10,7 @@ import type {
   SubmissionFilters,
   ContestContext,
   ContestProblemListItem,
+  CpTeamResult,
   CpSessionStatus,
   FocusEventRow,
   FocusFilters,
@@ -61,6 +62,23 @@ export async function getContestContext(isAdmin: boolean): Promise<ContestContex
   if (!session) return null;
 
   return { competitionId, registrationId, teamName, session, autoFreezeAt: autoFreezeAt ?? null };
+}
+
+// The participant's own CP team (RLS: own registration only). Null for admins and teams outside CP.
+export async function getCpTeamResult(): Promise<CpTeamResult | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data: access } = await supabase.rpc("cp_access");
+  const ids = (access ?? []).map((row) => row.registration_id);
+  if (ids.length === 0) return null;
+  const { data } = await supabase
+    .from("registrations")
+    .select("team_name, disqualified_at, disqualification_reason")
+    .in("id", ids)
+    .order("disqualified_at", { ascending: false, nullsFirst: false })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return null;
+  return { teamName: data.team_name, disqualifiedAt: data.disqualified_at, reason: data.disqualification_reason };
 }
 
 export async function listContestProblems(competitionId: string, registrationId: string | null): Promise<ContestProblemListItem[]> {
