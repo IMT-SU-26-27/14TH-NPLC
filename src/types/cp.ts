@@ -129,8 +129,18 @@ export type RecentSubmission = {
 
 export type LeaderboardRow = Pick<
   CpScore,
-  "registration_id" | "team_name" | "total_points" | "solved" | "total_runtime_ms" | "total_memory_kb"
+  "registration_id" | "team_name" | "total_points" | "solved" | "total_runtime_ms" | "total_memory_kb" | "problems"
 >;
+
+// One team's result on one problem, from cp_scores.problems.
+export type ProblemStatus = { solved: boolean; wrong: number };
+
+// A leaderboard column.
+export type LeaderboardProblem = Pick<CpProblem, "id" | "level" | "title">;
+
+export type ProblemStatusCellProps = {
+  status: ProblemStatus | null;
+};
 
 export type AdminProblemRow = Pick<CpProblem, "id" | "level" | "difficulty" | "title" | "points" | "is_published" | "time_limit_ms" | "memory_limit_kb"> & {
   testCaseCount: number;
@@ -205,6 +215,8 @@ export type OutcomeBadgeProps = {
 
 export type LeaderboardTableProps = {
   initialRows: LeaderboardRow[];
+  // Published problems in level order, one column each.
+  problems: LeaderboardProblem[];
   competitionId: string;
   highlightRegistrationId: string | null;
   // Who is looking: admins always get live scores; participants get the snapshot while frozen.
