@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutDashboardIcon, LogOutIcon, MapPinIcon, MenuIcon, ShieldIcon, UserRoundIcon, UsersIcon } from "lucide-react";
+import { LayoutDashboardIcon, LogOutIcon, MapPinIcon, MenuIcon, ShieldIcon, UserRoundIcon } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 import { removeAllDrafts } from "@/lib/form-draft";
 import { useI18n } from "@/hooks/use-i18n";
@@ -17,6 +17,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { UserMenuProps } from "@/types/auth";
 
+const ROLE_LABEL = { participant: "nav.roleParticipant", admin: "nav.roleAdmin", lo: "nav.roleLo" } as const;
+
+// The account menu (☰) of the site header: name and role, Dashboard (phones only; the header shows it on wider
+// screens), Profile, Admin for admins, then Sign out.
 export function UserMenu({ user }: UserMenuProps) {
   const { t, href } = useI18n();
   const name = user.full_name || user.email;
@@ -24,7 +28,7 @@ export function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={<Button variant="outline" size="icon-lg" className="border-primary rounded-[8px]" aria-label={t("nav.openMenu")} />}
+        render={<Button variant="ghost" size="icon-lg" aria-label={t("nav.accountMenu")} />}
       >
         <MenuIcon />
       </DropdownMenuTrigger>
@@ -32,17 +36,17 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuGroup>
           <DropdownMenuLabel>
             <span className="block truncate">{name}</span>
-            <span className="text-muted-foreground block truncate text-xs font-normal">{user.email}</span>
+            <span className="text-muted-foreground block truncate text-xs font-normal">{t(ROLE_LABEL[user.role])}</span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {user.role === "lo" ? (
-          <DropdownMenuItem render={<Link href={href("/lo")} />}>
+          <DropdownMenuItem className="sm:hidden" render={<Link href={href("/lo")} />}>
             <MapPinIcon />
             {t("nav.loPosts")}
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem render={<Link href={href("/dashboard")} />}>
+          <DropdownMenuItem className="sm:hidden" render={<Link href={href("/dashboard")} />}>
             <LayoutDashboardIcon />
             {t("nav.dashboard")}
           </DropdownMenuItem>
@@ -51,12 +55,6 @@ export function UserMenu({ user }: UserMenuProps) {
           <UserRoundIcon />
           {t("nav.profile")}
         </DropdownMenuItem>
-        {user.role !== "lo" && (
-          <DropdownMenuItem render={<Link href={href("/join")} />}>
-            <UsersIcon />
-            {t("nav.joinTeam")}
-          </DropdownMenuItem>
-        )}
         {user.role === "admin" && (
           <DropdownMenuItem render={<Link href={href("/admin")} />}>
             <ShieldIcon />
