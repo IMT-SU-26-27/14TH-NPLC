@@ -1279,6 +1279,9 @@ export type Database = {
       }
       registrations: {
         Row: {
+          disqualification_reason: string | null
+          disqualified_at: string | null
+          disqualified_by: string | null
           competition_id: string
           created_at: string
           id: string
@@ -1298,6 +1301,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          disqualification_reason?: string | null
+          disqualified_at?: string | null
+          disqualified_by?: string | null
           competition_id: string
           created_at?: string
           id?: string
@@ -1317,6 +1323,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          disqualification_reason?: string | null
+          disqualified_at?: string | null
+          disqualified_by?: string | null
           competition_id?: string
           created_at?: string
           id?: string

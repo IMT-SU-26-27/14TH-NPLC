@@ -56,6 +56,8 @@ const RAISED: [string, string][] = [
   ["A team needs exactly one leader", "errors.teamSize"],
   ["The team leader cannot be removed", "errors.leaderProtected"],
   ["Sign in to", "errors.signInAgain"],
+  ["This team has been disqualified", "errors.disqualified"],
+  ["Only an admin can disqualify a team", "errors.adminOnly"],
 ];
 
 // Maps Postgres errors (RAISE EXCEPTION, constraints) to a dictionary key.

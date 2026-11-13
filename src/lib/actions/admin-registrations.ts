@@ -14,6 +14,7 @@ import { localePath } from "@/lib/i18n/config";
 import { getRequestLocale } from "@/lib/i18n/server";
 import {
   adminCreateRegistrationSchema,
+  disqualifySchema,
   reviewRegistrationSchema,
   updateTeamNameSchema,
   uuidSchema,
@@ -68,6 +69,39 @@ export async function updateTeamName(_prev: FormState, formData: FormData): Prom
 
   refresh();
   return successState("admin.detail.renamed");
+}
+
+// Disqualifies an accepted team with a reason it reads on its dashboard. Results are kept; it can be lifted.
+export async function disqualifyTeam(_prev: FormState, formData: FormData): Promise<FormState> {
+  if (!(await isAdmin())) return errorState(NOT_ADMIN);
+  const parsed = disqualifySchema.safeParse({
+    registrationId: formData.get("registrationId"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("registrations")
+    .update({ disqualification_reason: parsed.data.reason })
+    .eq("id", parsed.data.registrationId);
+  if (error) return errorState(databaseErrorMessage(error));
+
+  refresh();
+  return successState("admin.detail.disqualified");
+}
+
+export async function liftDisqualification(registrationId: string): Promise<ActionResult> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  const id = uuidSchema.safeParse(registrationId);
+  if (!id.success) return { ok: false, message: "errors.invalidRequest" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("registrations").update({ disqualification_reason: null }).eq("id", id.data);
+  if (error) return { ok: false, message: databaseErrorMessage(error) };
+
+  refresh();
+  return { ok: true, data: undefined, message: "admin.detail.disqualificationLifted" };
 }
 
 export async function adminCreateRegistration(_prev: FormState, formData: FormData): Promise<FormState> {

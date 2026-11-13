@@ -82,6 +82,12 @@ export type RegistrationTrendChartProps = {
   trend: RegistrationTrend;
 };
 
+export type DisqualificationFormProps = {
+  registrationId: string;
+  disqualifiedAt: string | null;
+  reason: string | null;
+};
+
 export type ReviewFormProps = {
   registrationId: string;
   status: RegistrationStatus;

@@ -1,4 +1,4 @@
-import { InfoIcon, OctagonXIcon, UsersIcon } from "lucide-react";
+import { BanIcon, InfoIcon, OctagonXIcon, UsersIcon } from "lucide-react";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { isRegistrationOpen } from "@/lib/data/competitions";
 import { rallyQrVisible } from "@/lib/rally/session-visibility";
@@ -57,6 +57,17 @@ export function TeamCard({ team, userId, qrisUrl, lang, contestStatus, rallyStat
         </div>
         <TeamStatusPill status={team.status} lang={lang} />
       </header>
+
+      {team.disqualified_at && team.disqualification_reason && (
+        <Alert variant="destructive">
+          <BanIcon />
+          <AlertTitle>{t("dashboard.disqualifiedTitle")}</AlertTitle>
+          <AlertDescription>
+            <p>{team.disqualification_reason}</p>
+            <p>{t("dashboard.disqualifiedContact")}</p>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {team.status === "rejected" && team.rejection_reason && (
         <Alert variant="destructive">
