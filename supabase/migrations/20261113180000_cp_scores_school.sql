@@ -29,6 +29,12 @@ create trigger cp_leaderboard_snapshots_fill_school
   before insert on public.cp_leaderboard_snapshots
   for each row execute function private.cp_leaderboard_fill_school();
 
+-- Every accepted CP team is already on the leaderboard from acceptance (cp_sync_scoreboard, 0 points, no problems
+-- tried). Also run it when an admin edits a team's school, so the leaderboard row picks the new school up.
+drop trigger registrations_sync_scoreboard on public.registrations;
+create trigger registrations_sync_scoreboard after insert or update of status, team_name, school on public.registrations
+  for each row execute function private.cp_sync_scoreboard();
+
 -- Rows already recorded.
 update public.cp_scores s set school = r.school from public.registrations r where r.id = s.registration_id;
 update public.cp_leaderboard_snapshots s set school = r.school from public.registrations r where r.id = s.registration_id;
