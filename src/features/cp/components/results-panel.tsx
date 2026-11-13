@@ -2,6 +2,7 @@
 
 import { ListChecksIcon } from "lucide-react";
 import { formatDateTime, formatPointsDelta } from "@/lib/format";
+import { submissionOutcome } from "@/lib/cp/outcome";
 import { useI18n } from "@/hooks/use-i18n";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,8 +11,8 @@ import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/comp
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OutcomeBadge } from "@/features/cp/components/outcome-badge";
 import { VerdictBadge } from "@/features/cp/components/verdict-badge";
+import { TestVerdictBadge } from "@/features/cp/components/test-verdict-badge";
 import type { ResultsPanelProps } from "@/types/cp";
 
 export function ResultsPanel({ result, recent, pending }: ResultsPanelProps) {
@@ -46,7 +47,7 @@ export function ResultsPanel({ result, recent, pending }: ResultsPanelProps) {
               <>
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <OutcomeBadge verdict={result.verdict} alreadySolved={result.alreadySolved} />
+                    <VerdictBadge kind={submissionOutcome(result.verdict, result.alreadySolved)} />
                     <span className="text-sm">{t("cp.passed", { passed: result.passed, total: result.total })}</span>
                   </div>
                   {result.submissionId ? (
@@ -82,7 +83,7 @@ export function ResultsPanel({ result, recent, pending }: ResultsPanelProps) {
                             {test.timeMs ?? "–"} ms · {test.memoryKb ?? "–"} KB
                           </ItemDescription>
                         </ItemContent>
-                        <VerdictBadge verdict={test.verdict} />
+                        <TestVerdictBadge verdict={test.verdict} />
                       </div>
                       {test.isSample &&
                         !["accepted", "compilation_error", "internal_error", "exec_format_error"].includes(test.verdict) && (
@@ -135,7 +136,7 @@ export function ResultsPanel({ result, recent, pending }: ResultsPanelProps) {
                       <TableCell className="text-muted-foreground text-xs">{formatDateTime(s.created_at, lang)}</TableCell>
                       <TableCell>{t(`cp.languages.${s.language}`)}</TableCell>
                       <TableCell>
-                        <OutcomeBadge verdict={s.verdict} alreadySolved={s.already_solved} />
+                        <VerdictBadge kind={submissionOutcome(s.verdict, s.already_solved)} />
                       </TableCell>
                       <TableCell className="text-right tabular-nums">{formatPointsDelta(Number(s.score), lang)}</TableCell>
                     </TableRow>

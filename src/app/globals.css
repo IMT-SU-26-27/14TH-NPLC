@@ -32,8 +32,10 @@
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-success-soft: var(--success-soft);
+  --color-success-border: var(--success-border);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-warning-border: var(--warning-border);
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
   --color-brand-purple: var(--brand-purple);
@@ -91,8 +93,11 @@
   --success: #008236;
   --success-foreground: #FFFFFF;
   --success-soft: #DCFCE7;
+  /* Outline of a passed-but-not-new state ("Yes – Solved") and of easy difficulty. */
+  --success-border: #86D19F;
   --warning: #B45309;
   --warning-foreground: #FFFFFF;
+  --warning-border: #F0B37A;
   --border: #D9E1F0;
   --input: #CFD8EA;
   --ring: #315BF0;

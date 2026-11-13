@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { CodeIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
-import { getContestContext, getLeaderboard, getProblemView, getRecentSubmissions, listContestProblems } from "@/lib/data/cp";
+import { getContestContext, getLeaderboard, getProblemView, getRecentSubmissions, listContestProblems, listLeaderboardProblems } from "@/lib/data/cp";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { uuidSchema } from "@/lib/validations/admin";
@@ -76,11 +76,15 @@ export async function ContestLeaderboard({ lang }: LangProps) {
   const viewer = user.role === "admin" ? "admin" : "participant";
   const frozenAt = context.session.leaderboard_frozen_at;
   // Participants see the snapshot while frozen; admins always see live scores.
-  const rows = await getLeaderboard(context.competitionId, viewer === "participant" && frozenAt ? "snapshot" : "live");
+  const [rows, problems] = await Promise.all([
+    getLeaderboard(context.competitionId, viewer === "participant" && frozenAt ? "snapshot" : "live"),
+    listLeaderboardProblems(context.competitionId),
+  ]);
   return (
     <LeaderboardTable
       key={frozenAt ?? "live"}
       initialRows={rows}
+      problems={problems}
       competitionId={context.competitionId}
       highlightRegistrationId={context.registrationId}
       viewer={viewer}

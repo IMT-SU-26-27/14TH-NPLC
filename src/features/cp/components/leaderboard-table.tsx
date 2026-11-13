@@ -8,17 +8,19 @@ import { formatDateTime, formatScore } from "@/lib/format";
 import { useCpSessionRealtime } from "@/hooks/use-cp-session-realtime";
 import { useI18n } from "@/hooks/use-i18n";
 import { useLeaderboardRealtime } from "@/hooks/use-leaderboard-realtime";
+import { problemStatus } from "@/lib/cp/problem-status";
 import { useRefreshAt } from "@/hooks/use-refresh-at";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TablePagination } from "@/components/shared/table-pagination";
+import { LeaderboardProblemCell } from "@/features/cp/components/leaderboard-problem-cell";
 import type { LeaderboardTableProps } from "@/types/cp";
 
 const PAGE_SIZE = 10;
 
-export function LeaderboardTable({ initialRows, competitionId, highlightRegistrationId, viewer, frozenAt, frozenAuto, autoFreezeAt }: LeaderboardTableProps) {
+export function LeaderboardTable({ initialRows, problems, competitionId, highlightRegistrationId, viewer, frozenAt, frozenAuto, autoFreezeAt }: LeaderboardTableProps) {
   const { t, lang, href } = useI18n();
   const router = useRouter();
   const participantFrozen = viewer === "participant" && !!frozenAt;
@@ -90,6 +92,12 @@ export function LeaderboardTable({ initialRows, competitionId, highlightRegistra
             <TableRow>
               <TableHead className="w-12">{t("cp.rank")}</TableHead>
               <TableHead>{t("cp.team")}</TableHead>
+              {problems.map((p) => (
+                <TableHead key={p.id} className="w-12 text-center tabular-nums" title={p.title}>
+                  <span aria-hidden>{p.level}</span>
+                  <span className="sr-only">{t("cp.level", { level: p.level })}: {p.title}</span>
+                </TableHead>
+              ))}
               <TableHead className="text-right">{t("cp.solvedCount")}</TableHead>
               <TableHead className="text-right">{t("cp.totalPoints")}</TableHead>
               <TableHead className="text-right max-sm:hidden">{t("cp.totalRuntime")}</TableHead>
@@ -112,6 +120,11 @@ export function LeaderboardTable({ initialRows, competitionId, highlightRegistra
                     </Badge>
                   )}
                 </TableCell>
+                {problems.map((p) => (
+                  <TableCell key={p.id} className="text-center">
+                    <LeaderboardProblemCell status={problemStatus(row.problems, p.id)} />
+                  </TableCell>
+                ))}
                 <TableCell className="text-right tabular-nums">{row.solved}</TableCell>
                 <TableCell className="text-right font-semibold tabular-nums">{formatScore(Number(row.total_points), lang)}</TableCell>
                 <TableCell className="text-muted-foreground text-right font-mono tabular-nums max-sm:hidden">
