@@ -156,7 +156,7 @@ The Figma file [NPLC XIV – Website (Final)](https://www.figma.com/design/KmXmj
 - One blue primary on a blue-white ground; green is reserved for accepted/passed.
 - Space Grotesk for headings, Inter for body text, Geist Mono for code, codes, NISN, phone numbers, timers and slugs.
 - Flat cards with a 1px foreground/10% ring and 14px corners.
-- Single centred shell column (max-w-6xl, 1152px) with 16px gutters.
+- Single centred shell column (max-w-6xl, 1152px) with 16px gutters; only the CP problem workspace runs full width.
 - Light only. The `.dark` values in `globals.css` are unused and are not part of this theme.
 - Bilingual (Indonesian default, English) with every visible string from the dictionaries.
 
@@ -197,7 +197,7 @@ Navy and cool neutrals with one saturated blue voice, small masdes accents and s
 
 **The One Blue Rule.** Blue means "act here" or "you are here". It is never used for an accepted state or as decoration.
 
-**The Green Means Done Rule.** `success` appears only on accepted registrations and Accepted verdicts (and editor strings), applied as `bg-success text-success-foreground` on the default Badge.
+**The Green Means Done Rule.** `success` appears only on accepted registrations, Accepted verdicts and solved problems (and editor strings), applied as `bg-success text-success-foreground` on the default Badge. A repeat Accepted ("Yes – Solved") is the outline form: `success-border` border with `success` text.
 
 **The Lime Rule.** Lime always carries `highlight-foreground` text (10.55:1). Never put white text on it.
 
@@ -227,11 +227,13 @@ Navy and cool neutrals with one saturated blue voice, small masdes accents and s
 
 ## Layout
 
-A single centred column: `max-w-6xl` (1152px) with 16px side padding is the shell for the header, footer, landing sections, admin, register and CP pages. Narrower measures are content-driven: the hero at 768px, prose at 672px, auth forms at 448px.
+A single centred column: `max-w-6xl` (1152px) with 16px side padding is the shell for the header, footer, landing sections, admin, register and CP pages. The one exception is the CP problem workspace (`/cp/problems/[id]`), which spans the full viewport with 16-24px gutters so the statement and editor sit side by side down to 1024px. Narrower measures are content-driven: the hero at 768px, prose at 672px, auth forms at 448px.
 
 Page rhythm: `main` gets 32px vertical padding (48px on register) and 24px between stacked blocks; inside cards, 16px padding (12px for `size="sm"`), 8-16px gaps between fields and list items, 4px between a label and its value. Grids collapse to one column on mobile and go to two columns from `md`/`lg` (dashboard progress card beside members + payment card).
 
-The header is a 56px sticky bar with a translucent background blur and a bottom hairline: the NPLC XIV logo left (26px tall, 20px below 360px wide), language switcher, ghost nav links (hidden below `sm`) and user menu right.
+The header is a 56px sticky bar with a translucent background blur and a bottom hairline: the NPLC XIV logo left (26px tall, 20px below 360px wide), and on the right the language switcher, a ghost Dasbor link and a ☰ menu button. The account name never shows in the header. The ☰ DropdownMenu lists the name and role (Peserta/Admin), Dasbor (phones only, where the header link is hidden), Profil, Admin (admins only), a separator and Keluar in destructive text.
+
+Contest screens (CP workspace, problem list, waiting room, leaderboard) replace the site header and footer with the ContestBar: session and team, a status Badge, Soal / Papan peringkat navigation, the remaining-time countdown in Geist Mono and the language switcher. On phones it wraps to two rows with 44px targets. The results-of-the-round screen keeps the site header and footer.
 
 Motion: the only scripted motion is the landing hero, where each `[data-hero-item]` fades up 24px over 0.8s, staggered 0.12s, `power3.out`, gated on `prefers-reduced-motion: no-preference`. Everything else uses the primitives' own short colour/opacity transitions and the 1px press nudge on buttons. Charts render with animation off.
 
@@ -260,7 +262,20 @@ shadcn/ui base-nova primitives in `src/components/ui` are the only building bloc
 ### Chips (status badges)
 - **Style:** 20px pill, 12px medium text, 8px horizontal padding.
 - **Registration status:** `pending_payment` outline, `under_review` secondary (blue-grey), `accepted` success green, `rejected` destructive tint.
-- **CP verdicts:** Accepted success green; Time Limit secondary; internal/exec-format errors outline; every other failure destructive tint.
+- **CP verdicts (`VerdictBadge`, one map everywhere):** labels stay in English exactly as the guidebook writes them.
+
+  | Verdict | Badge | Icon |
+  |---|---|---|
+  | Yes – Accepted | default, `bg-success text-success-foreground` | circle-check |
+  | Yes – Solved | outline, `success-border` border, `success` text | circle-check |
+  | No – Wrong Answer / Runtime Error / Compile Error | destructive tint | circle-x |
+  | No – Time Limit Exceeded | secondary (blue-grey) | clock |
+  | Judge error / other judge response | outline | info |
+  | Judging | outline | Spinner |
+  | Run · not scored | outline | play |
+  | Not scored · time up | outline | clock |
+
+- **CP problem status (problem list):** solved default success; wrong n times destructive tint; not tried outline with a dashed-circle icon.
 
 ### Cards / Containers
 - **Corner Style:** 14px.
@@ -281,7 +296,7 @@ shadcn/ui base-nova primitives in `src/components/ui` are the only building bloc
 - **Sonner** toasts, top-right, for transient confirmations.
 
 ### Navigation
-- Sticky 56px header described in Layout; admin sub-navigation is a wrapping row of button-styled links above a bottom hairline, the active page as a secondary (Blue Wash) button and the rest ghost; user actions sit in a DropdownMenu.
+- Sticky 56px header described in Layout; admin sub-navigation is a wrapping row of button-styled links above a bottom hairline, the active page as a secondary (Blue Wash) button and the rest ghost; user actions sit in the ☰ DropdownMenu.
 
 ### Progress step list (signature)
 A vertical list of team registration steps: Decode Blue icon for done and current steps (current marked `aria-current="step"`), Slate for upcoming, Verdict Red for failed, joined by a 1px connector that is blue between completed steps and hairline otherwise.
@@ -297,7 +312,7 @@ Monaco themed from tokens at runtime: Card White background, Decode Blue keyword
 ### Do:
 - **Do** take every colour from `globals.css` tokens through Tailwind aliases or `var(--token)`; add a new token there before using a new colour.
 - **Do** compose screens only from `src/components/ui` shadcn primitives; use Field for forms, Alert for errors, Empty for no-data, Skeleton for loading and Spinner for pending buttons.
-- **Do** keep pages in the `max-w-6xl` column with 16px gutters and 24px block spacing.
+- **Do** keep pages in the `max-w-6xl` column with 16px gutters and 24px block spacing; the CP problem workspace is the only full-width page.
 - **Do** colour statuses through the shared `RegistrationStatusBadge` and `VerdictBadge` mappings.
 - **Do** set codes, NISN, phone numbers and slugs in Geist Mono, and numbers in tabular figures.
 - **Do** source every visible string from the `id` and `en` dictionaries (Indonesian default), and format dates and numbers with `INTL_LOCALE` (`id-ID`, `en-GB`).
