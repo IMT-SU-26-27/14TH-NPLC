@@ -11,12 +11,13 @@ import { Button } from "@/components/ui/button";
 
 const PROBLEM_PATH = /\/cp\/problems\/([0-9a-f-]{36})/;
 
-// Mounted once in the contest layout for participants. Active on every contest page except the waiting room,
-// so moving between problems and the leaderboard inside the site is never counted as leaving.
+// Mounted once in the contest layout for participants. Active on every contest page except the waiting room and
+// the results page, so moving between problems and the leaderboard inside the site is never counted as leaving.
 export function ContestFocusMonitor() {
   const { t, lang } = useI18n();
   const pathname = usePathname();
-  const enabled = /\/cp(\/|$)/.test(pathname) && !pathname.includes("/cp/waiting");
+  const onResult = pathname.includes("/cp/result");
+  const enabled = /\/cp(\/|$)/.test(pathname) && !pathname.includes("/cp/waiting") && !onResult;
   const problemId = PROBLEM_PATH.exec(pathname)?.[1] ?? null;
 
   const { fullscreen, enterFullscreen } = useFocusMonitor(enabled, problemId, (kind, ms) => {
@@ -27,7 +28,8 @@ export function ContestFocusMonitor() {
   });
 
   // Shown in the waiting room too, so teams can switch to fullscreen before the start; only recorded once live.
-  if (fullscreen) return null;
+  // The results page is not part of the contest, so it has no fullscreen reminder.
+  if (fullscreen || onResult) return null;
 
   return (
     <Alert className="mb-6">

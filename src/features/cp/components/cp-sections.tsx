@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import { CodeIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
-import { getContestContext, getLeaderboard, getProblemView, getRecentSubmissions, listContestProblems } from "@/lib/data/cp";
+import { getContestContext, getCpTeamResult, getLeaderboard, getProblemView, getRecentSubmissions, listContestProblems } from "@/lib/data/cp";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
 import { uuidSchema } from "@/lib/validations/admin";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { ContestHeader } from "@/features/cp/components/contest-header";
+import { DisqualifiedResult } from "@/features/cp/components/disqualified-result";
 import { ContestLiveGuard } from "@/features/cp/components/contest-live-guard";
 import { LeaderboardTable } from "@/features/cp/components/leaderboard-table";
 import { ProblemList } from "@/features/cp/components/problem-list";
@@ -68,6 +69,15 @@ export async function ContestWaiting({ lang }: LangProps) {
       teamName={context.teamName}
     />
   );
+}
+
+// Results of the round for the participant's team. Only the disqualified state exists so far; the
+// qualified / not qualified states follow with the final session.
+export async function ContestResult({ lang }: LangProps) {
+  const { user, empty } = await loadContext(lang);
+  const result = user.role === "admin" ? null : await getCpTeamResult();
+  if (!result?.disqualifiedAt) return empty;
+  return <DisqualifiedResult lang={lang} teamName={result.teamName} disqualifiedAt={result.disqualifiedAt} reason={result.reason} />;
 }
 
 export async function ContestLeaderboard({ lang }: LangProps) {

@@ -100,6 +100,20 @@ export type ContestProblemListItem = Pick<CpProblem, "id" | "level" | "difficult
   solved: boolean;
 };
 
+// The signed-in participant's own CP team, for the results-of-the-round page.
+export type CpTeamResult = {
+  teamName: string;
+  disqualifiedAt: string | null;
+  reason: string | null;
+};
+
+export type DisqualifiedResultProps = {
+  lang: Locale;
+  teamName: string;
+  disqualifiedAt: string;
+  reason: string | null;
+};
+
 export type ContestContext = {
   competitionId: string;
   registrationId: string | null; // null for admins previewing

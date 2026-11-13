@@ -1164,6 +1164,17 @@ export const id = {
         fullscreen_exit: "Tidak layar penuh",
       },
     },
+    result: {
+      title: "Hasil babak",
+      disqualifiedBadge: "Didiskualifikasi",
+      disqualifiedTitle: "{team} didiskualifikasi",
+      disqualifiedLead: "Tim ini tidak bisa membuka soal, Run, atau Submit di Competitive Programming.",
+      noteTitle: "Keterangan dari panitia",
+      reason: "Alasan",
+      since: "Sejak",
+      final: "Keputusan panitia bersifat mutlak dan tidak dapat diganggu gugat (guidebook bab 2).",
+      contact: "Ada pertanyaan? Hubungi CP Competitive Programming · {name} ·",
+    },
     waiting: {
       title: "Ruang tunggu",
       scheduledTitle: "Kontes belum dimulai",

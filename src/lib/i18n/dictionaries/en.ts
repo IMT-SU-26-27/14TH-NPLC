@@ -1163,6 +1163,17 @@ export const en: Dictionary = {
         fullscreen_exit: "Not fullscreen",
       },
     },
+    result: {
+      title: "Round results",
+      disqualifiedBadge: "Disqualified",
+      disqualifiedTitle: "{team} has been disqualified",
+      disqualifiedLead: "This team can no longer open problems, Run or Submit in Competitive Programming.",
+      noteTitle: "Note from the committee",
+      reason: "Reason",
+      since: "Since",
+      final: "The committee's decision is final and cannot be contested (guidebook chapter 2).",
+      contact: "Questions? Contact the Competitive Programming contact person · {name} ·",
+    },
     waiting: {
       title: "Waiting room",
       scheduledTitle: "The contest hasn't started yet",
