@@ -1,7 +1,14 @@
 import type { z } from "zod";
 import type { Enums, Tables } from "@/types/database";
 import type { Locale } from "@/types/i18n";
-import type { codeSubmissionSchema, problemSchema, sessionSchema, submissionFiltersSchema } from "@/lib/validations/cp";
+import type {
+  codeSubmissionSchema,
+  focusFiltersSchema,
+  focusLeaveSchema,
+  problemSchema,
+  sessionSchema,
+  submissionFiltersSchema,
+} from "@/lib/validations/cp";
 
 export type CpLanguage = Enums<"cp_language">;
 export type CpVerdict = Enums<"cp_verdict">;
@@ -393,4 +400,65 @@ export type VerdictGuideEntry = {
   description: string;
   causes?: string[];
   fixes?: string[];
+};
+
+// ----- Leaving the contest page -----
+
+export type CpFocusKind = Enums<"cp_focus_kind">;
+export type FocusLeaveInput = z.infer<typeof focusLeaveSchema>;
+export type FocusFilters = z.infer<typeof focusFiltersSchema>;
+
+export type FocusSummaryRow = {
+  registrationId: string;
+  teamName: string;
+  events: number;
+  totalMs: number;
+  longestMs: number | null;
+  tabHidden: number;
+  windowBlur: number;
+  fullscreenExit: number;
+  openEvents: number;
+  lastLeftAt: string;
+};
+
+export type FocusEventRow = {
+  id: string;
+  kind: CpFocusKind;
+  leftAt: string;
+  returnedAt: string | null;
+  returnedByReload: boolean;
+  durationMs: number | null;
+  memberName: string | null;
+  problemTitle: string | null;
+};
+
+export type FocusAwayState = {
+  kind: CpFocusKind;
+  startedAt: number;
+  // Resolves to the recorded row id (null when the server refused it, e.g. the contest is not live).
+  id: Promise<string | null>;
+};
+
+export type AdminFocusPageProps = {
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export type AdminFocusSectionProps = {
+  lang: Locale;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export type FocusFiltersFormProps = {
+  filters: FocusFilters;
+  competitionId: string;
+};
+
+export type FocusKindBadgeProps = {
+  kind: CpFocusKind;
+  label: string;
+};
+
+export type StillAwayBadgeProps = {
+  label: string;
 };

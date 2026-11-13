@@ -11,6 +11,9 @@ import type {
   ContestContext,
   ContestProblemListItem,
   CpSessionStatus,
+  FocusEventRow,
+  FocusFilters,
+  FocusSummaryRow,
   LeaderboardRow,
   ProblemView,
   RecentSubmission,
@@ -242,4 +245,53 @@ export async function getAdminSubmission(submissionId: string): Promise<AdminSub
   const submission = data as unknown as AdminSubmissionDetail;
   submission.results.sort((a, b) => (a.test?.ordinal ?? 0) - (b.test?.ordinal ?? 0));
   return submission;
+}
+
+// ----- Leaving the contest page (Admin -> CP -> Activity) -----
+
+// One row per team that left the contest page, teams still away first, then the longest total time away.
+export async function listFocusSummary(competitionId: string, filters: FocusFilters): Promise<FocusSummaryRow[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.rpc("admin_cp_focus_summary", {
+    p_competition_id: competitionId,
+    p_kind: filters.kind ?? null,
+    p_min_ms: filters.min * 1000,
+  });
+  return (data ?? []).map((r) => ({
+    registrationId: r.registration_id,
+    teamName: r.team_name,
+    events: Number(r.events),
+    totalMs: Number(r.total_ms),
+    longestMs: r.longest_ms === null ? null : Number(r.longest_ms),
+    tabHidden: Number(r.tab_hidden),
+    windowBlur: Number(r.window_blur),
+    fullscreenExit: Number(r.fullscreen_exit),
+    openEvents: Number(r.open_events),
+    lastLeftAt: r.last_left_at,
+  }));
+}
+
+// Every time one team left the contest page, newest first, with the same filters as the summary.
+export async function listTeamFocusEvents(competitionId: string, filters: FocusFilters & { team: string }): Promise<FocusEventRow[]> {
+  const supabase = await createSupabaseServerClient();
+  let query = supabase
+    .from("cp_focus_events")
+    .select("id, kind, left_at, returned_at, returned_by_reload, duration_ms, member:profiles ( full_name, email ), problem:cp_problems ( level, title )")
+    .eq("competition_id", competitionId)
+    .eq("registration_id", filters.team)
+    .order("left_at", { ascending: false })
+    .limit(500);
+  if (filters.kind) query = query.eq("kind", filters.kind);
+  if (filters.min > 0) query = query.or(`returned_at.is.null,duration_ms.gte.${filters.min * 1000}`);
+  const { data } = await query;
+  return (data ?? []).map((e) => ({
+    id: e.id,
+    kind: e.kind,
+    leftAt: e.left_at,
+    returnedAt: e.returned_at,
+    returnedByReload: e.returned_by_reload,
+    durationMs: e.duration_ms,
+    memberName: e.member ? e.member.full_name || e.member.email : null,
+    problemTitle: e.problem ? `${e.problem.level}. ${e.problem.title}` : null,
+  }));
 }

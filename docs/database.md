@@ -22,6 +22,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261110210000_registration_events_without_realtime.sql` | `registration_events` leaves the `supabase_realtime` publication: realtime is for the CP and Rally contests only. The dashboard and the admin registrations list refresh when the tab is opened again (at most every 30 s) or with "Muat ulang" |
 | `20261110220000_auto_freeze_leaderboards.sql` | The participants' leaderboard (CP and Rally) closes on its own `private.leaderboard_freeze_minutes()` (60, FREEZE_MINUTES) before the end: `cp_sessions.scheduled_end_at`, and the new `rally_sessions.scheduled_end_at` set in Admin → Rally. New columns `leaderboard_frozen_auto` and `leaderboard_released_at` on both session tables; `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` for the pages |
 | `20261113100000_cp_guidebook_scoring.sql` | CP scoring follows the Programming guidebook: Accepted earns the problem's points once, every other submission costs `cp_sessions.wrong_penalty` (default 10; compile errors only while `penalize_compile_error`, judge failures never), and an Accepted on a solved problem is "Yes – Solved" (`cp_submissions.already_solved`, no points, a faster run replaces the problem's runtime and memory). Drops `cp_submissions.efficiency` and `last_improved_at`; `cp_problem_scores.best_score` becomes `points` with `wrong_attempts`, `solved_at`, `best_time_ms`, `best_memory_kb`; `cp_scores` and snapshots get `total_runtime_ms`, `total_memory_kb`. The database scores each submission (`cp_submissions_score` trigger). Existing submissions are rescored |
+| `20261113120000_cp_focus_events.sql` | `cp_focus_events`: every time a participant leaves the contest page during a live contest (`tab_hidden`, `window_blur`, `fullscreen_exit`), with when they came back; `admin_cp_focus_summary()` for Admin → CP → Activity |
 | `20261113140000_team_disqualification.sql` | Team disqualification on `registrations` (`disqualified_at`, `disqualification_reason`, `disqualified_by`; admins only, reason required): blocks new CP submissions and new Rally results, and hides the team from the participants' CP and Rally leaderboards (live and frozen). `private.is_disqualified()` |
 
 Where migrations are applied, and how each database keeps track:
@@ -115,6 +116,7 @@ All changes to results go through these functions, and direct writes are refused
 | `cp_problem_scores` | A team's result on each problem: net `points` (+points once solved, minus penalties), `wrong_attempts`, `solved` and `solved_at`, and the best accepted run (`best_submission_id`, `best_time_ms`, `best_memory_kb`). |
 | `cp_scores` | The leaderboard: one row per accepted CP team, with total points (can be negative), problems solved, and `total_runtime_ms` / `total_memory_kb` for tie-breaks. |
 | `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when the leaderboard is frozen (`cp_sessions.leaderboard_frozen_at` set, by an admin or by the last-hour cut-off), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
+| `cp_focus_events` | One row each time a participant left the contest page while the contest was live: `kind` (`tab_hidden` another tab or minimised, `window_blur` another app or window, `fullscreen_exit` not in fullscreen), `left_at`, `returned_at` (null while away), `duration_ms` (generated), the problem open at the time, and `returned_by_reload` when the page closed while away and was loaded again. Written by the server for the participant's own live team (at most 30 per minute per person); a record for the committee, never an automatic penalty. |
 
 ### Views and functions
 
@@ -167,6 +169,7 @@ members join with the referral code at any point while the competition's registr
 | Submissions and results | Their own team's | All |
 | Leaderboard (`cp_scores`) | Members of accepted CP teams, **only while the contest hasn't ended and the leaderboard isn't frozen** | All, always live |
 | Frozen leaderboard (`cp_leaderboard_snapshots`) | Members of accepted CP teams, only while frozen and the contest hasn't ended | All |
+| Leaving the contest page (`cp_focus_events`) | Nobody reads it; rows are added through server actions for the user's own live team | All, through Admin → CP → Activity |
 
 `competitions` is read through column privileges (since `20261109120000`): `anon` and `authenticated` may select every column except `wa_group_url`. A new column on `competitions` needs its own `grant select (…)`, and `select *` on it fails from the browser and the server client; list the columns.
 
