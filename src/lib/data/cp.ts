@@ -18,6 +18,7 @@ import type {
   LeaderboardRow,
   ProblemView,
   RecentSubmission,
+  TeamStanding,
 } from "@/types/cp";
 
 // The contest state of one CP competition, for the dashboard's contest button. Null when there is no session yet.
@@ -76,10 +77,17 @@ export async function listContestProblems(competitionId: string, registrationId:
     registrationId
       ? supabase
           .from("cp_problem_scores")
-          .select("problem_id, points, solved, wrong_attempts, best_time_ms")
+          .select("problem_id, points, solved, wrong_attempts, best_time_ms, best_memory_kb")
           .eq("registration_id", registrationId)
       : Promise.resolve({
-          data: [] as { problem_id: string; points: number; solved: boolean; wrong_attempts: number; best_time_ms: number | null }[],
+          data: [] as {
+            problem_id: string;
+            points: number;
+            solved: boolean;
+            wrong_attempts: number;
+            best_time_ms: number | null;
+            best_memory_kb: number | null;
+          }[],
         }),
   ]);
   const byProblem = new Map((scores ?? []).map((s) => [s.problem_id, s]));
@@ -90,6 +98,7 @@ export async function listContestProblems(competitionId: string, registrationId:
       netPoints: score ? Number(score.points) : null,
       wrongAttempts: score?.wrong_attempts ?? 0,
       bestTimeMs: score?.best_time_ms ?? null,
+      bestMemoryKb: score?.best_memory_kb ?? null,
       solved: score?.solved ?? false,
     };
   });
@@ -115,16 +124,36 @@ export async function getProblemView(problemId: string): Promise<ProblemView | n
   return { ...problem, samples: samples ?? [] };
 }
 
+// The team's last 10 submissions on a problem, newest first, numbered from the team's first one ("Submit #n").
 export async function getRecentSubmissions(problemId: string, registrationId: string): Promise<RecentSubmission[]> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  const { data, count } = await supabase
     .from("cp_submissions")
-    .select("id, language, verdict, already_solved, passed, total, score, created_at")
+    .select("id, language, verdict, already_solved, passed, total, score, max_time_ms, max_memory_kb, created_at", { count: "exact" })
     .eq("problem_id", problemId)
     .eq("registration_id", registrationId)
     .order("created_at", { ascending: false })
     .limit(10);
-  return data ?? [];
+  const total = count ?? data?.length ?? 0;
+  return (data ?? []).map((row, i) => ({ ...row, number: total - i }));
+}
+
+// The team's score, totals and rank for the problem list summary. Participants read the frozen snapshot while the
+// leaderboard is closed, so the rank is the one at the moment it closed.
+export async function getTeamStanding(context: ContestContext, viewer: "admin" | "participant"): Promise<TeamStanding | null> {
+  if (!context.registrationId) return null;
+  const frozen = viewer === "participant" && context.session.leaderboard_frozen_at !== null;
+  const rows = await getLeaderboard(context.competitionId, frozen ? "snapshot" : "live");
+  const index = rows.findIndex((row) => row.registration_id === context.registrationId);
+  const own = index >= 0 ? rows[index] : null;
+  return {
+    score: own ? Number(own.total_points) : 0,
+    totalRuntimeMs: own ? Number(own.total_runtime_ms) : 0,
+    totalMemoryKb: own ? Number(own.total_memory_kb) : 0,
+    rank: index >= 0 ? index + 1 : null,
+    teamCount: rows.length,
+    frozen,
+  };
 }
 
 // "live" reads cp_scores (admins, or participants while not frozen); "snapshot" reads the standings
@@ -133,7 +162,7 @@ export async function getLeaderboard(competitionId: string, source: "live" | "sn
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from(source === "live" ? "cp_scores" : "cp_leaderboard_snapshots")
-    .select("registration_id, team_name, total_points, solved, total_runtime_ms, total_memory_kb, problems")
+    .select("registration_id, team_name, school, total_points, solved, total_runtime_ms, total_memory_kb, problems")
     .eq("competition_id", competitionId)
     .order("total_points", { ascending: false })
     .order("total_runtime_ms", { ascending: true })

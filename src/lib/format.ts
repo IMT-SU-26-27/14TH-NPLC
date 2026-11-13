@@ -31,6 +31,13 @@ export function formatTimeOfDay(ms: number, lang: Locale): string {
   return new Intl.DateTimeFormat(INTL_LOCALE[lang], { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(ms));
 }
 
+// Hours and minutes in WIB without the zone label, e.g. "14.32" (id) / "14:32" (en).
+export function formatWibTime(value: string, lang: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[lang], { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Jakarta" }).format(
+    new Date(value),
+  );
+}
+
 // With seconds, for judging records where the order of submissions matters.
 export function formatTimestamp(value: string, lang: Locale): string {
   const formatted = new Intl.DateTimeFormat(INTL_LOCALE[lang], {
@@ -80,6 +87,29 @@ export function formatScore(value: number, lang: Locale): string {
 // Change to a team total: "+100", "-10", "0".
 export function formatPointsDelta(value: number, lang: Locale): string {
   return new Intl.NumberFormat(INTL_LOCALE[lang], { maximumFractionDigits: 2, signDisplay: "exceptZero" }).format(value);
+}
+
+// A submission's score change as the contest shows it: "+100", "−10" (minus sign) and "±0".
+export function formatScoreDelta(value: number, lang: Locale): string {
+  if (value === 0) return "±0";
+  const formatted = new Intl.NumberFormat(INTL_LOCALE[lang], { maximumFractionDigits: 2 }).format(Math.abs(value));
+  return `${value > 0 ? "+" : "−"}${formatted}`;
+}
+
+// A total that may be negative, with a minus sign: "250", "−40".
+export function formatSignedScore(value: number, lang: Locale): string {
+  const formatted = new Intl.NumberFormat(INTL_LOCALE[lang], { maximumFractionDigits: 2 }).format(Math.abs(value));
+  return value < 0 ? `−${formatted}` : formatted;
+}
+
+// Runtime in seconds with two decimals, without the unit: 210 -> "0,21" (id) / "0.21" (en).
+export function formatSeconds(ms: number, lang: Locale): string {
+  return new Intl.NumberFormat(INTL_LOCALE[lang], { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(ms / 1000);
+}
+
+// Memory in MB with one decimal, without the unit: 18842 KB -> "18,4" (id) / "18.4" (en).
+export function formatMegabytes(kb: number, lang: Locale): string {
+  return new Intl.NumberFormat(INTL_LOCALE[lang], { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(kb / 1024);
 }
 
 // 3725 -> "01:02:05". Hours keep counting past 24 (a contest is at most 48 hours).

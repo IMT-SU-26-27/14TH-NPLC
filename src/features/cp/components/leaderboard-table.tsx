@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TablePagination } from "@/components/shared/table-pagination";
-import { ProblemStatusCell } from "@/features/cp/components/problem-status-cell";
+import { LeaderboardProblemCell } from "@/features/cp/components/leaderboard-problem-cell";
 import type { LeaderboardTableProps } from "@/types/cp";
 
 const PAGE_SIZE = 10;
@@ -122,7 +122,7 @@ export function LeaderboardTable({ initialRows, problems, competitionId, highlig
                 </TableCell>
                 {problems.map((p) => (
                   <TableCell key={p.id} className="text-center">
-                    <ProblemStatusCell status={problemStatus(row.problems, p.id)} />
+                    <LeaderboardProblemCell status={problemStatus(row.problems, p.id)} />
                   </TableCell>
                 ))}
                 <TableCell className="text-right tabular-nums">{row.solved}</TableCell>
