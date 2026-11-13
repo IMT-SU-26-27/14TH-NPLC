@@ -1,7 +1,7 @@
 "use client";
 
 import { ListChecksIcon } from "lucide-react";
-import { formatDateTime, formatScore } from "@/lib/format";
+import { formatDateTime, formatPointsDelta } from "@/lib/format";
 import { useI18n } from "@/hooks/use-i18n";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/comp
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OutcomeBadge } from "@/features/cp/components/outcome-badge";
 import { VerdictBadge } from "@/features/cp/components/verdict-badge";
 import type { ResultsPanelProps } from "@/types/cp";
 
@@ -45,13 +46,13 @@ export function ResultsPanel({ result, recent, pending }: ResultsPanelProps) {
               <>
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <VerdictBadge verdict={result.verdict} />
+                    <OutcomeBadge verdict={result.verdict} alreadySolved={result.alreadySolved} />
                     <span className="text-sm">{t("cp.passed", { passed: result.passed, total: result.total })}</span>
                   </div>
                   {result.submissionId ? (
                     <p className="text-muted-foreground text-sm">
-                      {t("cp.score", { score: formatScore(result.score, lang), points: result.points })} ·{" "}
-                      {t("cp.efficiency", { value: Math.round(result.efficiency * 100) })}
+                      {t("cp.scoreChange", { change: formatPointsDelta(result.score, lang) })}
+                      {result.maxTimeMs !== null && ` · ${result.maxTimeMs} ms · ${result.maxMemoryKb ?? "–"} KB`}
                     </p>
                   ) : (
                     <p className="text-muted-foreground text-sm">{t("cp.sampleRunNote")}</p>
@@ -134,9 +135,9 @@ export function ResultsPanel({ result, recent, pending }: ResultsPanelProps) {
                       <TableCell className="text-muted-foreground text-xs">{formatDateTime(s.created_at, lang)}</TableCell>
                       <TableCell>{t(`cp.languages.${s.language}`)}</TableCell>
                       <TableCell>
-                        <VerdictBadge verdict={s.verdict} />
+                        <OutcomeBadge verdict={s.verdict} alreadySolved={s.already_solved} />
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{formatScore(s.score, lang)}</TableCell>
+                      <TableCell className="text-right tabular-nums">{formatPointsDelta(Number(s.score), lang)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

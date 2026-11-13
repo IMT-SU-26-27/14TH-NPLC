@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeftIcon, FileCodeIcon, FlaskConicalIcon, XIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
 import { getAdminSubmission, listAdminSubmissions, listCpCompetitions, listProblemOptions } from "@/lib/data/cp";
-import { formatTimestamp } from "@/lib/format";
+import { formatPointsDelta, formatTimestamp } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AdminSubmissionsTable } from "@/features/cp/components/admin-submissions-table";
 import { SubmissionCodeViewer } from "@/features/cp/components/submission-code-viewer";
 import { SubmissionFilters } from "@/features/cp/components/submission-filters";
+import { OutcomeBadge } from "@/features/cp/components/outcome-badge";
 import { VerdictBadge } from "@/features/cp/components/verdict-badge";
 import type { AdminSubmissionPageProps, AdminSubmissionsSectionProps } from "@/types/cp";
 
@@ -108,8 +109,7 @@ export async function AdminSubmissionDetailSection({ params }: AdminSubmissionPa
     { label: t("admin.submissions.submitted"), value: formatTimestamp(s.created_at, lang) },
     { label: t("cp.language"), value: t(`cp.languages.${s.language}`) },
     { label: t("admin.submissions.tests"), value: `${s.passed}/${s.total}` },
-    { label: t("admin.submissions.score"), value: `${Number(s.score).toFixed(2)} / ${s.problem.points}` },
-    { label: t("admin.submissions.efficiency"), value: `${Math.round(Number(s.efficiency) * 100)}%` },
+    { label: t("admin.submissions.score"), value: formatPointsDelta(Number(s.score), lang) },
     {
       label: t("admin.submissions.slowest"),
       value: s.max_time_ms === null ? "—" : `${s.max_time_ms} / ${s.problem.time_limit_ms} ms`,
@@ -139,7 +139,7 @@ export async function AdminSubmissionDetailSection({ params }: AdminSubmissionPa
             {s.team.team_name} · <span className="font-mono text-xs">{s.id}</span>
           </p>
         </div>
-        <VerdictBadge verdict={s.verdict} />
+        <OutcomeBadge verdict={s.verdict} alreadySolved={s.already_solved} />
       </div>
 
       <Card>
