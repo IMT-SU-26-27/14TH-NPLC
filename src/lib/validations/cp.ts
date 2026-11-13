@@ -85,3 +85,24 @@ export const submissionFiltersSchema = z.object({
     .catch(""),
   page: z.coerce.number().int().min(1).catch(1),
 });
+
+// ----- Leaving the contest page (Admin -> CP -> Activity) -----
+
+export const CP_FOCUS_KINDS = Constants.public.Enums.cp_focus_kind;
+// Minimum length filter on the admin page, in seconds.
+export const CP_FOCUS_MIN_SECONDS = [0, 5, 30, 120] as const;
+
+export const focusLeaveSchema = z.object({
+  kind: z.enum(CP_FOCUS_KINDS),
+  problemId: z.uuid().nullable(),
+});
+
+export const focusFiltersSchema = z.object({
+  competition: z.uuid().optional().catch(undefined),
+  team: z.uuid().optional().catch(undefined),
+  kind: z.enum(CP_FOCUS_KINDS).optional().catch(undefined),
+  min: z.coerce
+    .number()
+    .refine((v) => (CP_FOCUS_MIN_SECONDS as readonly number[]).includes(v))
+    .catch(0),
+});

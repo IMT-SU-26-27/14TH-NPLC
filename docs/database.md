@@ -21,6 +21,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261110200000_members_admin_only.sql` | Only admins remove a member, in every status: leaders no longer remove members and members no longer leave (policy "members: admin removes"). `private.registration_accepted` is dropped. Joining with the code is unchanged |
 | `20261110210000_registration_events_without_realtime.sql` | `registration_events` leaves the `supabase_realtime` publication: realtime is for the CP and Rally contests only. The dashboard and the admin registrations list refresh when the tab is opened again (at most every 30 s) or with "Muat ulang" |
 | `20261110220000_auto_freeze_leaderboards.sql` | The participants' leaderboard (CP and Rally) closes on its own `private.leaderboard_freeze_minutes()` (60, FREEZE_MINUTES) before the end: `cp_sessions.scheduled_end_at`, and the new `rally_sessions.scheduled_end_at` set in Admin → Rally. New columns `leaderboard_frozen_auto` and `leaderboard_released_at` on both session tables; `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` for the pages |
+| `20261113120000_cp_focus_events.sql` | `cp_focus_events`: every time a participant leaves the contest page during a live contest (`tab_hidden`, `window_blur`, `fullscreen_exit`), with when they came back; `admin_cp_focus_summary()` for Admin → CP → Activity |
 
 Where migrations are applied, and how each database keeps track:
 
@@ -113,6 +114,7 @@ All changes to results go through these functions, and direct writes are refused
 | `cp_problem_scores` | A team's best score on each problem, and whether it solved it. |
 | `cp_scores` | The leaderboard: one row per accepted CP team, with total points, problems solved and `last_improved_at` for tie-breaks. |
 | `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when the leaderboard is frozen (`cp_sessions.leaderboard_frozen_at` set, by an admin or by the last-hour cut-off), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
+| `cp_focus_events` | One row each time a participant left the contest page while the contest was live: `kind` (`tab_hidden` another tab or minimised, `window_blur` another app or window, `fullscreen_exit` not in fullscreen), `left_at`, `returned_at` (null while away), `duration_ms` (generated), the problem open at the time, and `returned_by_reload` when the page closed while away and was loaded again. Written by the server for the participant's own live team (at most 30 per minute per person); a record for the committee, never an automatic penalty. |
 
 ### Views and functions
 
@@ -165,6 +167,7 @@ members join with the referral code at any point while the competition's registr
 | Submissions and results | Their own team's | All |
 | Leaderboard (`cp_scores`) | Members of accepted CP teams, **only while the contest hasn't ended and the leaderboard isn't frozen** | All, always live |
 | Frozen leaderboard (`cp_leaderboard_snapshots`) | Members of accepted CP teams, only while frozen and the contest hasn't ended | All |
+| Leaving the contest page (`cp_focus_events`) | Nobody reads it; rows are added through server actions for the user's own live team | All, through Admin → CP → Activity |
 
 `competitions` is read through column privileges (since `20261109120000`): `anon` and `authenticated` may select every column except `wa_group_url`. A new column on `competitions` needs its own `grant select (…)`, and `select *` on it fails from the browser and the server client; list the columns.
 
