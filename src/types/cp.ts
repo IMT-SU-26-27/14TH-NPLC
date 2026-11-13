@@ -14,6 +14,8 @@ export type CpLanguage = Enums<"cp_language">;
 export type CpVerdict = Enums<"cp_verdict">;
 export type CpSessionStatus = Enums<"cp_session_status">;
 export type CpDifficulty = Enums<"cp_difficulty">;
+// A submission's response as the guidebook names it.
+export type CpOutcome = "accepted" | "solved" | "wrongAnswer" | "runtimeError" | "timeLimit" | "compileError" | "judgeError";
 
 export type CpSession = Tables<"cp_sessions">;
 export type CpProblem = Tables<"cp_problems">;
@@ -75,8 +77,10 @@ export type JudgeSummary = {
 
 export type SubmissionOutcome = JudgeSummary & {
   submissionId: string | null; // null for sample runs
-  efficiency: number;
+  // What this submission did to the team total: +points (first Accepted), 0 (Solved again, judge error) or -penalty.
   score: number;
+  // Accepted on a problem the team had already solved ("Yes - Solved").
+  alreadySolved: boolean;
   points: number;
 };
 
@@ -89,7 +93,10 @@ export type CpAccessRow = {
 };
 
 export type ContestProblemListItem = Pick<CpProblem, "id" | "level" | "difficulty" | "title" | "points"> & {
-  bestScore: number | null;
+  // Net points on this problem (+points once solved, minus penalties); null when not tried yet.
+  netPoints: number | null;
+  wrongAttempts: number;
+  bestTimeMs: number | null;
   solved: boolean;
 };
 
@@ -116,10 +123,14 @@ export type RecentSubmission = {
   passed: number;
   total: number;
   score: number;
+  already_solved: boolean;
   created_at: string;
 };
 
-export type LeaderboardRow = Pick<CpScore, "registration_id" | "team_name" | "total_points" | "solved" | "last_improved_at">;
+export type LeaderboardRow = Pick<
+  CpScore,
+  "registration_id" | "team_name" | "total_points" | "solved" | "total_runtime_ms" | "total_memory_kb"
+>;
 
 export type AdminProblemRow = Pick<CpProblem, "id" | "level" | "difficulty" | "title" | "points" | "is_published" | "time_limit_ms" | "memory_limit_kb"> & {
   testCaseCount: number;
@@ -185,6 +196,11 @@ export type DifficultyBadgeProps = {
 
 export type VerdictBadgeProps = {
   verdict: CpVerdict;
+};
+
+export type OutcomeBadgeProps = {
+  verdict: CpVerdict;
+  alreadySolved: boolean;
 };
 
 export type LeaderboardTableProps = {
@@ -303,7 +319,7 @@ export type CpSubmission = Tables<"cp_submissions">;
 
 export type AdminSubmissionRow = Pick<
   CpSubmission,
-  "id" | "registration_id" | "language" | "verdict" | "passed" | "total" | "score" | "max_time_ms" | "max_memory_kb" | "created_at"
+  "id" | "registration_id" | "language" | "verdict" | "already_solved" | "passed" | "total" | "score" | "max_time_ms" | "max_memory_kb" | "created_at"
 > & {
   problem: Pick<CpProblem, "id" | "level" | "title">;
   team: { team_name: string };

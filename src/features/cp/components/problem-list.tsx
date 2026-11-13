@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CircleCheckIcon, CircleDashedIcon, FileCodeIcon } from "lucide-react";
 import { localePath } from "@/lib/i18n/config";
-import { formatScore } from "@/lib/format";
+import { formatPointsDelta } from "@/lib/format";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
@@ -37,7 +37,15 @@ export function ProblemList({ problems, lang }: ProblemListProps) {
               {t("cp.level", { level: p.level })} · {p.title}
             </ItemTitle>
             <ItemDescription>
-              {p.bestScore === null ? t("cp.notTried") : t("cp.best", { score: formatScore(p.bestScore, lang) })}
+              {p.netPoints === null
+                ? t("cp.notTried")
+                : [
+                    t("cp.netPoints", { points: formatPointsDelta(p.netPoints, lang) }),
+                    p.wrongAttempts > 0 && t("cp.wrongAttempts", { count: p.wrongAttempts }),
+                    p.solved && p.bestTimeMs !== null && t("cp.bestRuntime", { ms: p.bestTimeMs }),
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
             </ItemDescription>
           </ItemContent>
           <ItemActions>

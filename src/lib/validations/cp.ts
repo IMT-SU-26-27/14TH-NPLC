@@ -52,6 +52,8 @@ export const sessionSchema = z
     durationMinutes: z.coerce.number().int("validation.wholeNumber").min(0, "validation.nonNegative").max(59, "validation.minutesRange"),
     durationSeconds: z.coerce.number().int("validation.wholeNumber").min(0, "validation.nonNegative").max(59, "validation.minutesRange"),
     cooldownSeconds: z.coerce.number().int().min(0, "validation.nonNegative").max(600, "validation.cooldownMax"),
+    wrongPenalty: z.coerce.number().int("validation.wholeNumber").min(0, "validation.nonNegative").max(1000, "validation.penaltyMax"),
+    penalizeCompileError: z.boolean(),
   })
   .transform(({ durationHours, durationMinutes, durationSeconds, ...rest }) => ({
     ...rest,

@@ -243,27 +243,30 @@ export type Database = {
       cp_leaderboard_snapshots: {
         Row: {
           competition_id: string
-          last_improved_at: string | null
           registration_id: string
           solved: number
           team_name: string
+          total_memory_kb: number
           total_points: number
+          total_runtime_ms: number
         }
         Insert: {
           competition_id: string
-          last_improved_at?: string | null
           registration_id: string
           solved?: number
           team_name: string
+          total_memory_kb?: number
           total_points?: number
+          total_runtime_ms?: number
         }
         Update: {
           competition_id?: string
-          last_improved_at?: string | null
           registration_id?: string
           solved?: number
           team_name?: string
+          total_memory_kb?: number
           total_points?: number
+          total_runtime_ms?: number
         }
         Relationships: [
           {
@@ -285,27 +288,39 @@ export type Database = {
       cp_problem_scores: {
         Row: {
           achieved_at: string
-          best_score: number
-          best_submission_id: string
+          points: number
+          best_memory_kb: number | null
+          best_submission_id: string | null
+          best_time_ms: number | null
           problem_id: string
           registration_id: string
           solved: boolean
+          solved_at: string | null
+          wrong_attempts: number
         }
         Insert: {
           achieved_at: string
-          best_score: number
-          best_submission_id: string
+          points: number
+          best_memory_kb?: number | null
+          best_submission_id?: string | null
+          best_time_ms?: number | null
           problem_id: string
           registration_id: string
           solved?: boolean
+          solved_at?: string | null
+          wrong_attempts?: number
         }
         Update: {
           achieved_at?: string
-          best_score?: number
-          best_submission_id?: string
+          points?: number
+          best_memory_kb?: number | null
+          best_submission_id?: string | null
+          best_time_ms?: number | null
           problem_id?: string
           registration_id?: string
           solved?: boolean
+          solved_at?: string | null
+          wrong_attempts?: number
         }
         Relationships: [
           {
@@ -404,29 +419,32 @@ export type Database = {
       cp_scores: {
         Row: {
           competition_id: string
-          last_improved_at: string | null
           registration_id: string
           solved: number
           team_name: string
+          total_memory_kb: number
           total_points: number
+          total_runtime_ms: number
           updated_at: string
         }
         Insert: {
           competition_id: string
-          last_improved_at?: string | null
           registration_id: string
           solved?: number
           team_name: string
+          total_memory_kb?: number
           total_points?: number
+          total_runtime_ms?: number
           updated_at?: string
         }
         Update: {
           competition_id?: string
-          last_improved_at?: string | null
           registration_id?: string
           solved?: number
           team_name?: string
+          total_memory_kb?: number
           total_points?: number
+          total_runtime_ms?: number
           updated_at?: string
         }
         Relationships: [
@@ -473,8 +491,10 @@ export type Database = {
           started_at: string | null
           started_by: string | null
           status: Database["public"]["Enums"]["cp_session_status"]
+          penalize_compile_error: boolean
           submission_cooldown_seconds: number
           updated_at: string
+          wrong_penalty: number
         }
         Insert: {
           competition_id: string
@@ -492,8 +512,10 @@ export type Database = {
           started_at?: string | null
           started_by?: string | null
           status?: Database["public"]["Enums"]["cp_session_status"]
+          penalize_compile_error?: boolean
           submission_cooldown_seconds?: number
           updated_at?: string
+          wrong_penalty?: number
         }
         Update: {
           competition_id?: string
@@ -511,8 +533,10 @@ export type Database = {
           started_at?: string | null
           started_by?: string | null
           status?: Database["public"]["Enums"]["cp_session_status"]
+          penalize_compile_error?: boolean
           submission_cooldown_seconds?: number
           updated_at?: string
+          wrong_penalty?: number
         }
         Relationships: [
           {
@@ -580,9 +604,9 @@ export type Database = {
       }
       cp_submissions: {
         Row: {
+          already_solved: boolean
           compile_output: string | null
           created_at: string
-          efficiency: number
           id: string
           language: Database["public"]["Enums"]["cp_language"]
           max_memory_kb: number | null
@@ -597,9 +621,9 @@ export type Database = {
           verdict: Database["public"]["Enums"]["cp_verdict"]
         }
         Insert: {
+          already_solved?: boolean
           compile_output?: string | null
           created_at?: string
-          efficiency?: number
           id?: string
           language: Database["public"]["Enums"]["cp_language"]
           max_memory_kb?: number | null
@@ -614,9 +638,9 @@ export type Database = {
           verdict: Database["public"]["Enums"]["cp_verdict"]
         }
         Update: {
+          already_solved?: boolean
           compile_output?: string | null
           created_at?: string
-          efficiency?: number
           id?: string
           language?: Database["public"]["Enums"]["cp_language"]
           max_memory_kb?: number | null

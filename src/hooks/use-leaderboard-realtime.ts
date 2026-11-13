@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { subscribeAuthed } from "@/lib/supabase/realtime";
 import type { LeaderboardRow } from "@/types/cp";
 
+// Guidebook order: higher total, then lower total runtime, then lower total memory.
 function rank(rows: LeaderboardRow[]): LeaderboardRow[] {
   return [...rows].sort(
     (a, b) =>
       Number(b.total_points) - Number(a.total_points) ||
-      (a.last_improved_at ?? "9999").localeCompare(b.last_improved_at ?? "9999") ||
+      Number(a.total_runtime_ms) - Number(b.total_runtime_ms) ||
+      Number(a.total_memory_kb) - Number(b.total_memory_kb) ||
       a.team_name.localeCompare(b.team_name),
   );
 }

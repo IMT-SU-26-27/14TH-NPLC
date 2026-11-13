@@ -22,10 +22,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
 import { ContestClock } from "@/features/cp/components/contest-clock";
 import type { ContestControlProps, ContestTransition, ContestTransitionButtonProps } from "@/types/cp";
 
@@ -161,7 +162,20 @@ export function ContestControl({ contest }: ContestControlProps) {
                 <FieldDescription>{t("admin.cp.cooldownHint")}</FieldDescription>
                 <FieldError errors={fieldErrors(errors.cooldownSeconds)} />
               </Field>
+              <Field data-invalid={!!errors.wrongPenalty}>
+                <FieldLabel htmlFor="wrongPenalty">{t("admin.cp.wrongPenalty")}</FieldLabel>
+                <Input id="wrongPenalty" name="wrongPenalty" type="number" min={0} max={1000} defaultValue={session.wrong_penalty} aria-invalid={!!errors.wrongPenalty} />
+                <FieldDescription>{t("admin.cp.wrongPenaltyHint")}</FieldDescription>
+                <FieldError errors={fieldErrors(errors.wrongPenalty)} />
+              </Field>
             </div>
+            <Field orientation="horizontal">
+              <Switch id="penalizeCompileError" name="penalizeCompileError" defaultChecked={session.penalize_compile_error} />
+              <FieldContent>
+                <FieldLabel htmlFor="penalizeCompileError">{t("admin.cp.penalizeCompileError")}</FieldLabel>
+                <FieldDescription>{t("admin.cp.penalizeCompileErrorHint")}</FieldDescription>
+              </FieldContent>
+            </Field>
             <Button type="submit" variant="outline" disabled={pending} className="sm:w-fit">
               {pending && <Spinner />}
               {t("common.save")}

@@ -73,15 +73,25 @@ export async function listContestProblems(competitionId: string, registrationId:
       .eq("is_published", true)
       .order("level"),
     registrationId
-      ? supabase.from("cp_problem_scores").select("problem_id, best_score, solved").eq("registration_id", registrationId)
-      : Promise.resolve({ data: [] as { problem_id: string; best_score: number; solved: boolean }[] }),
+      ? supabase
+          .from("cp_problem_scores")
+          .select("problem_id, points, solved, wrong_attempts, best_time_ms")
+          .eq("registration_id", registrationId)
+      : Promise.resolve({
+          data: [] as { problem_id: string; points: number; solved: boolean; wrong_attempts: number; best_time_ms: number | null }[],
+        }),
   ]);
   const byProblem = new Map((scores ?? []).map((s) => [s.problem_id, s]));
-  return (problems ?? []).map((p) => ({
-    ...p,
-    bestScore: byProblem.get(p.id)?.best_score ?? null,
-    solved: byProblem.get(p.id)?.solved ?? false,
-  }));
+  return (problems ?? []).map((p) => {
+    const score = byProblem.get(p.id);
+    return {
+      ...p,
+      netPoints: score ? Number(score.points) : null,
+      wrongAttempts: score?.wrong_attempts ?? 0,
+      bestTimeMs: score?.best_time_ms ?? null,
+      solved: score?.solved ?? false,
+    };
+  });
 }
 
 // Participants only see published problems while the contest is live (RLS), and only sample tests.
@@ -108,7 +118,7 @@ export async function getRecentSubmissions(problemId: string, registrationId: st
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from("cp_submissions")
-    .select("id, language, verdict, passed, total, score, created_at")
+    .select("id, language, verdict, already_solved, passed, total, score, created_at")
     .eq("problem_id", problemId)
     .eq("registration_id", registrationId)
     .order("created_at", { ascending: false })
@@ -122,10 +132,12 @@ export async function getLeaderboard(competitionId: string, source: "live" | "sn
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from(source === "live" ? "cp_scores" : "cp_leaderboard_snapshots")
-    .select("registration_id, team_name, total_points, solved, last_improved_at")
+    .select("registration_id, team_name, total_points, solved, total_runtime_ms, total_memory_kb")
     .eq("competition_id", competitionId)
     .order("total_points", { ascending: false })
-    .order("last_improved_at", { ascending: true, nullsFirst: false });
+    .order("total_runtime_ms", { ascending: true })
+    .order("total_memory_kb", { ascending: true })
+    .order("team_name", { ascending: true });
   return data ?? [];
 }
 
@@ -184,7 +196,7 @@ export async function listAdminSubmissions(competitionId: string, filters: Submi
   let query = supabase
     .from("cp_submissions")
     .select(
-      `id, registration_id, language, verdict, passed, total, score, max_time_ms, max_memory_kb, created_at,
+      `id, registration_id, language, verdict, already_solved, passed, total, score, max_time_ms, max_memory_kb, created_at,
        problem:cp_problems!inner ( id, level, title, competition_id ),
        team:registrations!inner ( team_name )`,
       { count: "exact" },
