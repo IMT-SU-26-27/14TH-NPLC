@@ -21,6 +21,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261110200000_members_admin_only.sql` | Only admins remove a member, in every status: leaders no longer remove members and members no longer leave (policy "members: admin removes"). `private.registration_accepted` is dropped. Joining with the code is unchanged |
 | `20261110210000_registration_events_without_realtime.sql` | `registration_events` leaves the `supabase_realtime` publication: realtime is for the CP and Rally contests only. The dashboard and the admin registrations list refresh when the tab is opened again (at most every 30 s) or with "Muat ulang" |
 | `20261110220000_auto_freeze_leaderboards.sql` | The participants' leaderboard (CP and Rally) closes on its own `private.leaderboard_freeze_minutes()` (60, FREEZE_MINUTES) before the end: `cp_sessions.scheduled_end_at`, and the new `rally_sessions.scheduled_end_at` set in Admin → Rally. New columns `leaderboard_frozen_auto` and `leaderboard_released_at` on both session tables; `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` for the pages |
+| `20261113100000_cp_guidebook_scoring.sql` | CP scoring follows the Programming guidebook: Accepted earns the problem's points once, every other submission costs `cp_sessions.wrong_penalty` (default 10; compile errors only while `penalize_compile_error`, judge failures never), and an Accepted on a solved problem is "Yes – Solved" (`cp_submissions.already_solved`, no points, a faster run replaces the problem's runtime and memory). Drops `cp_submissions.efficiency` and `last_improved_at`; `cp_problem_scores.best_score` becomes `points` with `wrong_attempts`, `solved_at`, `best_time_ms`, `best_memory_kb`; `cp_scores` and snapshots get `total_runtime_ms`, `total_memory_kb`. The database scores each submission (`cp_submissions_score` trigger). Existing submissions are rescored |
 
 Where migrations are applied, and how each database keeps track:
 
@@ -105,13 +106,13 @@ All changes to results go through these functions, and direct writes are refused
 
 | Table | What it holds |
 |---|---|
-| `cp_sessions` | One per CP competition. `status` is `scheduled`, `live`, `paused` or `ended`. The admin's start/pause/resume/end buttons update it; `started_at`/`ended_at`/`paused_at` are filled automatically. Only a live contest can be paused. While paused, problems are hidden and submissions are refused (both require `live`) and participants wait in the waiting room. On resume the pause length is added to `paused_seconds` and `scheduled_end_at` moves back by it. `submission_cooldown_seconds` limits how often a team can submit (default 15; it keeps Judge0's queue short, since one submission costs one job per test case). `duration_seconds` (required before starting) sets the length: on start `scheduled_end_at` becomes `started_at + duration_seconds + paused_seconds` (the `cp_sessions_set_end` trigger, which also follows duration changes while running). After `scheduled_end_at` no submission is accepted (2-minute grace in the database for code already being judged; the server action checks strictly on arrival), and the contest timer calls `cp_finish_if_time_up()` at zero to set `status = 'ended'`. |
+| `cp_sessions` | One per CP competition. `status` is `scheduled`, `live`, `paused` or `ended`. The admin's start/pause/resume/end buttons update it; `started_at`/`ended_at`/`paused_at` are filled automatically. Only a live contest can be paused. While paused, problems are hidden and submissions are refused (both require `live`) and participants wait in the waiting room. On resume the pause length is added to `paused_seconds` and `scheduled_end_at` moves back by it. `submission_cooldown_seconds` limits how often a team can submit (default 15; it keeps Judge0's queue short, since one submission costs one job per test case). `wrong_penalty` (default 10) is taken off for every submission that is not Accepted; `penalize_compile_error` (default true) decides whether compile errors count. Both apply to submissions from the moment they change. `duration_seconds` (required before starting) sets the length: on start `scheduled_end_at` becomes `started_at + duration_seconds + paused_seconds` (the `cp_sessions_set_end` trigger, which also follows duration changes while running). After `scheduled_end_at` no submission is accepted (2-minute grace in the database for code already being judged; the server action checks strictly on arrival), and the contest timer calls `cp_finish_if_time_up()` at zero to set `status = 'ended'`. |
 | `cp_problems` | The levels: `level` number, `difficulty` (`easy`, `medium`, `hard`; default `easy`), title, markdown statement, input/output format, `constraints`, `time_limit_ms`, `memory_limit_kb`, `points`, `is_published`. A problem can only be published once it has a test case. |
 | `cp_test_cases` | One or more per problem, in order. `is_sample` cases are shown to participants; the rest stay hidden. |
-| `cp_submissions` | Every judged submission: language, code, overall verdict, tests passed out of total, slowest time, highest memory, `efficiency`, `score`, compiler output. |
+| `cp_submissions` | Every judged submission: language, code, overall verdict, tests passed out of total, slowest time, highest memory, compiler output, `score` (what it did to the team total: +points, 0 or −penalty, set by the database) and `already_solved` (Accepted on a problem the team had already solved: "Yes – Solved"). |
 | `cp_submission_results` | The result of each test case in a submission. Never stores the expected output of hidden tests. |
-| `cp_problem_scores` | A team's best score on each problem, and whether it solved it. |
-| `cp_scores` | The leaderboard: one row per accepted CP team, with total points, problems solved and `last_improved_at` for tie-breaks. |
+| `cp_problem_scores` | A team's result on each problem: net `points` (+points once solved, minus penalties), `wrong_attempts`, `solved` and `solved_at`, and the best accepted run (`best_submission_id`, `best_time_ms`, `best_memory_kb`). |
+| `cp_scores` | The leaderboard: one row per accepted CP team, with total points (can be negative), problems solved, and `total_runtime_ms` / `total_memory_kb` for tie-breaks. |
 | `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when the leaderboard is frozen (`cp_sessions.leaderboard_frozen_at` set, by an admin or by the last-hour cut-off), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
 
 ### Views and functions
@@ -178,16 +179,21 @@ Every team member signs in before creating or joining a team, so each member row
 
 ## Scoring
 
-The server works out each submission's score after Judge0 runs every test case:
+The rules are those of the Programming guidebook (sections 06, 08 and 11). The database scores each submission in the `cp_submissions_score` trigger, so the server action only sends the verdict and the run's time and memory.
 
-```
-score = points × (passed / total) × efficiency
-```
+| Submission | Score | Guidebook response |
+|---|---|---|
+| First Accepted on a problem (every test case passed) | + the problem's `points` (100) | Yes – Accepted |
+| Accepted on a problem already solved | 0; a faster run (or as fast with less memory) replaces the problem's runtime and memory | Yes – Solved |
+| Wrong Answer, Runtime Error, Time Limit Exceeded | − `wrong_penalty` (10) | No – … |
+| Compile Error | − `wrong_penalty` while `penalize_compile_error`, otherwise 0 | No – Compile Error |
+| `internal_error`, `exec_format_error` (the judge failed) | 0 | not a response |
 
-- `efficiency` ranges from 0.7 to 1.0. It drops as the slowest test case's time and highest memory get closer to the problem's limits.
-- Judge0 can't measure time or space complexity directly. Big test cases are what catch the wrong complexity: a slow solution hits Time Limit Exceeded and loses that test case.
-- Only a team's best submission per problem counts, so a worse later submission never lowers the score.
-- Leaderboard order: `total_points` descending, then `last_improved_at` ascending (whoever got there first).
+- There is no partial credit: passing some test cases earns nothing.
+- Penalties count after a problem is solved too, as the guidebook says every non-Accepted submission is wrong. A team total can go below zero.
+- A problem's runtime is the slowest test of its best accepted run, its memory that run's highest memory. The team totals are the sums over solved problems.
+- Leaderboard order: `total_points` descending, then `total_runtime_ms` ascending, then `total_memory_kb` ascending (then team name, so the order is stable).
+- Changing `wrong_penalty` or `penalize_compile_error` does not rescore earlier submissions.
 
 ## Last-hour freeze
 

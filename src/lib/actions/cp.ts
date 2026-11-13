@@ -5,7 +5,6 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUser } from "@/lib/data/auth";
 import { Judge0Error, runOnJudge0, verdictFor } from "@/lib/judge0/server";
-import { computeEfficiency, computeScore } from "@/lib/cp/scoring";
 import { codeSubmissionSchema } from "@/lib/validations/cp";
 import type { ActionResult } from "@/types";
 import type { CodeSubmissionInput, JudgeCase, JudgeProblem, JudgeSummary, SubmissionOutcome, TestOutcome } from "@/types/cp";
@@ -102,7 +101,7 @@ export async function runSamples(input: CodeSubmissionInput): Promise<ActionResu
 
   try {
     const summary = await judge(parsed.data, access.problem, samples);
-    return { ok: true, data: { ...summary, submissionId: null, efficiency: 0, score: 0, points: access.problem.points } };
+    return { ok: true, data: { ...summary, submissionId: null, score: 0, alreadySolved: false, points: access.problem.points } };
   } catch (error) {
     return { ok: false, message: error instanceof Judge0Error ? "cp.errors.judgeUnavailable" : "errors.generic" };
   }
@@ -155,10 +154,6 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
     return { ok: false, message: error instanceof Judge0Error ? "cp.errors.judgeUnavailable" : "errors.generic" };
   }
 
-  const efficiency =
-    summary.passed > 0 ? computeEfficiency(summary.maxTimeMs, problem.time_limit_ms, summary.maxMemoryKb, problem.memory_limit_kb) : 0;
-  const score = computeScore(problem.points, summary.passed, summary.total, efficiency);
-
   const { data: submission, error } = await admin
     .from("cp_submissions")
     .insert({
@@ -172,11 +167,10 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
       total: summary.total,
       max_time_ms: summary.maxTimeMs,
       max_memory_kb: summary.maxMemoryKb,
-      efficiency,
-      score,
       compile_output: summary.compileOutput || null,
     })
-    .select("id")
+    // The database scores it (cp_submissions_score): +points, 0 or -penalty, and whether it was already solved.
+    .select("id, score, already_solved")
     .single();
   if (error) {
     if (error.message.startsWith("Please wait")) return { ok: false, message: "cp.errors.cooldown", params: { seconds: cooldown } };
@@ -197,5 +191,14 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
   );
 
   refresh();
-  return { ok: true, data: { ...summary, submissionId: submission.id, efficiency, score, points: problem.points } };
+  return {
+    ok: true,
+    data: {
+      ...summary,
+      submissionId: submission.id,
+      score: Number(submission.score),
+      alreadySolved: submission.already_solved,
+      points: problem.points,
+    },
+  };
 }

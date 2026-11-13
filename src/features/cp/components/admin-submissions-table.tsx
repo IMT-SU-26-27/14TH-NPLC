@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { FileCodeIcon } from "lucide-react";
-import { formatTimestamp } from "@/lib/format";
+import { formatPointsDelta, formatTimestamp } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TablePagination } from "@/components/shared/table-pagination";
-import { VerdictBadge } from "@/features/cp/components/verdict-badge";
+import { OutcomeBadge } from "@/features/cp/components/outcome-badge";
 import type { AdminSubmissionsTableProps, SubmissionFilters } from "@/types/cp";
 import type { Locale } from "@/types/i18n";
 
@@ -70,12 +70,12 @@ export function AdminSubmissionsTable({ list, filters, competitionId, lang }: Ad
                 </TableCell>
                 <TableCell>{t(`cp.languages.${s.language}`)}</TableCell>
                 <TableCell>
-                  <VerdictBadge verdict={s.verdict} />
+                  <OutcomeBadge verdict={s.verdict} alreadySolved={s.already_solved} />
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {s.passed}/{s.total}
                 </TableCell>
-                <TableCell className="text-right tabular-nums">{Number(s.score).toFixed(2)}</TableCell>
+                <TableCell className="text-right tabular-nums">{formatPointsDelta(Number(s.score), lang)}</TableCell>
                 <TableCell className="text-muted-foreground text-right tabular-nums">{s.max_time_ms === null ? "—" : `${s.max_time_ms} ms`}</TableCell>
                 <TableCell className="text-muted-foreground text-right tabular-nums">
                   {s.max_memory_kb === null ? "—" : `${Math.round(s.max_memory_kb / 1024)} MB`}

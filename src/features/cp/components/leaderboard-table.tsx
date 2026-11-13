@@ -92,7 +92,8 @@ export function LeaderboardTable({ initialRows, competitionId, highlightRegistra
               <TableHead>{t("cp.team")}</TableHead>
               <TableHead className="text-right">{t("cp.solvedCount")}</TableHead>
               <TableHead className="text-right">{t("cp.totalPoints")}</TableHead>
-              <TableHead className="max-sm:hidden">{t("cp.lastImprovement")}</TableHead>
+              <TableHead className="text-right max-sm:hidden">{t("cp.totalRuntime")}</TableHead>
+              <TableHead className="text-right max-sm:hidden">{t("cp.totalMemory")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -113,7 +114,12 @@ export function LeaderboardTable({ initialRows, competitionId, highlightRegistra
                 </TableCell>
                 <TableCell className="text-right tabular-nums">{row.solved}</TableCell>
                 <TableCell className="text-right font-semibold tabular-nums">{formatScore(Number(row.total_points), lang)}</TableCell>
-                <TableCell className="text-muted-foreground max-sm:hidden">{formatDateTime(row.last_improved_at, lang)}</TableCell>
+                <TableCell className="text-muted-foreground text-right font-mono tabular-nums max-sm:hidden">
+                  {formatScore(Number(row.total_runtime_ms), lang)} ms
+                </TableCell>
+                <TableCell className="text-muted-foreground text-right font-mono tabular-nums max-sm:hidden">
+                  {formatScore(Number(row.total_memory_kb), lang)} KB
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

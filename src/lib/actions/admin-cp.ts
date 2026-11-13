@@ -74,6 +74,8 @@ export async function updateSessionSettings(_prev: FormState, formData: FormData
     durationMinutes: formData.get("durationMinutes") || 0,
     durationSeconds: formData.get("durationSeconds") || 0,
     cooldownSeconds: formData.get("cooldownSeconds"),
+    wrongPenalty: formData.get("wrongPenalty"),
+    penalizeCompileError: formData.get("penalizeCompileError") === "on",
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
 
@@ -85,6 +87,9 @@ export async function updateSessionSettings(_prev: FormState, formData: FormData
       // While the contest runs, the cp_sessions_set_end trigger moves the end time to match.
       duration_seconds: parsed.data.duration,
       submission_cooldown_seconds: parsed.data.cooldownSeconds,
+      // Applies to submissions from now on; earlier ones keep the score they got.
+      wrong_penalty: parsed.data.wrongPenalty,
+      penalize_compile_error: parsed.data.penalizeCompileError,
     })
     .eq("competition_id", parsed.data.competitionId);
   if (error) return errorState(databaseErrorMessage(error));
