@@ -77,6 +77,11 @@ export function formatScore(value: number, lang: Locale): string {
   return new Intl.NumberFormat(INTL_LOCALE[lang], { maximumFractionDigits: 2 }).format(value);
 }
 
+// Change to a team total: "+100", "-10", "0".
+export function formatPointsDelta(value: number, lang: Locale): string {
+  return new Intl.NumberFormat(INTL_LOCALE[lang], { maximumFractionDigits: 2, signDisplay: "exceptZero" }).format(value);
+}
+
 // 3725 -> "01:02:05". Hours keep counting past 24 (a contest is at most 48 hours).
 export function formatClock(seconds: number): string {
   const h = Math.floor(seconds / 3600);
