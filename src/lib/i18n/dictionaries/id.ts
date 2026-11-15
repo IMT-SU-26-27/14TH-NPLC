@@ -339,6 +339,8 @@ export const id = {
     proof: "Link postingan twibbon",
     proofOptional: "Link postingan twibbon (opsional)",
     open: "Buka twibbon",
+    captionNote: "*Caption ada di",
+    captionLink: "Drive guidebook",
     noLink: "Link twibbon belum tersedia. Kamu boleh mengosongkan bagian ini dulu.",
     hint: "Tempel link postingan twibbon kamu. Pastikan akun Instagram-mu publik supaya panitia bisa mengecek.",
     placeholder: "https://www.instagram.com/p/…",
