@@ -338,6 +338,8 @@ export const en: Dictionary = {
     proof: "Twibbon post link",
     proofOptional: "Twibbon post link (optional)",
     open: "Open twibbon",
+    captionNote: "*The caption is in the",
+    captionLink: "guidebook Drive folder",
     noLink: "The twibbon link isn't available yet. You can leave this empty for now.",
     hint: "Paste the link to your twibbon post. Make sure your Instagram account is public so the committee can check it.",
     placeholder: "https://www.instagram.com/p/…",
