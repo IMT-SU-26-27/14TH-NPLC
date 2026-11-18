@@ -46,6 +46,11 @@ export async function getActiveCompetitionBySlug(slug: string): Promise<PublicCo
   return competitions.find((c) => c.slug === slug) ?? null;
 }
 
+// Opening time moved into the future after launch: the admin paused registration (e.g. to change the bank account).
+export function isRegistrationPaused(competition: RegistrationWindow, now = new Date()): boolean {
+  return !!competition.registration_opens_at && now < new Date(competition.registration_opens_at);
+}
+
 export function isRegistrationOpen(competition: RegistrationWindow, now = new Date()): boolean {
   const opens = competition.registration_opens_at ? new Date(competition.registration_opens_at) : null;
   const closes = competition.registration_closes_at ? new Date(competition.registration_closes_at) : null;
