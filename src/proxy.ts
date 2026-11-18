@@ -70,6 +70,20 @@ export async function proxy(request: NextRequest) {
       const { data: access } = await supabase.rpc("cp_access");
       if (!access || access.length === 0) return to("/dashboard", { notice: "cp-not-registered" });
 
+      // A disqualified team sees only the results page with the committee's reason, in every contest state.
+      const onResult = path === "/cp/result";
+      const { data: disqualified } = await supabase
+        .from("registrations")
+        .select("id")
+        .in("id", access.map((row) => row.registration_id))
+        .not("disqualified_at", "is", null)
+        .limit(1);
+      if (disqualified && disqualified.length > 0) {
+        if (!onResult) return to("/cp/result");
+        return withLocale(response());
+      }
+      if (onResult) return to("/dashboard");
+
       const status = access.some((row) => row.session_status === "live")
         ? "live"
         : access.some((row) => row.session_status === "paused")
