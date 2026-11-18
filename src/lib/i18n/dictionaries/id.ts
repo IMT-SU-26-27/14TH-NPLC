@@ -902,7 +902,7 @@ export const id = {
       cells: "Sel soal papan peringkat",
       cellsLead: "Ukuran sm (HP), default (1440) dan lg (layar besar), lalu legenda.",
       board: "Papan peringkat (cp-05)",
-      boardLead: "Contoh baris dengan sel, skor negatif, baris tim kamu, dan pemberitahuan papan ditutup.",
+      boardLead: "Contoh baris dengan sel, skor 0, baris tim kamu, dan pemberitahuan papan ditutup.",
       bigTimer: "Sisa waktu layar besar",
     },
     focus: {
@@ -1358,7 +1358,7 @@ export const id = {
         colScore: "Skor",
         colRuntime: "Total runtime (dtk)",
         colMemory: "Total memori (MB)",
-        footnote: "Total runtime = jumlah runtime terbaik tiap soal Accepted. Skor bisa negatif karena setiap jawaban salah mengurangi skor.",
+        footnote: "Total runtime = jumlah runtime terbaik tiap soal Accepted. Setiap jawaban salah mengurangi skor 10, tapi skor total tidak pernah di bawah 0.",
         empty: "Belum ada tim di papan peringkat",
       },
       qualification: {
