@@ -4,13 +4,17 @@ import { useEffect, useState } from "react";
 import { subscribeAuthed } from "@/lib/supabase/realtime";
 import type { LeaderboardRow } from "@/types/cp";
 
-// Guidebook order: higher total, then lower total runtime, then lower total memory.
+// Guidebook order: higher total, then lower total runtime, then lower total memory; still tied, the team that
+// reached its score first (earlier last Accepted).
+const solvedAt = (row: LeaderboardRow) => (row.last_solved_at ? new Date(row.last_solved_at).getTime() : Number.POSITIVE_INFINITY);
+
 function rank(rows: LeaderboardRow[]): LeaderboardRow[] {
   return [...rows].sort(
     (a, b) =>
       Number(b.total_points) - Number(a.total_points) ||
       Number(a.total_runtime_ms) - Number(b.total_runtime_ms) ||
       Number(a.total_memory_kb) - Number(b.total_memory_kb) ||
+      solvedAt(a) - solvedAt(b) ||
       a.team_name.localeCompare(b.team_name),
   );
 }

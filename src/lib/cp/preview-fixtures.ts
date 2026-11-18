@@ -174,6 +174,8 @@ export function previewSession(now: number, overrides: Partial<CpSession>): CpSe
     leaderboard_frozen_at: null,
     leaderboard_frozen_auto: false,
     leaderboard_released_at: null,
+    finalists_announced_at: null,
+    round: "preliminary",
     status: "live",
     penalize_compile_error: true,
     submission_cooldown_seconds: 15,

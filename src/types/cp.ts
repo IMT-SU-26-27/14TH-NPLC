@@ -14,12 +14,13 @@ export type CpLanguage = Enums<"cp_language">;
 export type CpVerdict = Enums<"cp_verdict">;
 export type CpSessionStatus = Enums<"cp_session_status">;
 export type CpDifficulty = Enums<"cp_difficulty">;
+export type CpRound = Enums<"cp_round">;
 // A submission's response as the guidebook names it.
 export type CpOutcome = "accepted" | "solved" | "wrongAnswer" | "runtimeError" | "timeLimit" | "compileError" | "judgeError";
 // Everything a VerdictBadge shows: a guidebook response, or a state around judging that never carries a score.
 export type VerdictBadgeKind = CpOutcome | "judging" | "run" | "lateRejected";
-// The contest round a session belongs to. Every session is the preliminary until the final session exists.
-export type ContestRound = "preliminary" | "final";
+// The round a ContestBar shows (cp_sessions.round).
+export type ContestRound = CpRound;
 
 export type CpSession = Tables<"cp_sessions">;
 export type CpProblem = Tables<"cp_problems">;
@@ -99,6 +100,9 @@ export type CpAccessRow = {
   competition_id: string;
   registration_id: string;
   session_status: CpSessionStatus;
+  round: CpRound;
+  // Only true once the finalists are announced (or the final has started).
+  is_finalist: boolean;
 };
 
 export type ContestProblemListItem = Pick<CpProblem, "id" | "level" | "difficulty" | "title" | "points"> & {
@@ -115,6 +119,14 @@ export type CpTeamResult = {
   teamName: string;
   disqualifiedAt: string | null;
   reason: string | null;
+  // Whether the team made the final; null until the admin announces the finalists.
+  qualification: "qualified" | "notQualified" | null;
+};
+
+export type QualificationResultProps = {
+  lang: Locale;
+  teamName: string;
+  qualified: boolean;
 };
 
 export type DisqualifiedResultProps = {
@@ -169,7 +181,7 @@ export type TeamStanding = {
 
 export type LeaderboardRow = Pick<
   CpScore,
-  "registration_id" | "team_name" | "school" | "total_points" | "solved" | "total_runtime_ms" | "total_memory_kb" | "problems"
+  "registration_id" | "team_name" | "school" | "total_points" | "solved" | "total_runtime_ms" | "total_memory_kb" | "last_solved_at" | "problems"
 >;
 
 // One team's result on one problem, from cp_scores.problems.
@@ -252,7 +264,15 @@ export type ContestTimerProps = {
   finishAtZero?: boolean;
 };
 
-export type AdminProblemRow = Pick<CpProblem, "id" | "level" | "difficulty" | "title" | "points" | "is_published" | "time_limit_ms" | "memory_limit_kb"> & {
+// The admin's finalist picker: the preliminary standings, which teams are picked, and which are disqualified.
+export type FinalRoundCardProps = {
+  contest: AdminContest;
+  standings: LeaderboardRow[];
+  finalistIds: string[];
+  disqualifiedIds: string[];
+};
+
+export type AdminProblemRow = Pick<CpProblem, "id" | "level" | "round" | "difficulty" | "title" | "points" | "is_published" | "time_limit_ms" | "memory_limit_kb"> & {
   testCaseCount: number;
 };
 

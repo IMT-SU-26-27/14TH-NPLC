@@ -8,6 +8,9 @@ export const CP_LANGUAGES = ["python", "cpp", "java"] as const;
 // input (a leading `T`), which costs one job instead of ten.
 export const CP_MAX_TEST_CASES = 10;
 export const CP_DIFFICULTIES = ["easy", "medium", "hard"] as const;
+export const CP_ROUNDS = Constants.public.Enums.cp_round;
+// The guidebook's number of finalists, the default the picker suggests.
+export const CP_FINALIST_COUNT = 15;
 
 export const codeSubmissionSchema = z.object({
   problemId: z.uuid(),
@@ -28,6 +31,7 @@ export const problemSchema = z.object({
   id: z.uuid().optional(),
   competitionId: z.uuid(),
   level: z.coerce.number().int().min(1, "validation.atLeastOne").max(999),
+  round: z.enum(CP_ROUNDS),
   difficulty: z.enum(CP_DIFFICULTIES),
   title: z.string().trim().min(1, "validation.title").max(120),
   statement: z.string().trim().min(1, "validation.statement"),
@@ -39,6 +43,11 @@ export const problemSchema = z.object({
   points: z.coerce.number().int().min(1, "validation.atLeastOne").max(100000),
   isPublished: z.boolean(),
   testCases: z.array(testCaseSchema).min(1, "validation.testCasesMin").max(CP_MAX_TEST_CASES, "validation.testCasesMax"),
+});
+
+export const finalistsSchema = z.object({
+  competitionId: z.uuid(),
+  registrationIds: z.array(z.uuid()).max(200),
 });
 
 export const sessionSchema = z

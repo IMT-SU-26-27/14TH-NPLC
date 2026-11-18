@@ -172,6 +172,24 @@ export type Database = {
         }
         Relationships: []
       }
+      cp_finalists: {
+        Row: {
+          competition_id: string
+          created_at: string
+          registration_id: string
+        }
+        Insert: {
+          competition_id: string
+          created_at?: string
+          registration_id: string
+        }
+        Update: {
+          competition_id?: string
+          created_at?: string
+          registration_id?: string
+        }
+        Relationships: []
+      }
       cp_focus_events: {
         Row: {
           competition_id: string
@@ -243,6 +261,7 @@ export type Database = {
       cp_leaderboard_snapshots: {
         Row: {
           competition_id: string
+          last_solved_at: string | null
           problems: Json
           registration_id: string
           school: string | null
@@ -254,6 +273,7 @@ export type Database = {
         }
         Insert: {
           competition_id: string
+          last_solved_at?: string | null
           problems?: Json
           registration_id: string
           school?: string | null
@@ -265,6 +285,7 @@ export type Database = {
         }
         Update: {
           competition_id?: string
+          last_solved_at?: string | null
           problems?: Json
           registration_id?: string
           school?: string | null
@@ -368,6 +389,7 @@ export type Database = {
           memory_limit_kb: number
           output_format: string
           points: number
+          round: Database["public"]["Enums"]["cp_round"]
           statement: string
           time_limit_ms: number
           title: string
@@ -385,6 +407,7 @@ export type Database = {
           memory_limit_kb?: number
           output_format?: string
           points: number
+          round?: Database["public"]["Enums"]["cp_round"]
           statement: string
           time_limit_ms?: number
           title: string
@@ -402,6 +425,7 @@ export type Database = {
           memory_limit_kb?: number
           output_format?: string
           points?: number
+          round?: Database["public"]["Enums"]["cp_round"]
           statement?: string
           time_limit_ms?: number
           title?: string
@@ -422,9 +446,49 @@ export type Database = {
           },
         ]
       }
+      cp_round_results: {
+        Row: {
+          archived_at: string
+          competition_id: string
+          rank: number
+          registration_id: string
+          round: Database["public"]["Enums"]["cp_round"]
+          solved: number
+          team_name: string
+          total_memory_kb: number
+          total_points: number
+          total_runtime_ms: number
+        }
+        Insert: {
+          archived_at?: string
+          competition_id: string
+          rank: number
+          registration_id: string
+          round: Database["public"]["Enums"]["cp_round"]
+          solved: number
+          team_name: string
+          total_memory_kb: number
+          total_points: number
+          total_runtime_ms: number
+        }
+        Update: {
+          archived_at?: string
+          competition_id?: string
+          rank?: number
+          registration_id?: string
+          round?: Database["public"]["Enums"]["cp_round"]
+          solved?: number
+          team_name?: string
+          total_memory_kb?: number
+          total_points?: number
+          total_runtime_ms?: number
+        }
+        Relationships: []
+      }
       cp_scores: {
         Row: {
           competition_id: string
+          last_solved_at: string | null
           problems: Json
           registration_id: string
           school: string | null
@@ -437,6 +501,7 @@ export type Database = {
         }
         Insert: {
           competition_id: string
+          last_solved_at?: string | null
           problems?: Json
           registration_id: string
           school?: string | null
@@ -449,6 +514,7 @@ export type Database = {
         }
         Update: {
           competition_id?: string
+          last_solved_at?: string | null
           problems?: Json
           registration_id?: string
           school?: string | null
@@ -492,12 +558,14 @@ export type Database = {
           created_at: string
           duration_seconds: number | null
           ended_at: string | null
+          finalists_announced_at: string | null
           id: string
           leaderboard_frozen_at: string | null
           leaderboard_frozen_auto: boolean
           leaderboard_released_at: string | null
           paused_at: string | null
           paused_seconds: number
+          round: Database["public"]["Enums"]["cp_round"]
           scheduled_end_at: string | null
           scheduled_start_at: string | null
           started_at: string | null
@@ -513,12 +581,14 @@ export type Database = {
           created_at?: string
           duration_seconds?: number | null
           ended_at?: string | null
+          finalists_announced_at?: string | null
           id?: string
           leaderboard_frozen_at?: string | null
           leaderboard_frozen_auto?: boolean
           leaderboard_released_at?: string | null
           paused_at?: string | null
           paused_seconds?: number
+          round?: Database["public"]["Enums"]["cp_round"]
           scheduled_end_at?: string | null
           scheduled_start_at?: string | null
           started_at?: string | null
@@ -534,12 +604,14 @@ export type Database = {
           created_at?: string
           duration_seconds?: number | null
           ended_at?: string | null
+          finalists_announced_at?: string | null
           id?: string
           leaderboard_frozen_at?: string | null
           leaderboard_frozen_auto?: boolean
           leaderboard_released_at?: string | null
           paused_at?: string | null
           paused_seconds?: number
+          round?: Database["public"]["Enums"]["cp_round"]
           scheduled_end_at?: string | null
           scheduled_start_at?: string | null
           started_at?: string | null
@@ -1544,7 +1616,13 @@ export type Database = {
           competition_id: string
           registration_id: string
           session_status: Database["public"]["Enums"]["cp_session_status"]
+          round: Database["public"]["Enums"]["cp_round"]
+          is_finalist: boolean
         }[]
+      }
+      cp_start_final: {
+        Args: { p_competition_id: string }
+        Returns: undefined
       }
       cp_finish_if_time_up: {
         Args: { p_competition_id: string }
@@ -1661,6 +1739,7 @@ export type Database = {
     Enums: {
       competition_type: "competitive_programming" | "logic"
       cp_difficulty: "easy" | "medium" | "hard"
+      cp_round: "preliminary" | "final"
       cp_focus_kind: "tab_hidden" | "window_blur" | "fullscreen_exit"
       cp_language: "python" | "cpp" | "java"
       cp_session_status: "scheduled" | "live" | "paused" | "ended"
@@ -2363,6 +2442,7 @@ export const Constants = {
     Enums: {
       competition_type: ["competitive_programming", "logic"],
       cp_difficulty: ["easy", "medium", "hard"],
+      cp_round: ["preliminary", "final"],
       cp_focus_kind: ["tab_hidden", "window_blur", "fullscreen_exit"],
       cp_language: ["python", "cpp", "java"],
       cp_session_status: ["scheduled", "live", "paused", "ended"],
