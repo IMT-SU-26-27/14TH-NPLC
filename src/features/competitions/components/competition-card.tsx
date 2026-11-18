@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRightIcon, ClockIcon, CodeXmlIcon, NetworkIcon, UsersIcon, WalletIcon } from "lucide-react";
 import { competitionDescription, formatDateTime, formatTeamSize } from "@/lib/format";
-import { isRegistrationOpen } from "@/lib/data/competitions";
+import { isRegistrationOpen, isRegistrationPaused } from "@/lib/data/competitions";
 import { localePath } from "@/lib/i18n/config";
 import { currentFee } from "@/lib/pricing";
 import { getT } from "@/lib/i18n/get-dictionary";
@@ -18,6 +18,7 @@ const microLabel = "text-primary flex items-center gap-1.5 font-mono text-xs tra
 export function CompetitionCard({ competition, lang, index, full }: CompetitionCardProps) {
   const t = getT(lang);
   const open = isRegistrationOpen(competition);
+  const paused = isRegistrationPaused(competition);
   const category = t(`competition.category.${competition.type}`);
   const isCp = competition.type === "competitive_programming";
   const Icon = isCp ? CodeXmlIcon : NetworkIcon;
@@ -35,7 +36,7 @@ export function CompetitionCard({ competition, lang, index, full }: CompetitionC
               aria-hidden
               className={cn("size-2 rounded-full", !open ? "bg-muted-foreground" : full ? "bg-destructive" : "bg-highlight ring-highlight-foreground/40 ring-1")}
             />
-            {!open ? t("competition.closed") : full ? t("competition.quotaFullBadge") : t("competition.open")}
+            {paused ? t("competition.maintenance") : !open ? t("competition.closed") : full ? t("competition.quotaFullBadge") : t("competition.open")}
           </Badge>
         </div>
         <div className="flex items-start justify-between gap-4">
@@ -101,7 +102,7 @@ export function CompetitionCard({ competition, lang, index, full }: CompetitionC
           </Link>
         ) : (
           <span aria-disabled className={cn(buttonVariants({ variant: "outline", size: "lg" }), "pointer-events-none h-11 opacity-60")}>
-            {open ? t("competition.quotaFull") : t("competition.registrationClosed")}
+            {open ? t("competition.quotaFull") : paused ? t("competition.registrationMaintenance") : t("competition.registrationClosed")}
           </span>
         )}
       </CardFooter>

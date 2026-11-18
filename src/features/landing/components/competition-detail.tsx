@@ -54,7 +54,7 @@ export function CompetitionDetail({ item, labels }: CompetitionDetailProps) {
               aria-hidden
               className={cn("size-2 rounded-full", !item.open ? "bg-muted-foreground" : item.full ? "bg-destructive" : "bg-highlight ring-highlight-foreground/40 ring-1")}
             />
-            {!item.open ? labels.closed : item.full ? labels.full : labels.open}
+            {item.paused ? labels.maintenance : !item.open ? labels.closed : item.full ? labels.full : labels.open}
           </Badge>
           {item.closesLabel && (
             <span className="text-muted-foreground flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase">
@@ -73,7 +73,7 @@ export function CompetitionDetail({ item, labels }: CompetitionDetailProps) {
           </Link>
         ) : (
           <span aria-disabled className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pointer-events-none h-11 opacity-60 max-sm:w-full")}>
-            {item.open ? labels.quotaFull : labels.registrationClosed}
+            {item.open ? labels.quotaFull : item.paused ? labels.registrationMaintenance : labels.registrationClosed}
           </span>
         )}
       </CardFooter>
