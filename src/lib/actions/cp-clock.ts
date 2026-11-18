@@ -6,6 +6,12 @@ import { notifyContestStatus } from "@/lib/push/notify";
 import { uuidSchema } from "@/lib/validations/admin";
 import type { ActionResult } from "@/types";
 
+// The server's clock in epoch milliseconds. The contest timer measures its offset from the device clock once per
+// page load (see src/lib/cp/server-clock.ts), so every countdown follows the committee's server.
+export async function getServerTime(): Promise<number> {
+  return Date.now();
+}
+
 // Called by the contest timer when it reaches zero. The database only ends the contest if its end
 // time has really passed, so it is safe for any signed-in participant or admin to call.
 // Everyone's pages then move on through Realtime on cp_sessions.

@@ -262,7 +262,9 @@ export type Database = {
         Row: {
           competition_id: string
           last_solved_at: string | null
+          problems: Json
           registration_id: string
+          school: string | null
           solved: number
           team_name: string
           total_memory_kb: number
@@ -272,7 +274,9 @@ export type Database = {
         Insert: {
           competition_id: string
           last_solved_at?: string | null
+          problems?: Json
           registration_id: string
+          school?: string | null
           solved?: number
           team_name: string
           total_memory_kb?: number
@@ -282,7 +286,9 @@ export type Database = {
         Update: {
           competition_id?: string
           last_solved_at?: string | null
+          problems?: Json
           registration_id?: string
+          school?: string | null
           solved?: number
           team_name?: string
           total_memory_kb?: number
@@ -483,7 +489,9 @@ export type Database = {
         Row: {
           competition_id: string
           last_solved_at: string | null
+          problems: Json
           registration_id: string
+          school: string | null
           solved: number
           team_name: string
           total_memory_kb: number
@@ -494,7 +502,9 @@ export type Database = {
         Insert: {
           competition_id: string
           last_solved_at?: string | null
+          problems?: Json
           registration_id: string
+          school?: string | null
           solved?: number
           team_name: string
           total_memory_kb?: number
@@ -505,7 +515,9 @@ export type Database = {
         Update: {
           competition_id?: string
           last_solved_at?: string | null
+          problems?: Json
           registration_id?: string
+          school?: string | null
           solved?: number
           team_name?: string
           total_memory_kb?: number

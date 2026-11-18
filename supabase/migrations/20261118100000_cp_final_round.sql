@@ -342,7 +342,7 @@ begin
   delete from public.cp_scores s
   where s.competition_id = p_competition_id and not private.is_cp_finalist(s.registration_id);
   update public.cp_scores
-  set total_points = 0, solved = 0, total_runtime_ms = 0, total_memory_kb = 0, updated_at = now()
+  set total_points = 0, solved = 0, total_runtime_ms = 0, total_memory_kb = 0, problems = '{}'::jsonb, updated_at = now()
   where competition_id = p_competition_id;
 
   -- Back to "scheduled" for the final; the admin sets its start and duration.

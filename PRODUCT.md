@@ -8,24 +8,24 @@ web
 
 ## Users
 
-- **Participants:** Indonesian high-school students (identified by NISN) competing in teams. A team leader creates the team, pays the registration fee by QRIS and tracks the review; members join with the team's code. They use the site on phones and laptops about equally; the competitive programming contest itself is done on laptops.
+- **Participants:** Indonesian high-school students (identified by NISN) competing in teams. A team leader creates the team, pays the registration fee by bank transfer and tracks the review; members join with the team's code. They use the site on phones and laptops about equally; the competitive programming contest itself is done on laptops.
 - **Admins:** the organizing committee. They manage competitions, review payment proofs, accept or reject teams with a reason, write contest problems and start/stop the live contest.
 
 ## Product Purpose
 
-Registration and contest platform for the 14th NPLC (National Programming & Logic Competition). It replaces manual sign-up and payment checking: teams register online, pay by QRIS, and see exactly where their registration stands. Accepted competitive programming teams compete online with real-time judging (self-hosted Judge0) and a live leaderboard. Success means every team knows its status without contacting the committee, and the contest runs without manual scoring.
+Registration and contest platform for the 14th NPLC (National Programming & Logic Competition). It replaces manual sign-up and payment checking: teams register online, pay by bank transfer, and see exactly where their registration stands. Accepted competitive programming teams compete online with real-time judging (self-hosted Judge0) and a live leaderboard. Success means every team knows its status without contacting the committee, and the contest runs without manual scoring.
 
 ## Operating Context
 
-- Several competitions can run at once. Currently: Competitive Programming (online contest on this site) and Category 2 (logic; registration only for now).
-- Payment is manual: the admin uploads a QRIS image per competition, the leader pays and uploads proof, an admin verifies it. No payment gateway (no Midtrans/Xendit).
+- Several competitions can run at once. Currently: Competitive Programming (contest on this site: online preliminary round, offline final) and Category 2, Logic Rally Games (posts scored on committee devices, with a live Rally leaderboard).
+- Payment is manual: the leader transfers the fee to the account shown on the registration form (blu by BCA only), uploads the proof, and an admin verifies it. No QRIS and no payment gateway (no Midtrans/Xendit).
 - The CP contest opens only when an admin presses start; participants wait in a waiting room until then. Problems are levels with sample and hidden test cases; languages are Python, C++ and Java.
 - Times are Indonesian Western Time (WIB).
 
 ## Capabilities and Constraints
 
 - Email/password sign-in. Google sign-in is planned later; accounts with the same email must link.
-- Team size per competition is set by the admin. Team names are fixed once created; leaders can only add (by code) or remove members.
+- Team size per competition is set by the admin. Team names are fixed once created. Members join with the team's code; after that only an admin changes a team's members (leaders cannot remove members and members cannot leave).
 - Only accepted registrations count toward "registered" totals.
 - Stack is fixed: Next.js 16 (App Router, Cache Components), self-hosted Supabase (Postgres, Auth, Realtime), Cloudinary for files, shadcn/ui components only, colors only from the theme in `globals.css`.
 - **Language:** bilingual, Bahasa Indonesia by default with an English option.

@@ -75,6 +75,7 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
           <LeaderboardTable
             key={contest.session.leaderboard_frozen_at ?? "live"}
             initialRows={leaderboard}
+            problems={contest.problems.filter((p) => p.is_published)}
             competitionId={contest.competitionId}
             highlightRegistrationId={null}
             viewer="admin"

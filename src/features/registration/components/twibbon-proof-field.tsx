@@ -2,6 +2,7 @@
 
 import { ExternalLinkIcon, ImageIcon, Link2Icon } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
+import { GUIDEBOOK_URL } from "@/lib/event-info";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
@@ -19,11 +20,22 @@ export function TwibbonProofField({ twibbonUrl, disabled, error, onValueChange }
         {t(twibbonUrl ? "twibbon.proof" : "twibbon.proofOptional")}
       </FieldLabel>
       {twibbonUrl ? (
-        <a href={twibbonUrl} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-primary text-foreground h-10 w-fit! px-4")}>
-          <ImageIcon />
-          {t("twibbon.open")}
-          <ExternalLinkIcon data-icon="inline-end" />
-        </a>
+        <>
+          <a href={twibbonUrl} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-primary text-foreground h-10 w-fit! px-4")}>
+            <ImageIcon />
+            {t("twibbon.open")}
+            <ExternalLinkIcon data-icon="inline-end" />
+          </a>
+          {/* HOD, 15 Nov: the post caption to use is in the guidebook Drive folder. */}
+          {GUIDEBOOK_URL && (
+            <FieldDescription>
+              {t("twibbon.captionNote")}{" "}
+              <a href={GUIDEBOOK_URL} target="_blank" rel="noopener noreferrer">
+                {t("twibbon.captionLink")}
+              </a>
+            </FieldDescription>
+          )}
+        </>
       ) : (
         <FieldDescription>{t("twibbon.noLink")}</FieldDescription>
       )}
