@@ -195,6 +195,7 @@ export type Database = {
           competition_id: string
           duration_ms: number | null
           id: string
+          is_warning: boolean
           kind: Database["public"]["Enums"]["cp_focus_kind"]
           left_at: string
           problem_id: string | null
@@ -207,6 +208,7 @@ export type Database = {
           competition_id: string
           duration_ms?: never
           id?: string
+          is_warning?: boolean
           kind: Database["public"]["Enums"]["cp_focus_kind"]
           left_at?: string
           problem_id?: string | null
@@ -219,6 +221,7 @@ export type Database = {
           competition_id?: string
           duration_ms?: never
           id?: string
+          is_warning?: boolean
           kind?: Database["public"]["Enums"]["cp_focus_kind"]
           left_at?: string
           problem_id?: string | null
@@ -1587,6 +1590,7 @@ export type Database = {
           p_min_ms: number
         }
         Returns: {
+          disqualified: boolean
           events: number
           fullscreen_exit: number
           last_left_at: string
@@ -1596,6 +1600,7 @@ export type Database = {
           tab_hidden: number
           team_name: string
           total_ms: number
+          warnings: number
           window_blur: number
         }[]
       }

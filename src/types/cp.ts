@@ -554,6 +554,8 @@ export type FocusFilters = z.infer<typeof focusFiltersSchema>;
 export type FocusSummaryRow = {
   registrationId: string;
   teamName: string;
+  warnings: number;
+  disqualified: boolean;
   events: number;
   totalMs: number;
   longestMs: number | null;
@@ -571,8 +573,22 @@ export type FocusEventRow = {
   returnedAt: string | null;
   returnedByReload: boolean;
   durationMs: number | null;
+  isWarning: boolean;
   memberName: string | null;
   problemTitle: string | null;
+};
+
+// After a return is recorded: whether it became a warning, and the team's warnings so far.
+export type FocusReturnResult = {
+  warned: boolean;
+  warnings: number;
+};
+
+// The team page of Admin -> CP -> Activity: its warnings and disqualification, for the disqualify button.
+export type TeamWarningStatus = {
+  warnings: number;
+  disqualifiedAt: string | null;
+  reason: string | null;
 };
 
 export type FocusAwayState = {
@@ -585,6 +601,11 @@ export type FocusAwayState = {
 export type AdminFocusPageProps = {
   params: Promise<{ lang: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export type FocusWarningsBadgeProps = {
+  count: number;
+  label: string;
 };
 
 export type AdminFocusSectionProps = {

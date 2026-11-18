@@ -1,16 +1,20 @@
 import Link from "next/link";
-import { ArrowLeftIcon, EyeOffIcon } from "lucide-react";
+import { ArrowLeftIcon, EyeOffIcon, TriangleAlertIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
-import { listCpCompetitions, listFocusSummary, listTeamFocusEvents } from "@/lib/data/cp";
+import { getTeamWarningStatus, listCpCompetitions, listFocusSummary, listTeamFocusEvents } from "@/lib/data/cp";
 import { formatAwayDuration, formatTimestamp } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
-import { focusFiltersSchema } from "@/lib/validations/cp";
+import { CP_FOCUS_WARNING_LIMIT, focusFiltersSchema } from "@/lib/validations/cp";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DisqualificationForm } from "@/components/shared/disqualification-form";
 import { FocusFilters } from "@/features/cp/components/focus-filters";
 import { FocusKindBadge } from "@/features/cp/components/focus-kind-badge";
+import { FocusWarningsBadge } from "@/features/cp/components/focus-warnings-badge";
 import { StillAwayBadge } from "@/features/cp/components/still-away-badge";
 import type { AdminFocusSectionProps, FocusFilters as Filters } from "@/types/cp";
 import type { Locale } from "@/types/i18n";
@@ -57,8 +61,9 @@ export async function AdminFocusSection({ lang, searchParams }: AdminFocusSectio
 
   if (filters.team) {
     const team = filters.team;
-    const events = await listTeamFocusEvents(selected.id, { ...filters, team });
+    const [events, status] = await Promise.all([listTeamFocusEvents(selected.id, { ...filters, team }), getTeamWarningStatus(team)]);
     const row = summary.find((r) => r.registrationId === team);
+    const reached = status.warnings >= CP_FOCUS_WARNING_LIMIT;
     return (
       <div className="space-y-4">
         <Link href={pageHref(lang, selected.id, filters)} className={buttonVariants({ variant: "ghost", size: "sm", className: "-ml-2" })}>
@@ -67,12 +72,28 @@ export async function AdminFocusSection({ lang, searchParams }: AdminFocusSectio
         </Link>
         <div className="space-y-1">
           <h2 className="font-heading text-lg font-semibold">{row?.teamName ?? t("admin.focus.team")}</h2>
-          {row && (
-            <p className="text-muted-foreground text-sm">
-              {t("admin.focus.teamSummary", { count: row.events, total: formatAwayDuration(row.totalMs, lang) })}
-            </p>
-          )}
+          <p className="text-muted-foreground text-sm">
+            {t("admin.focus.teamWarnings", { count: status.warnings, limit: CP_FOCUS_WARNING_LIMIT })}
+            {row && ` · ${t("admin.focus.teamSummary", { count: row.events, total: formatAwayDuration(row.totalMs, lang) })}`}
+          </p>
         </div>
+        {reached && !status.disqualifiedAt ? (
+          <Alert variant="destructive">
+            <TriangleAlertIcon />
+            <AlertTitle>{t("admin.focus.decideTitle")}</AlertTitle>
+            <AlertDescription>
+              <p>{t("admin.focus.decideLead", { limit: CP_FOCUS_WARNING_LIMIT })}</p>
+              <div className="mt-2">
+                <DisqualificationForm registrationId={team} disqualifiedAt={null} reason={null} />
+              </div>
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <div className="space-y-2">
+            {!status.disqualifiedAt && <p className="text-muted-foreground text-sm">{t("admin.focus.decideEarly")}</p>}
+            <DisqualificationForm registrationId={team} disqualifiedAt={status.disqualifiedAt} reason={status.reason} />
+          </div>
+        )}
         <FocusFilters filters={filters} competitionId={selected.id} />
         {events.length === 0 ? (
           <Empty className="border">
@@ -108,7 +129,10 @@ export async function AdminFocusSection({ lang, searchParams }: AdminFocusSectio
                       )}
                     </TableCell>
                     <TableCell>
-                      <FocusKindBadge kind={e.kind} label={t(`cp.focus.kind.${e.kind}`)} />
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <FocusKindBadge kind={e.kind} label={t(`cp.focus.kind.${e.kind}`)} />
+                        {e.isWarning && <Badge variant="destructive">{t("admin.focus.warningRow")}</Badge>}
+                      </div>
                     </TableCell>
                     <TableCell className="max-w-48 truncate">{e.memberName ?? "—"}</TableCell>
                     <TableCell className="text-muted-foreground max-w-56 truncate">{e.problemTitle ?? t("admin.focus.problemList")}</TableCell>
@@ -158,6 +182,7 @@ export async function AdminFocusSection({ lang, searchParams }: AdminFocusSectio
               <TableHeader>
                 <TableRow>
                   <TableHead>{t("admin.focus.team")}</TableHead>
+                  <TableHead>{t("admin.focus.warnings")}</TableHead>
                   <TableHead className="text-right">{t("admin.focus.events")}</TableHead>
                   <TableHead className="text-right">{t("admin.focus.totalAway")}</TableHead>
                   <TableHead className="text-right">{t("admin.focus.longest")}</TableHead>
@@ -179,7 +204,11 @@ export async function AdminFocusSection({ lang, searchParams }: AdminFocusSectio
                           {r.teamName}
                         </Link>
                         {r.openEvents > 0 && <StillAwayBadge label={t("admin.focus.stillAway")} />}
+                        {r.disqualified && <Badge variant="destructive">{t("admin.focus.disqualifiedBadge")}</Badge>}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <FocusWarningsBadge count={r.warnings} label={t("admin.focus.warningBadge", { count: r.warnings })} />
                     </TableCell>
                     <TableCell className="text-right tabular-nums">{r.events}</TableCell>
                     <TableCell className="text-right font-medium tabular-nums">{formatAwayDuration(r.totalMs, lang)}</TableCell>

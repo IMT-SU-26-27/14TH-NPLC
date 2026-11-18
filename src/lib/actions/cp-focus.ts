@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/data/auth";
 import { uuidSchema } from "@/lib/validations/admin";
 import { focusLeaveSchema } from "@/lib/validations/cp";
 import type { ActionResult } from "@/types";
-import type { FocusLeaveInput } from "@/types/cp";
+import type { FocusLeaveInput, FocusReturnResult } from "@/types/cp";
 
 // A browser that flips focus in a loop should not flood the table.
 const MAX_EVENTS_PER_MINUTE = 30;
@@ -52,34 +52,49 @@ export async function recordFocusLeave(input: FocusLeaveInput): Promise<ActionRe
   return { ok: true, data: { id: data.id } };
 }
 
+// The team's warnings so far, and whether any of the rows just closed became one (the database decides).
+async function warningResult(closed: { registration_id: string; is_warning: boolean }[]): Promise<FocusReturnResult | null> {
+  const team = closed[0]?.registration_id;
+  if (!team) return null;
+  const admin = createSupabaseAdminClient();
+  const { count } = await admin
+    .from("cp_focus_events")
+    .select("id", { count: "exact", head: true })
+    .eq("registration_id", team)
+    .eq("is_warning", true);
+  return { warned: closed.some((row) => row.is_warning), warnings: count ?? 0 };
+}
+
 // The participant is back on the contest page.
-export async function recordFocusReturn(eventId: string): Promise<ActionResult> {
+export async function recordFocusReturn(eventId: string): Promise<ActionResult<FocusReturnResult | null>> {
   const id = uuidSchema.safeParse(eventId);
   if (!id.success) return { ok: false, message: "errors.invalidRequest" };
   const user = await getCurrentUser();
   if (!user) return { ok: false, message: "errors.signInAgain" };
 
   const admin = createSupabaseAdminClient();
-  await admin
+  const { data } = await admin
     .from("cp_focus_events")
     .update({ returned_at: new Date().toISOString() })
     .eq("id", id.data)
     .eq("user_id", user.id)
-    .is("returned_at", null);
-  return { ok: true, data: undefined };
+    .is("returned_at", null)
+    .select("registration_id, is_warning");
+  return { ok: true, data: await warningResult(data ?? []) };
 }
 
 // A fresh load of a contest page: anything this participant left open (the page closed or crashed while away)
 // ended now, when they came back.
-export async function closeOpenFocusEvents(): Promise<ActionResult> {
+export async function closeOpenFocusEvents(): Promise<ActionResult<FocusReturnResult | null>> {
   const user = await getCurrentUser();
-  if (!user || user.role === "admin") return { ok: true, data: undefined };
+  if (!user || user.role === "admin") return { ok: true, data: null };
 
   const admin = createSupabaseAdminClient();
-  await admin
+  const { data } = await admin
     .from("cp_focus_events")
     .update({ returned_at: new Date().toISOString(), returned_by_reload: true })
     .eq("user_id", user.id)
-    .is("returned_at", null);
-  return { ok: true, data: undefined };
+    .is("returned_at", null)
+    .select("registration_id, is_warning");
+  return { ok: true, data: await warningResult(data ?? []) };
 }
