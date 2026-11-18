@@ -243,7 +243,9 @@ export type Database = {
       cp_leaderboard_snapshots: {
         Row: {
           competition_id: string
+          problems: Json
           registration_id: string
+          school: string | null
           solved: number
           team_name: string
           total_memory_kb: number
@@ -252,7 +254,9 @@ export type Database = {
         }
         Insert: {
           competition_id: string
+          problems?: Json
           registration_id: string
+          school?: string | null
           solved?: number
           team_name: string
           total_memory_kb?: number
@@ -261,7 +265,9 @@ export type Database = {
         }
         Update: {
           competition_id?: string
+          problems?: Json
           registration_id?: string
+          school?: string | null
           solved?: number
           team_name?: string
           total_memory_kb?: number
@@ -419,7 +425,9 @@ export type Database = {
       cp_scores: {
         Row: {
           competition_id: string
+          problems: Json
           registration_id: string
+          school: string | null
           solved: number
           team_name: string
           total_memory_kb: number
@@ -429,7 +437,9 @@ export type Database = {
         }
         Insert: {
           competition_id: string
+          problems?: Json
           registration_id: string
+          school?: string | null
           solved?: number
           team_name: string
           total_memory_kb?: number
@@ -439,7 +449,9 @@ export type Database = {
         }
         Update: {
           competition_id?: string
+          problems?: Json
           registration_id?: string
+          school?: string | null
           solved?: number
           team_name?: string
           total_memory_kb?: number

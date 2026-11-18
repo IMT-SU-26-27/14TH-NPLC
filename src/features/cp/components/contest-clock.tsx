@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { formatClock } from "@/lib/format";
 import { finishContestIfTimeUp } from "@/lib/actions/cp-clock";
 import { useCountdown } from "@/hooks/use-countdown";
+import { useServerClockOffset } from "@/hooks/use-server-clock-offset";
 import { useI18n } from "@/hooks/use-i18n";
 import type { ContestClockProps } from "@/types/cp";
 
@@ -14,7 +15,8 @@ import type { ContestClockProps } from "@/types/cp";
 export function ContestClock({ competitionId, status, endsAt, pausedAt }: ContestClockProps) {
   const { t } = useI18n();
   const live = status === "live";
-  const left = useCountdown(live ? endsAt : null);
+  const offset = useServerClockOffset();
+  const left = useCountdown(live ? endsAt : null, offset);
   const timeUp = live && left === 0;
 
   // Ask now, then every 5 s: this browser's clock may run slightly ahead of the server's.

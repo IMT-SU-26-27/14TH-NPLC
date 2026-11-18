@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { VerdictBadge } from "@/features/cp/components/verdict-badge";
+import { TestVerdictBadge } from "@/features/cp/components/test-verdict-badge";
 import type { VerdictGuideEntry, VerdictGuideProps } from "@/types/cp";
 
 // Floating (?) button on every contest page. Opens a reference of every judging result:
@@ -61,7 +61,7 @@ export function VerdictGuide({ className }: VerdictGuideProps) {
               >
                 <div className="space-y-1.5">
                   <h3 id={`verdict-guide-${verdict}-title`}>
-                    <VerdictBadge verdict={verdict} />
+                    <TestVerdictBadge verdict={verdict} />
                   </h3>
                   <p>{entry.description}</p>
                 </div>
