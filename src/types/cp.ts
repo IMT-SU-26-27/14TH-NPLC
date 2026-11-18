@@ -16,6 +16,10 @@ export type CpSessionStatus = Enums<"cp_session_status">;
 export type CpDifficulty = Enums<"cp_difficulty">;
 // A submission's response as the guidebook names it.
 export type CpOutcome = "accepted" | "solved" | "wrongAnswer" | "runtimeError" | "timeLimit" | "compileError" | "judgeError";
+// Everything a VerdictBadge shows: a guidebook response, or a state around judging that never carries a score.
+export type VerdictBadgeKind = CpOutcome | "judging" | "run" | "lateRejected";
+// The contest round a session belongs to. Every session is the preliminary until the final session exists.
+export type ContestRound = "preliminary" | "final";
 
 export type CpSession = Tables<"cp_sessions">;
 export type CpProblem = Tables<"cp_problems">;
@@ -82,6 +86,11 @@ export type SubmissionOutcome = JudgeSummary & {
   // Accepted on a problem the team had already solved ("Yes - Solved").
   alreadySolved: boolean;
   points: number;
+  // The problem's best runtime before this submission (null: not solved before, or a sample run). With
+  // alreadySolved, a lower maxTimeMs means this run replaced the best runtime and memory.
+  previousBestTimeMs: number | null;
+  // "Submit #n": the team's nth submission on this problem (null for sample runs).
+  submissionNumber: number | null;
 };
 
 // ----- Contest pages -----
@@ -97,6 +106,7 @@ export type ContestProblemListItem = Pick<CpProblem, "id" | "level" | "difficult
   netPoints: number | null;
   wrongAttempts: number;
   bestTimeMs: number | null;
+  bestMemoryKb: number | null;
   solved: boolean;
 };
 
@@ -118,18 +128,34 @@ export type ProblemView = Pick<
 
 export type RecentSubmission = {
   id: string;
+  // "Submit #n" for this team on this problem, counted from the first submission.
+  number: number;
   language: CpLanguage;
   verdict: CpVerdict;
   passed: number;
   total: number;
   score: number;
   already_solved: boolean;
+  // Slowest test and largest memory of the submission.
+  max_time_ms: number | null;
+  max_memory_kb: number | null;
   created_at: string;
+};
+
+// The team's own line on the problem list summary (screen 3). Rank is null when the team is not on the
+// leaderboard yet; while frozen, every value is the one at the moment it closed.
+export type TeamStanding = {
+  score: number;
+  totalRuntimeMs: number;
+  totalMemoryKb: number;
+  rank: number | null;
+  teamCount: number;
+  frozen: boolean;
 };
 
 export type LeaderboardRow = Pick<
   CpScore,
-  "registration_id" | "team_name" | "total_points" | "solved" | "total_runtime_ms" | "total_memory_kb" | "problems"
+  "registration_id" | "team_name" | "school" | "total_points" | "solved" | "total_runtime_ms" | "total_memory_kb" | "problems"
 >;
 
 // One team's result on one problem, from cp_scores.problems.
@@ -138,8 +164,78 @@ export type ProblemStatus = { solved: boolean; wrong: number };
 // A leaderboard column.
 export type LeaderboardProblem = Pick<CpProblem, "id" | "level" | "title">;
 
-export type ProblemStatusCellProps = {
+// ----- Contest foundation components (design v89) -----
+
+export type LeaderboardCellSize = "sm" | "default" | "lg";
+
+export type LeaderboardProblemCellProps = {
   status: ProblemStatus | null;
+  // sm: phone list (30x24, no wrong count under the check); default: 1440 table (38x30); lg: big screen (56x40).
+  size?: LeaderboardCellSize;
+};
+
+export type LeaderboardLegendProps = {
+  size?: "default" | "lg";
+  className?: string;
+};
+
+export type ProblemStatusBadgeProps = {
+  status: ProblemStatus | null;
+};
+
+export type ScoreDeltaProps = {
+  // cp_submissions.score / SubmissionOutcome.score. null: show nothing (Run, judging, refused).
+  score: number | null;
+  className?: string;
+};
+
+export type ContestBarView = "problems" | "problem" | "leaderboard" | "waiting";
+
+// What the status badge says. Derived from the session (and the team) by contestBarStatus().
+export type ContestBarStatus = "live" | "paused" | "ended" | "disqualified" | "scheduled" | "unscheduled";
+
+export type ContestBarProps = {
+  lang: Locale;
+  context: ContestContext;
+  // The page it sits on: marks the active nav item; the waiting room hides "Problems".
+  view: ContestBarView;
+  round?: ContestRound;
+  disqualified?: boolean;
+};
+
+// One state of the result panel (board cp-02-panel-hasil) for the internal components page.
+export type PanelStateFixture = {
+  id: string;
+  // null: the state has no verdict badge (empty panel, alerts).
+  kind: VerdictBadgeKind | null;
+  score: number | null;
+  passed?: number;
+  total?: number;
+  maxTimeMs?: number;
+  maxMemoryKb?: number;
+  notes: { key: string; params?: Record<string, string | number> }[];
+  // Shown as an Alert instead of a result (busy judge, time up, disqualified).
+  alert?: "warning" | "destructive" | "default";
+};
+
+export type ContestComponentsPreviewProps = {
+  lang: Locale;
+};
+
+export type ContestStatusBadgeProps = {
+  status: ContestBarStatus;
+};
+
+export type ContestTimerProps = {
+  competitionId: string;
+  status: CpSessionStatus;
+  scheduledStartAt: string | null;
+  endsAt: string | null;
+  pausedAt: string | null;
+  // default: contest bar (28px); lg: big screen (56px).
+  size?: "default" | "lg";
+  // Ask the server to end the contest when the countdown reaches zero (off for previews).
+  finishAtZero?: boolean;
 };
 
 export type AdminProblemRow = Pick<CpProblem, "id" | "level" | "difficulty" | "title" | "points" | "is_published" | "time_limit_ms" | "memory_limit_kb"> & {
@@ -205,12 +301,13 @@ export type DifficultyBadgeProps = {
 };
 
 export type VerdictBadgeProps = {
-  verdict: CpVerdict;
+  kind: VerdictBadgeKind;
+  className?: string;
 };
 
-export type OutcomeBadgeProps = {
+// One test case's raw Judge0 verdict (admin submission detail, verdict guide).
+export type TestVerdictBadgeProps = {
   verdict: CpVerdict;
-  alreadySolved: boolean;
 };
 
 export type LeaderboardTableProps = {

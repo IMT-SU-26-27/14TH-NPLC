@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeftIcon, FileCodeIcon, FlaskConicalIcon, XIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
+import { submissionOutcome } from "@/lib/cp/outcome";
 import { getAdminSubmission, listAdminSubmissions, listCpCompetitions, listProblemOptions } from "@/lib/data/cp";
 import { formatPointsDelta, formatTimestamp } from "@/lib/format";
 import { localePath } from "@/lib/i18n/config";
@@ -17,8 +18,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AdminSubmissionsTable } from "@/features/cp/components/admin-submissions-table";
 import { SubmissionCodeViewer } from "@/features/cp/components/submission-code-viewer";
 import { SubmissionFilters } from "@/features/cp/components/submission-filters";
-import { OutcomeBadge } from "@/features/cp/components/outcome-badge";
 import { VerdictBadge } from "@/features/cp/components/verdict-badge";
+import { TestVerdictBadge } from "@/features/cp/components/test-verdict-badge";
 import type { AdminSubmissionPageProps, AdminSubmissionsSectionProps } from "@/types/cp";
 
 function one(value: string | string[] | undefined) {
@@ -139,7 +140,7 @@ export async function AdminSubmissionDetailSection({ params }: AdminSubmissionPa
             {s.team.team_name} · <span className="font-mono text-xs">{s.id}</span>
           </p>
         </div>
-        <OutcomeBadge verdict={s.verdict} alreadySolved={s.already_solved} />
+        <VerdictBadge kind={submissionOutcome(s.verdict, s.already_solved)} />
       </div>
 
       <Card>
@@ -211,7 +212,7 @@ export async function AdminSubmissionDetailSection({ params }: AdminSubmissionPa
                       <Badge variant="outline">{r.test?.is_sample ? t("admin.submissions.sample") : t("admin.submissions.hidden")}</Badge>
                     </TableCell>
                     <TableCell>
-                      <VerdictBadge verdict={r.verdict} />
+                      <TestVerdictBadge verdict={r.verdict} />
                     </TableCell>
                     <TableCell className="text-muted-foreground text-right tabular-nums">{r.time_ms === null ? "—" : `${r.time_ms} ms`}</TableCell>
                     <TableCell className="text-muted-foreground text-right tabular-nums">

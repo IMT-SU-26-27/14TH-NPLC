@@ -101,7 +101,18 @@ export async function runSamples(input: CodeSubmissionInput): Promise<ActionResu
 
   try {
     const summary = await judge(parsed.data, access.problem, samples);
-    return { ok: true, data: { ...summary, submissionId: null, score: 0, alreadySolved: false, points: access.problem.points } };
+    return {
+      ok: true,
+      data: {
+        ...summary,
+        submissionId: null,
+        score: 0,
+        alreadySolved: false,
+        points: access.problem.points,
+        previousBestTimeMs: null,
+        submissionNumber: null,
+      },
+    };
   } catch (error) {
     return { ok: false, message: error instanceof Judge0Error ? "cp.errors.judgeUnavailable" : "errors.generic" };
   }
@@ -120,7 +131,7 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
   const admin = createSupabaseAdminClient();
 
   // Cooldown checked before spending Judge0 time; the database trigger checks it again on insert.
-  const [{ data: session }, { data: last }] = await Promise.all([
+  const [{ data: session }, { data: last }, { data: best }] = await Promise.all([
     admin.from("cp_sessions").select("submission_cooldown_seconds, scheduled_end_at").eq("competition_id", problem.competition_id).single(),
     admin
       .from("cp_submissions")
@@ -128,6 +139,13 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
       .eq("registration_id", registrationId)
       .order("created_at", { ascending: false })
       .limit(1)
+      .maybeSingle(),
+    // The best runtime before this submission, so a repeat Accepted can say whether it was faster.
+    admin
+      .from("cp_problem_scores")
+      .select("solved, best_time_ms")
+      .eq("registration_id", registrationId)
+      .eq("problem_id", problem.id)
       .maybeSingle(),
   ]);
   // Strict deadline on arrival; the database allows a short grace only for code already being judged.
@@ -191,6 +209,12 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
     })),
   );
 
+  const { count } = await admin
+    .from("cp_submissions")
+    .select("id", { count: "exact", head: true })
+    .eq("registration_id", registrationId)
+    .eq("problem_id", problem.id);
+
   refresh();
   return {
     ok: true,
@@ -200,6 +224,8 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
       score: Number(submission.score),
       alreadySolved: submission.already_solved,
       points: problem.points,
+      previousBestTimeMs: best?.solved ? best.best_time_ms : null,
+      submissionNumber: count ?? null,
     },
   };
 }

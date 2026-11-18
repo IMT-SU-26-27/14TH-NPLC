@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { FileCodeIcon } from "lucide-react";
 import { formatPointsDelta, formatTimestamp } from "@/lib/format";
+import { submissionOutcome } from "@/lib/cp/outcome";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TablePagination } from "@/components/shared/table-pagination";
-import { OutcomeBadge } from "@/features/cp/components/outcome-badge";
+import { VerdictBadge } from "@/features/cp/components/verdict-badge";
 import type { AdminSubmissionsTableProps, SubmissionFilters } from "@/types/cp";
 import type { Locale } from "@/types/i18n";
 
@@ -70,7 +71,7 @@ export function AdminSubmissionsTable({ list, filters, competitionId, lang }: Ad
                 </TableCell>
                 <TableCell>{t(`cp.languages.${s.language}`)}</TableCell>
                 <TableCell>
-                  <OutcomeBadge verdict={s.verdict} alreadySolved={s.already_solved} />
+                  <VerdictBadge kind={submissionOutcome(s.verdict, s.already_solved)} />
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {s.passed}/{s.total}

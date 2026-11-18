@@ -245,6 +245,7 @@ export type Database = {
           competition_id: string
           problems: Json
           registration_id: string
+          school: string | null
           solved: number
           team_name: string
           total_memory_kb: number
@@ -255,6 +256,7 @@ export type Database = {
           competition_id: string
           problems?: Json
           registration_id: string
+          school?: string | null
           solved?: number
           team_name: string
           total_memory_kb?: number
@@ -265,6 +267,7 @@ export type Database = {
           competition_id?: string
           problems?: Json
           registration_id?: string
+          school?: string | null
           solved?: number
           team_name?: string
           total_memory_kb?: number
@@ -424,6 +427,7 @@ export type Database = {
           competition_id: string
           problems: Json
           registration_id: string
+          school: string | null
           solved: number
           team_name: string
           total_memory_kb: number
@@ -435,6 +439,7 @@ export type Database = {
           competition_id: string
           problems?: Json
           registration_id: string
+          school?: string | null
           solved?: number
           team_name: string
           total_memory_kb?: number
@@ -446,6 +451,7 @@ export type Database = {
           competition_id?: string
           problems?: Json
           registration_id?: string
+          school?: string | null
           solved?: number
           team_name?: string
           total_memory_kb?: number
