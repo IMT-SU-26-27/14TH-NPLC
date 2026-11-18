@@ -35,6 +35,8 @@ export type CompetitionPickerItem = {
   earlyFee: string | null;
   earlyRange: string | null;
   open: boolean;
+  // Registration paused by the admin (opening time moved into the future).
+  paused: boolean;
   // Registration is open but the team quota is reached.
   full: boolean;
   closesLabel: string | null;
@@ -52,6 +54,8 @@ export type CompetitionPickerProps = {
     earlyPrice: string;
     open: string;
     closed: string;
+    maintenance: string;
+    registrationMaintenance: string;
     registrationClosed: string;
     full: string;
     quotaFull: string;

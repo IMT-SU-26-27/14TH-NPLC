@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CircleOffIcon, UsersIcon } from "lucide-react";
 import { requireUser } from "@/lib/data/auth";
-import { getActiveCompetitionBySlug, getCompetitionTeamCounts, isQuotaFull, isRegistrationOpen } from "@/lib/data/competitions";
+import { getActiveCompetitionBySlug, getCompetitionTeamCounts, isQuotaFull, isRegistrationOpen, isRegistrationPaused } from "@/lib/data/competitions";
 import { hasRegistration } from "@/lib/data/registrations";
 import { formatRupiah, formatTeamSize } from "@/lib/format";
 import { currentFee } from "@/lib/pricing";
@@ -29,6 +29,7 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
   if (await hasRegistration(user.id)) redirect(`${localePath(lang, "/dashboard")}?notice=already-registered`);
 
   if (!competition || !isRegistrationOpen(competition)) {
+    const closedKey = competition && isRegistrationPaused(competition) ? "register.maintenance" : "register.closed";
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-16">
         <Empty className="bg-card border">
@@ -36,8 +37,8 @@ export async function RegisterSection({ params }: RegisterSectionProps) {
             <EmptyMedia variant="icon">
               <CircleOffIcon />
             </EmptyMedia>
-            <EmptyTitle>{competition ? t("register.closedTitle") : t("register.notFoundTitle")}</EmptyTitle>
-            <EmptyDescription>{competition ? t("register.closedDescription") : t("register.notFoundDescription")}</EmptyDescription>
+            <EmptyTitle>{competition ? t(`${closedKey}Title`) : t("register.notFoundTitle")}</EmptyTitle>
+            <EmptyDescription>{competition ? t(`${closedKey}Description`) : t("register.notFoundDescription")}</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Link href={sectionHref(lang, "competitions")} className={buttonVariants({ variant: "outline" })}>
