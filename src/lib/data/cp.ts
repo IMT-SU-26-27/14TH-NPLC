@@ -14,6 +14,7 @@ import type {
   FocusEventRow,
   FocusFilters,
   FocusSummaryRow,
+  LeaderboardProblem,
   LeaderboardRow,
   ProblemView,
   RecentSubmission,
@@ -132,12 +133,24 @@ export async function getLeaderboard(competitionId: string, source: "live" | "sn
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from(source === "live" ? "cp_scores" : "cp_leaderboard_snapshots")
-    .select("registration_id, team_name, total_points, solved, total_runtime_ms, total_memory_kb")
+    .select("registration_id, team_name, total_points, solved, total_runtime_ms, total_memory_kb, problems")
     .eq("competition_id", competitionId)
     .order("total_points", { ascending: false })
     .order("total_runtime_ms", { ascending: true })
     .order("total_memory_kb", { ascending: true })
     .order("team_name", { ascending: true });
+  return data ?? [];
+}
+
+// The leaderboard's problem columns: published problems in level order (participants only see them while live).
+export async function listLeaderboardProblems(competitionId: string): Promise<LeaderboardProblem[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from("cp_problems")
+    .select("id, level, title")
+    .eq("competition_id", competitionId)
+    .eq("is_published", true)
+    .order("level");
   return data ?? [];
 }
 
