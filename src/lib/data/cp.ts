@@ -10,6 +10,7 @@ import type {
   SubmissionFilters,
   ContestContext,
   ContestProblemListItem,
+  CpRound,
   CpTeamResult,
   CpSessionStatus,
   FocusEventRow,
@@ -70,24 +71,39 @@ export async function getCpTeamResult(): Promise<CpTeamResult | null> {
   const { data: access } = await supabase.rpc("cp_access");
   const ids = (access ?? []).map((row) => row.registration_id);
   if (ids.length === 0) return null;
-  const { data } = await supabase
+  const [{ data: session }, { data }] = await Promise.all([
+    supabase.from("cp_sessions").select("finalists_announced_at, round").eq("competition_id", access![0].competition_id).maybeSingle(),
+    supabase
     .from("registrations")
     .select("team_name, disqualified_at, disqualification_reason")
     .in("id", ids)
     .order("disqualified_at", { ascending: false, nullsFirst: false })
     .limit(1)
-    .maybeSingle();
+    .maybeSingle(),
+  ]);
   if (!data) return null;
-  return { teamName: data.team_name, disqualifiedAt: data.disqualified_at, reason: data.disqualification_reason };
+  const known = !!session?.finalists_announced_at || session?.round === "final";
+  return {
+    teamName: data.team_name,
+    disqualifiedAt: data.disqualified_at,
+    reason: data.disqualification_reason,
+    qualification: known ? (access!.some((row) => row.is_finalist) ? "qualified" : "notQualified") : null,
+  };
 }
 
-export async function listContestProblems(competitionId: string, registrationId: string | null): Promise<ContestProblemListItem[]> {
+// Only the problems of the session's current round (participants are also limited by RLS).
+export async function listContestProblems(
+  competitionId: string,
+  registrationId: string | null,
+  round: CpRound,
+): Promise<ContestProblemListItem[]> {
   const supabase = await createSupabaseServerClient();
   const [{ data: problems }, { data: scores }] = await Promise.all([
     supabase
       .from("cp_problems")
       .select("id, level, difficulty, title, points")
       .eq("competition_id", competitionId)
+      .eq("round", round)
       .eq("is_published", true)
       .order("level"),
     registrationId
@@ -150,16 +166,31 @@ export async function getLeaderboard(competitionId: string, source: "live" | "sn
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from(source === "live" ? "cp_scores" : "cp_leaderboard_snapshots")
-    .select("registration_id, team_name, total_points, solved, total_runtime_ms, total_memory_kb")
+    .select("registration_id, team_name, total_points, solved, total_runtime_ms, total_memory_kb, last_solved_at")
     .eq("competition_id", competitionId)
     .order("total_points", { ascending: false })
     .order("total_runtime_ms", { ascending: true })
     .order("total_memory_kb", { ascending: true })
+    // Still tied: the team that reached its score first.
+    .order("last_solved_at", { ascending: true, nullsFirst: false })
     .order("team_name", { ascending: true });
   return data ?? [];
 }
 
 // ----- Admin -----
+
+// The finalist picker: who is picked, and which teams are disqualified (never suggested).
+export async function getFinalistPicks(competitionId: string): Promise<{ finalistIds: string[]; disqualifiedIds: string[] }> {
+  const supabase = await createSupabaseServerClient();
+  const [{ data: finalists }, { data: disqualified }] = await Promise.all([
+    supabase.from("cp_finalists").select("registration_id").eq("competition_id", competitionId),
+    supabase.from("registrations").select("id").eq("competition_id", competitionId).not("disqualified_at", "is", null),
+  ]);
+  return {
+    finalistIds: (finalists ?? []).map((f) => f.registration_id),
+    disqualifiedIds: (disqualified ?? []).map((r) => r.id),
+  };
+}
 
 export async function listCpCompetitions(): Promise<CompetitionOption[]> {
   const supabase = await createSupabaseServerClient();
@@ -175,8 +206,9 @@ export async function getAdminContest(competitionId: string): Promise<AdminConte
     supabase.from("cp_sessions").select("*").eq("competition_id", competitionId).maybeSingle(),
     supabase
       .from("cp_problems")
-      .select("id, level, difficulty, title, points, is_published, time_limit_ms, memory_limit_kb, cp_test_cases(count)")
+      .select("id, level, round, difficulty, title, points, is_published, time_limit_ms, memory_limit_kb, cp_test_cases(count)")
       .eq("competition_id", competitionId)
+      .order("round")
       .order("level"),
   ]);
   if (!competition || !session) return null;

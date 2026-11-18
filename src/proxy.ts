@@ -82,7 +82,10 @@ export async function proxy(request: NextRequest) {
         if (!onResult) return to("/cp/result");
         return withLocale(response());
       }
-      if (onResult) return to("/dashboard");
+      // Once the final has started, teams that did not make it only see the results page.
+      const finalRound = access.some((row) => row.round === "final");
+      if (finalRound && !access.some((row) => row.is_finalist)) return onResult ? withLocale(response()) : to("/cp/result");
+      if (onResult) return withLocale(response());
 
       const status = access.some((row) => row.session_status === "live")
         ? "live"

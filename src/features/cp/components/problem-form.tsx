@@ -18,9 +18,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Markdown } from "@/components/shared/markdown";
-import { CP_DIFFICULTIES } from "@/lib/validations/cp";
+import { CP_DIFFICULTIES, CP_ROUNDS } from "@/lib/validations/cp";
 import type { FieldErrors } from "@/types";
-import type { CpDifficulty, ProblemFormProps } from "@/types/cp";
+import type { CpDifficulty, CpRound, ProblemFormProps } from "@/types/cp";
 
 export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
   const { t, href, fieldErrors } = useI18n();
@@ -30,6 +30,8 @@ export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
   const [statement, setStatement] = useState(problem?.statement ?? "");
   const [published, setPublished] = useState(problem?.is_published ?? false);
   const [difficulty, setDifficulty] = useState<CpDifficulty>(problem?.difficulty ?? "easy");
+  const [round, setRound] = useState<CpRound>(problem?.round ?? "preliminary");
+  const roundItems = CP_ROUNDS.map((value) => ({ value, label: t(`admin.cp.round.${value}`) }));
   const difficultyItems = CP_DIFFICULTIES.map((value) => ({ value, label: t(`cp.difficulty.${value}`) }));
   const tests = useTestCases(
     (problem?.testCases ?? []).map((c) => ({ input: c.input, expectedOutput: c.expected_output, isSample: c.is_sample })),
@@ -43,6 +45,7 @@ export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
         id: problem?.id,
         competitionId,
         level: Number(data.get("level")),
+        round,
         difficulty,
         title: String(data.get("title") ?? ""),
         statement,
@@ -74,7 +77,23 @@ export function ProblemForm({ competitionId, problem }: ProblemFormProps) {
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-[8rem_10rem_1fr_8rem]">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-[10rem_7rem_9rem_1fr_7rem]">
+              <Field data-invalid={!!errors.round}>
+                <FieldLabel htmlFor="round">{t("admin.cp.form.round")}</FieldLabel>
+                <Select items={roundItems} value={round} onValueChange={(v) => v && setRound(v as CpRound)}>
+                  <SelectTrigger id="round" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roundItems.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={fieldErrors(errors.round)} />
+              </Field>
               <Field data-invalid={!!errors.level}>
                 <FieldLabel htmlFor="level">{t("admin.cp.form.level")}</FieldLabel>
                 <Input id="level" name="level" type="number" min={1} defaultValue={problem?.level ?? 1} required />

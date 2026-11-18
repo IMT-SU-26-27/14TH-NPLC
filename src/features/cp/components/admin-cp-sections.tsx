@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeftIcon, EyeOffIcon, FileCodeIcon, ListChecksIcon, PlusIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
-import { getAdminContest, getAdminProblem, getLeaderboard, listCpCompetitions } from "@/lib/data/cp";
+import { getAdminContest, getAdminProblem, getFinalistPicks, getLeaderboard, listCpCompetitions } from "@/lib/data/cp";
 import { localePath } from "@/lib/i18n/config";
 import { getT } from "@/lib/i18n/get-dictionary";
 import { resolveLang } from "@/lib/i18n/server";
@@ -15,6 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ContestControl } from "@/features/cp/components/contest-control";
 import { DifficultyBadge } from "@/features/cp/components/difficulty-badge";
 import { DeleteProblemButton } from "@/features/cp/components/delete-problem-button";
+import { FinalRoundCard } from "@/features/cp/components/final-round-card";
 import { ProblemForm } from "@/features/cp/components/problem-form";
 import { LeaderboardFreezeButton } from "@/features/cp/components/leaderboard-freeze-button";
 import { LeaderboardTable } from "@/features/cp/components/leaderboard-table";
@@ -38,7 +39,11 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
       </Empty>
     );
   }
-  const [contest, leaderboard] = await Promise.all([getAdminContest(selected.id), getLeaderboard(selected.id)]);
+  const [contest, leaderboard, picks] = await Promise.all([
+    getAdminContest(selected.id),
+    getLeaderboard(selected.id),
+    getFinalistPicks(selected.id),
+  ]);
   if (!contest) notFound();
 
   return (
@@ -57,6 +62,7 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
         </div>
       )}
       <ContestControl contest={contest} />
+      <FinalRoundCard contest={contest} standings={leaderboard} finalistIds={picks.finalistIds} disqualifiedIds={picks.disqualifiedIds} />
       <Card>
         <CardHeader>
           <CardTitle>{t("cp.leaderboard")}</CardTitle>
@@ -112,6 +118,7 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>{t("admin.cp.form.round")}</TableHead>
                   <TableHead className="w-16">{t("admin.cp.form.level")}</TableHead>
                   <TableHead>{t("admin.cp.form.titleLabel")}</TableHead>
                   <TableHead>{t("admin.cp.form.difficulty")}</TableHead>
@@ -124,6 +131,9 @@ export async function AdminCpSection({ lang, searchParams }: AdminCpSectionProps
               <TableBody>
                 {contest.problems.map((p) => (
                   <TableRow key={p.id}>
+                    <TableCell>
+                      <Badge variant={p.round === "final" ? "secondary" : "outline"}>{t(`admin.cp.round.${p.round}`)}</Badge>
+                    </TableCell>
                     <TableCell className="tabular-nums">{p.level}</TableCell>
                     <TableCell>
                       <Link href={localePath(lang, `/admin/cp/problems/${p.id}`)} className="font-medium underline-offset-4 hover:underline">

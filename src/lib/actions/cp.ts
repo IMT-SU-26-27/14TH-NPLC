@@ -176,6 +176,8 @@ export async function submitSolution(input: CodeSubmissionInput): Promise<Action
     if (error.message.startsWith("Please wait")) return { ok: false, message: "cp.errors.cooldown", params: { seconds: cooldown } };
     if (error.message.startsWith("The contest is not running")) return { ok: false, message: "cp.errors.notLive" };
     if (error.message.startsWith("This team has been disqualified")) return { ok: false, message: "cp.errors.disqualified" };
+    if (error.message.startsWith("This team is not in the final")) return { ok: false, message: "cp.errors.notFinalist" };
+    if (error.message.startsWith("This problem is not part of the current round")) return { ok: false, message: "cp.errors.notAvailable" };
     if (error.message.startsWith("The contest time is over")) return { ok: false, message: "cp.errors.timeUp" };
     return { ok: false, message: "errors.generic" };
   }

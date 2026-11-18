@@ -6,7 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { notifyContestStatus } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
-import { contestStatusSchema, leaderboardFreezeSchema, problemSchema, sessionSchema } from "@/lib/validations/cp";
+import { contestStatusSchema, finalistsSchema, leaderboardFreezeSchema, problemSchema, sessionSchema } from "@/lib/validations/cp";
 import { uuidSchema } from "@/lib/validations/admin";
 import type { ActionResult, FieldErrors, FormState } from "@/types";
 import type { CpSessionStatus, ProblemInput } from "@/types/cp";
@@ -32,6 +32,7 @@ export async function saveProblem(input: ProblemInput): Promise<ActionResult<{ i
     p_problem: {
       id: p.id,
       competition_id: p.competitionId,
+      round: p.round,
       level: p.level,
       difficulty: p.difficulty,
       title: p.title,
@@ -148,4 +149,59 @@ export async function setLeaderboardFrozen(competitionId: string, frozen: boolea
 
   refresh();
   return { ok: true, data: undefined, message: parsed.data.frozen ? "admin.cp.leaderboardFrozenDone" : "admin.cp.leaderboardUnfrozenDone" };
+}
+
+// ----- Final round -----
+
+// Replaces the competition's finalists with the picked teams.
+export async function saveFinalists(competitionId: string, registrationIds: string[]): Promise<ActionResult> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  const parsed = finalistsSchema.safeParse({ competitionId, registrationIds });
+  if (!parsed.success) return { ok: false, message: "errors.invalidRequest" };
+  const { competitionId: id, registrationIds: ids } = parsed.data;
+
+  const supabase = await createSupabaseServerClient();
+  const remove = supabase.from("cp_finalists").delete().eq("competition_id", id);
+  const { error: deleteError } = await (ids.length ? remove.not("registration_id", "in", `(${ids.join(",")})`) : remove);
+  if (deleteError) return { ok: false, message: databaseErrorMessage(deleteError) };
+  if (ids.length) {
+    const { error } = await supabase
+      .from("cp_finalists")
+      .upsert(ids.map((registration_id) => ({ registration_id, competition_id: id })), { ignoreDuplicates: true });
+    if (error) return { ok: false, message: databaseErrorMessage(error) };
+  }
+
+  refresh();
+  return { ok: true, data: undefined, message: "admin.cp.final.saved" };
+}
+
+// Lets the teams see whether they made the final (/cp/result), or hides it again.
+export async function setFinalistsAnnounced(competitionId: string, announced: boolean): Promise<ActionResult> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  const id = uuidSchema.safeParse(competitionId);
+  if (!id.success) return { ok: false, message: "errors.invalidRequest" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("cp_sessions")
+    .update({ finalists_announced_at: announced ? new Date().toISOString() : null })
+    .eq("competition_id", id.data);
+  if (error) return { ok: false, message: databaseErrorMessage(error) };
+
+  refresh();
+  return { ok: true, data: undefined, message: announced ? "admin.cp.final.announcedDone" : "admin.cp.final.hiddenDone" };
+}
+
+// Archives the preliminary standings, resets every score and moves the session to the final (cp_start_final).
+export async function startFinalRound(competitionId: string): Promise<ActionResult> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  const id = uuidSchema.safeParse(competitionId);
+  if (!id.success) return { ok: false, message: "errors.invalidRequest" };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.rpc("cp_start_final", { p_competition_id: id.data });
+  if (error) return { ok: false, message: databaseErrorMessage(error) };
+
+  refresh();
+  return { ok: true, data: undefined, message: "admin.cp.final.started" };
 }
