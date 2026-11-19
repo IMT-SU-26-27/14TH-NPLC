@@ -910,7 +910,7 @@ export const en: Dictionary = {
       cells: "Leaderboard problem cells",
       cellsLead: "Sizes sm (phone), default (1440) and lg (big screen), then the legend.",
       board: "Leaderboard (cp-05)",
-      boardLead: "Example rows with cells, a negative score, your team's row, and the closed-leaderboard notice.",
+      boardLead: "Example rows with cells, a zero score, your team's row, and the closed-leaderboard notice.",
       bigTimer: "Big screen time left",
     },
     focus: {
@@ -1366,7 +1366,7 @@ export const en: Dictionary = {
         colScore: "Score",
         colRuntime: "Total runtime (s)",
         colMemory: "Total memory (MB)",
-        footnote: "Total runtime = sum of the best runtime for each Accepted problem. Scores can be negative because every wrong answer costs points.",
+        footnote: "Total runtime = sum of the best runtime for each Accepted problem. Every wrong answer costs 10 points, but a total never goes below 0.",
         empty: "No teams on the leaderboard yet",
       },
       qualification: {
