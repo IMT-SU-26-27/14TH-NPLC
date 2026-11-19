@@ -11,6 +11,8 @@ const phone = z
 const nisn = z.string().trim().regex(/^[0-9]{10}$/, "validation.nisn");
 
 const fullName = z.string().trim().min(2, "validation.fullName").max(100);
+// The name on the bank account the fee was sent from, as it appears in the bank statement.
+const payerName = z.string().trim().min(2, "validation.payerName").max(100, "validation.payerName");
 
 export const schoolSchema = z.string().trim().min(2, "validation.school").max(120, "validation.school");
 
@@ -53,6 +55,7 @@ export const createRegistrationSchema = z.object({
   leaderName: fullName,
   leaderPhone: phone,
   leaderNisn: nisn,
+  payerName,
   twibbonPostUrl,
 });
 
@@ -70,6 +73,7 @@ export const submitPaymentSchema = z.object({
   registrationId: z.uuid(),
   publicId: z.string().min(1),
   format: z.enum(PAYMENT_PROOF_FORMATS),
+  payerName,
 });
 
 export const registrationIdSchema = z.uuid();
