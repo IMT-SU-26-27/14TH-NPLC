@@ -50,6 +50,7 @@ export type Team = Pick<
   | "leader_id"
   | "payment_proof_public_id"
   | "payment_submitted_at"
+  | "payer_name"
   | "rejection_reason"
   | "created_at"
 > & {

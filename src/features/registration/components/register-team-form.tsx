@@ -5,7 +5,7 @@ import { ArrowRightIcon, IdCardIcon, MailIcon, MessageCircleIcon, OctagonXIcon, 
 import { createRegistration, getNewRegistrationUploadSignature } from "@/lib/actions/registration";
 import { PAYMENT_PROOF_MAX_BYTES } from "@/lib/upload-limits";
 import { fieldErrorState, initialFormState } from "@/lib/form";
-import { isPaymentReady } from "@/lib/payment";
+import { isPaymentReady, transferNote } from "@/lib/payment";
 import { createRegistrationSchema } from "@/lib/validations/registration";
 import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload";
 import { useFormDraft } from "@/hooks/use-form-draft";
@@ -36,6 +36,7 @@ const typedFieldsSchema = createRegistrationSchema.pick({
   leaderName: true,
   leaderPhone: true,
   leaderNisn: true,
+  payerName: true,
   twibbonPostUrl: true,
 });
 
@@ -54,7 +55,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
   const { formRef, restored: draftRestored, savedAt: draftSavedAt, discardDraft, clearOnSuccess } = useFormDraft({ formId: `register-team-${competition.slug}`, userId: user.id });
   const [state, action, pending] = useActionState(clearOnSuccess(createRegistration), initialFormState);
   const { t, fieldErrors } = useI18n();
-  const [teamName, setTeamName] = useState("");
+  const [leaderName, setLeaderName] = useState(user.full_name ?? "");
   const [clientErrors, setClientErrors] = useState<FieldErrors>({});
   const [file, setFile] = useState<File | null>(null);
   const [missingProof, setMissingProof] = useState(false);
@@ -68,10 +69,10 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
   const busy = uploading || pending;
   const hasClientErrors = Object.values(clientErrors).some(Boolean);
 
-  // The draft hook fills the inputs without firing events, so read the restored team name for the transfer note.
+  // The draft hook fills the inputs without firing events, so read the restored leader name for the transfer note.
   useEffect(() => {
-    const input = formRef.current?.elements.namedItem("teamName");
-    if (input instanceof HTMLInputElement) setTeamName(input.value);
+    const input = formRef.current?.elements.namedItem("leaderName");
+    if (input instanceof HTMLInputElement) setLeaderName(input.value);
   }, [draftRestored, formRef]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -89,7 +90,8 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
     setMissingTwibbon(twibbonMissing);
     if (!typed.success || proofMissing || twibbonMissing) {
       // Field ids match their names, so the first problem in form order gets the focus.
-      const first = FIELD_ORDER.find((name) => nextErrors[name]) ?? (proofMissing ? "paymentProof" : "twibbonPostUrl");
+      const first =
+        FIELD_ORDER.find((name) => nextErrors[name]) ?? (proofMissing ? "paymentProof" : nextErrors.payerName ? "payerName" : "twibbonPostUrl");
       document.getElementById(first)?.focus();
       return;
     }
@@ -141,7 +143,6 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
                 maxLength={60}
                 aria-invalid={!!errors.teamName}
                 required
-                onChange={(e) => setTeamName(e.target.value)}
               />
             </InputGroup>
             <FieldDescription>{t("register.teamNameHint")}</FieldDescription>
@@ -173,7 +174,15 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
             <InputGroupAddon>
               <UserIcon />
             </InputGroupAddon>
-            <InputGroupInput id="leaderName" name="leaderName" defaultValue={user.full_name} autoComplete="name" aria-invalid={!!errors.leaderName} required />
+            <InputGroupInput
+              id="leaderName"
+              name="leaderName"
+              defaultValue={user.full_name}
+              autoComplete="name"
+              aria-invalid={!!errors.leaderName}
+              required
+              onChange={(e) => setLeaderName(e.target.value)}
+            />
           </InputGroup>
           <FieldError errors={fieldErrors(errors.leaderName)} />
         </Field>
@@ -240,7 +249,7 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
           details={competition}
           fee={fee}
           qrisUrl={qrisUrl}
-          transferNote={`${teamName.trim() || t("register.teamName")} - ${competition.name}`}
+          transferNote={transferNote(leaderName.trim() || t("register.leaderNameFallback"))}
         />
         <Field data-invalid={!!proofError}>
           <FieldLabel htmlFor="paymentProof" className={label}>
@@ -260,6 +269,16 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
           {draftRestored && !file && <FieldDescription className="text-warning">{t("draft.reselectFile")}</FieldDescription>}
           <FieldError errors={proofError ? [{ message: proofError }] : undefined} />
           {uploading && <Progress value={progress} />}
+        </Field>
+        <Field data-invalid={!!errors.payerName}>
+          <FieldLabel htmlFor="payerName" className={label}>
+            {t("payment.payerName")} {requiredMark}
+          </FieldLabel>
+          <InputGroup className="h-12">
+            <InputGroupInput id="payerName" name="payerName" maxLength={100} aria-invalid={!!errors.payerName} required />
+          </InputGroup>
+          <FieldDescription>{t("payment.payerNameHint")}</FieldDescription>
+          <FieldError errors={fieldErrors(errors.payerName)} />
         </Field>
 
         <FieldSeparator />

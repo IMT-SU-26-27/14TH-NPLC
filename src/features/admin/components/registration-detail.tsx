@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { ArrowLeftIcon, ListChecksIcon, ReceiptIcon } from "lucide-react";
 import { requireAdmin } from "@/lib/data/auth";
 import { getRegistrationDetail } from "@/lib/data/admin";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatRupiah } from "@/lib/format";
+import { transferAmount } from "@/lib/payment";
 import { currentFee } from "@/lib/pricing";
 import { privateAssetUrl } from "@/lib/cloudinary/server";
 import Image from "next/image";
@@ -116,17 +117,26 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
                   <dt className="text-muted-foreground">{t("payment.amount")}</dt>
                   {/* Same date as the participant's payment panel: the price when the team registered. */}
                   <dd className="font-medium">
-                    <FeeAmount
-                      fee={currentFee(team.competition.fee, new Date(team.created_at))}
-                      normalFee={team.competition.fee}
-                      lang={lang}
-                      labels={{ normal: t("competition.normalPrice"), early: t("competition.earlyPrice") }}
-                    />
+                    {/* Proofs sent with a sender's name follow the BCA flow: fee plus the unique code. Older ones don't. */}
+                    {team.payer_name ? (
+                      <span className="tabular-nums">{formatRupiah(transferAmount(currentFee(team.competition.fee, new Date(team.created_at))), lang)}</span>
+                    ) : (
+                      <FeeAmount
+                        fee={currentFee(team.competition.fee, new Date(team.created_at))}
+                        normalFee={team.competition.fee}
+                        lang={lang}
+                        labels={{ normal: t("competition.normalPrice"), early: t("competition.earlyPrice") }}
+                      />
+                    )}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">{t("admin.registrations.paymentSubmitted")}</dt>
                   <dd className="font-medium">{formatDateTime(team.payment_submitted_at, lang)}</dd>
+                </div>
+                <div className="col-span-2">
+                  <dt className="text-muted-foreground">{t("payment.payerName")}</dt>
+                  <dd className="font-medium break-words">{team.payer_name ?? t("admin.detail.payerNameMissing")}</dd>
                 </div>
               </dl>
               {team.payment_proof_public_id ? (
