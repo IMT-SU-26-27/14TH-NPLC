@@ -21,6 +21,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261110200000_members_admin_only.sql` | Only admins remove a member, in every status: leaders no longer remove members and members no longer leave (policy "members: admin removes"). `private.registration_accepted` is dropped. Joining with the code is unchanged |
 | `20261110210000_registration_events_without_realtime.sql` | `registration_events` leaves the `supabase_realtime` publication: realtime is for the CP and Rally contests only. The dashboard and the admin registrations list refresh when the tab is opened again (at most every 30 s) or with "Muat ulang" |
 | `20261110220000_auto_freeze_leaderboards.sql` | The participants' leaderboard (CP and Rally) closes on its own `private.leaderboard_freeze_minutes()` (60, FREEZE_MINUTES) before the end: `cp_sessions.scheduled_end_at`, and the new `rally_sessions.scheduled_end_at` set in Admin → Rally. New columns `leaderboard_frozen_auto` and `leaderboard_released_at` on both session tables; `cp_leaderboard_freeze_check()` / `rally_leaderboard_freeze_check()` for the pages |
+| `20261119100000_payment_payer_name.sql` | `registrations.payer_name`: the name on the account the fee was sent from, entered with the payment proof so finance can match the bank statement. `create_registration()` takes `p_payer_name`; a leader changes it only with a new proof (`registrations_guard_payer_name`) |
 
 Where migrations are applied, and how each database keeps track:
 

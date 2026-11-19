@@ -1193,6 +1193,7 @@ export type Database = {
           leader_id: string
           payment_proof_format: string | null
           payment_proof_public_id: string | null
+          payer_name: string | null
           payment_submitted_at: string | null
           rally_qr_token: string
           referral_code: string
@@ -1212,6 +1213,7 @@ export type Database = {
           leader_id?: string
           payment_proof_format?: string | null
           payment_proof_public_id?: string | null
+          payer_name?: string | null
           payment_submitted_at?: string | null
           rally_qr_token?: string
           referral_code?: string
@@ -1231,6 +1233,7 @@ export type Database = {
           leader_id?: string
           payment_proof_format?: string | null
           payment_proof_public_id?: string | null
+          payer_name?: string | null
           payment_submitted_at?: string | null
           rally_qr_token?: string
           referral_code?: string
@@ -1431,6 +1434,7 @@ export type Database = {
           p_team_name: string
           p_twibbon_proof_format?: string
           p_twibbon_proof_public_id?: string
+          p_payer_name?: string
           p_twibbon_post_url?: string
         }
         Returns: string

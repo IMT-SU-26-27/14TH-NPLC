@@ -18,7 +18,7 @@ Registration and contest platform for the 14th NPLC (National Programming & Logi
 ## Operating Context
 
 - Several competitions can run at once. Currently: Competitive Programming (online contest on this site) and Category 2 (logic; registration only for now).
-- Payment is manual: the admin uploads a QRIS image per competition, the leader pays and uploads proof, an admin verifies it. No payment gateway (no Midtrans/Xendit).
+- Payment is manual: the leader transfers the fee plus a unique code of 2 (Rp 85.000 is sent as Rp 85.002) to the BCA account shown on the registration form, with the note NPLC-<leader name>, uploads the proof with the sender's name, and an admin matches it against the bank statement. No QRIS and no payment gateway (no Midtrans/Xendit).
 - The CP contest opens only when an admin presses start; participants wait in a waiting room until then. Problems are levels with sample and hidden test cases; languages are Python, C++ and Java.
 - Times are Indonesian Western Time (WIB).
 
