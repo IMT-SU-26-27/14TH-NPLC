@@ -679,7 +679,7 @@ export const en: Dictionary = {
     accepted: "Accepted",
     acceptedDescription: "You're in the competition",
     rejected: "Rejected",
-    rejectedDescription: "Fix the issue and send the payment proof again",
+    rejectedDescription: "Read the reason, then resend your payment",
     final: "Final decision",
     history: "Status history ({count})",
     registered: "Registered & paid",
