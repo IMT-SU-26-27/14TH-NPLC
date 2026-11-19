@@ -685,7 +685,7 @@ export const id = {
     accepted: "Diterima",
     acceptedDescription: "Kamu sudah masuk lomba",
     rejected: "Ditolak",
-    rejectedDescription: "Perbaiki lalu kirim ulang bukti bayar",
+    rejectedDescription: "Baca alasannya, lalu kirim ulang pembayaran",
     final: "Keputusan akhir",
     history: "Riwayat status ({count})",
     registered: "Terdaftar & dibayar",
