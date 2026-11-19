@@ -36,6 +36,7 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
     leaderName: formData.get("leaderName"),
     leaderPhone: formData.get("leaderPhone"),
     leaderNisn: formData.get("leaderNisn"),
+    payerName: formData.get("payerName"),
     twibbonPostUrl: formData.get("twibbonPostUrl") ?? "",
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
@@ -66,6 +67,7 @@ export async function createRegistration(_prev: FormState, formData: FormData): 
     p_payment_proof_format: format,
     // The twibbon proof is a link to the Instagram post; nothing is uploaded for it any more.
     p_twibbon_post_url: parsed.data.twibbonPostUrl,
+    p_payer_name: parsed.data.payerName,
   });
   if (error) {
     await deleteAsset(publicId, "authenticated");
@@ -146,9 +148,11 @@ export async function getPaymentUploadSignature(registrationId: string): Promise
 // Attaches the uploaded proof and sends the registration for review.
 export async function submitPayment(input: SubmitPaymentInput): Promise<ActionResult> {
   const parsed = submitPaymentSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, message: "errors.uploadAgain" };
+  if (!parsed.success) {
+    return { ok: false, message: parsed.error.issues.some((i) => i.path[0] === "payerName") ? "validation.payerName" : "errors.uploadAgain" };
+  }
 
-  const { registrationId, publicId } = parsed.data;
+  const { registrationId, publicId, payerName } = parsed.data;
   const proof = await verifyUpload(publicId, "authenticated", paymentProofFolder(registrationId), PROOF_RULES);
   if (!proof.ok) return { ok: false, message: uploadErrorKey(proof.reason) };
   const format = proof.format;
@@ -162,7 +166,7 @@ export async function submitPayment(input: SubmitPaymentInput): Promise<ActionRe
 
   const { data, error } = await supabase
     .from("registrations")
-    .update({ payment_proof_public_id: publicId, payment_proof_format: format, status: "under_review" })
+    .update({ payment_proof_public_id: publicId, payment_proof_format: format, payer_name: payerName, status: "under_review" })
     .eq("id", registrationId)
     .select("id");
   if (error) {
