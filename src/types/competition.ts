@@ -43,7 +43,7 @@ export type PaymentInstructionsProps = {
   // What the team pays now, from currentFee(). details.fee is the normal price.
   fee: number;
   qrisUrl: string | null;
-  // "Team Name - Competition", shown with a copy button while registering.
+  // "NPLC-<leader name>" from transferNote(), shown with a copy button.
   transferNote?: string;
 };
 

@@ -11,7 +11,7 @@ import type { HeaderActionsProps } from "@/types/landing";
 
 // Reads the session, so the header renders it inside <Suspense>.
 // Guests get the Home section links (desktop and phone menu); signed-in users get only their account links,
-// as in the design: logo · language · dashboard (· admin) · user menu. The user menu covers the phone.
+// as in the design: logo · language · dashboard · account menu (☰). Admin and, on phones, Dashboard live in the menu.
 export async function HeaderActions({ lang, sections }: HeaderActionsProps) {
   const t = getT(lang);
   const user = await getCurrentUser();
@@ -20,14 +20,12 @@ export async function HeaderActions({ lang, sections }: HeaderActionsProps) {
     return (
       <div className="flex items-center gap-1">
         <LanguageSwitcher />
-        <Link href={localePath(lang, user.role === "lo" ? "/lo" : "/dashboard")} className={buttonVariants({ variant: "ghost", className: "max-sm:hidden" })}>
+        <Link
+          href={localePath(lang, user.role === "lo" ? "/lo" : "/dashboard")}
+          className={buttonVariants({ variant: "ghost", size: "sm", className: "max-sm:hidden" })}
+        >
           {t(user.role === "lo" ? "nav.loPosts" : "nav.dashboard")}
         </Link>
-        {user.role === "admin" && (
-          <Link href={localePath(lang, "/admin")} className={buttonVariants({ variant: "ghost", className: "max-sm:hidden" })}>
-            {t("nav.admin")}
-          </Link>
-        )}
         <UserMenu user={user} />
       </div>
     );

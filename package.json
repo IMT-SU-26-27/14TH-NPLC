@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint --max-warnings=0",
     "sb": "pnpm dlx supabase@2.101.0",
+    "seed:cp": "node --env-file=.env.local scripts/seed-cp-contest.mjs",
     "db:types": "docker exec supabase-meta node -e \"fetch('http://localhost:8080/generators/typescript?included_schemas=public&detect_one_to_one_relationships=true').then(r => r.text()).then(t => process.stdout.write(t))\" > src/types/database.ts"
   },
   "dependencies": {

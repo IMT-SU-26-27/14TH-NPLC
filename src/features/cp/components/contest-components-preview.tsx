@@ -37,7 +37,7 @@ const BOARD_ROWS = [
   { team: "Null Pointer", school: "SMK Contoh 5", score: 470, runtimeMs: 1300, memoryKb: 71885, you: false, cells: [{ solved: true, wrong: 1 }, { solved: true, wrong: 2 }, null, null] },
   { team: "Byte Squad", school: "SMA Contoh 1", score: 250, runtimeMs: 340, memoryKb: 26522, you: true, cells: [{ solved: true, wrong: 2 }, { solved: false, wrong: 1 }, null, null] },
   { team: "Graf Gerilya", school: "SMK Contoh 1", score: 50, runtimeMs: 90, memoryKb: 3994, you: false, cells: [{ solved: true, wrong: 3 }, { solved: false, wrong: 2 }, null, null] },
-  { team: "Heap Heroes", school: "SMA Contoh 13", score: -10, runtimeMs: 0, memoryKb: 0, you: false, cells: [{ solved: false, wrong: 1 }, null, null, null] },
+  { team: "Heap Heroes", school: "SMA Contoh 13", score: 0, runtimeMs: 0, memoryKb: 0, you: false, cells: [{ solved: false, wrong: 1 }, null, null, null] },
 ];
 
 // Internal page for the team building the contest screens: every state of the shared components, with example
