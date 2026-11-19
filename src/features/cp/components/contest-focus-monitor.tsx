@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useFocusMonitor } from "@/hooks/use-focus-monitor";
 import { useI18n } from "@/hooks/use-i18n";
 import { formatDuration } from "@/lib/format";
+import { CP_FOCUS_WARNING_LIMIT } from "@/lib/validations/cp";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
@@ -20,11 +21,22 @@ export function ContestFocusMonitor() {
   const enabled = /\/cp(\/|$)/.test(pathname) && !pathname.includes("/cp/waiting") && !onResult;
   const problemId = PROBLEM_PATH.exec(pathname)?.[1] ?? null;
 
-  const { fullscreen, enterFullscreen } = useFocusMonitor(enabled, problemId, (kind, ms) => {
-    if (kind === "fullscreen_exit") return;
-    toast.warning(t("cp.focus.returnedTitle"), {
-      description: t("cp.focus.returned", { duration: formatDuration(Math.max(1, Math.round(ms / 1000)), lang) }),
-    });
+  const { fullscreen, enterFullscreen } = useFocusMonitor(enabled, problemId, (kind, ms, result) => {
+    const duration = ms === null ? null : formatDuration(Math.max(1, Math.round(ms / 1000)), lang);
+    if (result?.warned) {
+      const reached = result.warnings >= CP_FOCUS_WARNING_LIMIT;
+      (reached ? toast.error : toast.warning)(t("cp.focus.warningTitle", { count: result.warnings, limit: CP_FOCUS_WARNING_LIMIT }), {
+        description: [
+          duration ? t("cp.focus.returned", { duration }) : t("cp.focus.returnedReload"),
+          reached ? t("cp.focus.warningReached") : t("cp.focus.warningRule", { limit: CP_FOCUS_WARNING_LIMIT }),
+        ].join(" "),
+        duration: 15_000,
+      });
+      return;
+    }
+    // Short stretches are recorded but are not warnings; leaving fullscreen briefly gets no toast at all.
+    if (kind === null || kind === "fullscreen_exit" || duration === null) return;
+    toast.info(t("cp.focus.returnedTitle"), { description: t("cp.focus.returned", { duration }) });
   });
 
   // Shown in the waiting room too, so teams can switch to fullscreen before the start; only recorded once live.

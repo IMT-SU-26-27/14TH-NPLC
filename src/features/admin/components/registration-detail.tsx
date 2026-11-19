@@ -23,7 +23,7 @@ import { AdminMembersTable } from "@/features/admin/components/admin-members-tab
 import { AdminTwibbonProofs } from "@/features/admin/components/admin-twibbon-proofs";
 import { RallyQrRegenerateButton } from "@/features/rally/components/rally-qr-regenerate-button";
 import { AdminDeleteButton } from "@/features/admin/components/admin-delete-button";
-import { DisqualificationForm } from "@/features/admin/components/disqualification-form";
+import { DisqualificationForm } from "@/components/shared/disqualification-form";
 import { PaymentProofButton } from "@/features/admin/components/payment-proof-button";
 import { ReviewForm } from "@/features/admin/components/review-form";
 import { TeamNameForm } from "@/features/admin/components/team-name-form";

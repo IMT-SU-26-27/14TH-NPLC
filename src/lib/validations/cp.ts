@@ -102,6 +102,8 @@ export const submissionFiltersSchema = z.object({
 export const CP_FOCUS_KINDS = Constants.public.Enums.cp_focus_kind;
 // Minimum length filter on the admin page, in seconds.
 export const CP_FOCUS_MIN_SECONDS = [0, 5, 30, 120] as const;
+// Warnings after which an admin may disqualify the team (Kenneth, 18 Nov 2026). Never automatic.
+export const CP_FOCUS_WARNING_LIMIT = 3;
 
 export const focusLeaveSchema = z.object({
   kind: z.enum(CP_FOCUS_KINDS),

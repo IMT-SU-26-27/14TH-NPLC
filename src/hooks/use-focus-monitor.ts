@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { closeOpenFocusEvents, recordFocusLeave, recordFocusReturn } from "@/lib/actions/cp-focus";
-import type { CpFocusKind, FocusAwayState } from "@/types/cp";
+import type { CpFocusKind, FocusAwayState, FocusReturnResult } from "@/types/cp";
 
 // Leaving for less than this is a flicker (a dialog of the browser itself, a focus bounce), not a decision.
 const SETTLE_MS = 150;
@@ -15,7 +15,13 @@ function subscribeFullscreen(onChange: () => void) {
 // Records every time the participant leaves the contest page while it is enabled (live contest pages only):
 // the page hidden (another tab, minimised), the browser losing focus (another app or window), and time spent
 // outside fullscreen. The server ignores it unless the team's contest is live, and admins read it in Admin -> CP.
-export function useFocusMonitor(enabled: boolean, problemId: string | null, onReturn: (kind: CpFocusKind, ms: number) => void) {
+// onReturn runs once the server has recorded a return, with whether it became a warning; kind and ms are null for
+// stretches closed by a reload (the page closed while away).
+export function useFocusMonitor(
+  enabled: boolean,
+  problemId: string | null,
+  onReturn: (kind: CpFocusKind | null, ms: number | null, result: FocusReturnResult | null) => void,
+) {
   // Assume fullscreen on the server so the banner never flashes before hydration.
   const fullscreen = useSyncExternalStore(
     subscribeFullscreen,
@@ -34,7 +40,11 @@ export function useFocusMonitor(enabled: boolean, problemId: string | null, onRe
     if (!enabled) return;
 
     // Close anything left open by an earlier load first, so it cannot close the rows this load opens.
-    const ready = closeOpenFocusEvents().catch(() => undefined);
+    const ready = closeOpenFocusEvents()
+      .then((result) => {
+        if (result.ok && result.data?.warned) onReturnRef.current(null, null, result.data);
+      })
+      .catch(() => undefined);
     let away: FocusAwayState | null = null;
     let outsideFullscreen: FocusAwayState | null = null;
     let settle: ReturnType<typeof setTimeout> | undefined;
@@ -49,8 +59,11 @@ export function useFocusMonitor(enabled: boolean, problemId: string | null, onRe
     });
 
     const finish = (state: FocusAwayState) => {
-      void state.id.then((id) => (id ? recordFocusReturn(id) : undefined)).catch(() => undefined);
-      return Date.now() - state.startedAt;
+      const ms = Date.now() - state.startedAt;
+      void state.id
+        .then((id) => (id ? recordFocusReturn(id) : null))
+        .then((result) => onReturnRef.current(state.kind, ms, result?.ok ? result.data : null))
+        .catch(() => undefined);
     };
 
     const check = () => {
@@ -63,7 +76,7 @@ export function useFocusMonitor(enabled: boolean, problemId: string | null, onRe
       } else if (!isAway && away) {
         const left = away;
         away = null;
-        onReturnRef.current(left.kind, finish(left));
+        finish(left);
       } else if (!isAway) {
         clearTimeout(settle);
       }

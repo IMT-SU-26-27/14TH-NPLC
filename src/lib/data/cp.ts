@@ -21,6 +21,7 @@ import type {
   ProblemView,
   RecentSubmission,
   TeamStanding,
+  TeamWarningStatus,
 } from "@/types/cp";
 
 // The contest state of one CP competition, for the dashboard's contest button. Null when there is no session yet.
@@ -354,6 +355,8 @@ export async function listFocusSummary(competitionId: string, filters: FocusFilt
   return (data ?? []).map((r) => ({
     registrationId: r.registration_id,
     teamName: r.team_name,
+    warnings: Number(r.warnings),
+    disqualified: r.disqualified,
     events: Number(r.events),
     totalMs: Number(r.total_ms),
     longestMs: r.longest_ms === null ? null : Number(r.longest_ms),
@@ -365,12 +368,22 @@ export async function listFocusSummary(competitionId: string, filters: FocusFilt
   }));
 }
 
+// One team's warnings and disqualification, for the disqualify button on its activity page.
+export async function getTeamWarningStatus(registrationId: string): Promise<TeamWarningStatus> {
+  const supabase = await createSupabaseServerClient();
+  const [{ count }, { data }] = await Promise.all([
+    supabase.from("cp_focus_events").select("id", { count: "exact", head: true }).eq("registration_id", registrationId).eq("is_warning", true),
+    supabase.from("registrations").select("disqualified_at, disqualification_reason").eq("id", registrationId).maybeSingle(),
+  ]);
+  return { warnings: count ?? 0, disqualifiedAt: data?.disqualified_at ?? null, reason: data?.disqualification_reason ?? null };
+}
+
 // Every time one team left the contest page, newest first, with the same filters as the summary.
 export async function listTeamFocusEvents(competitionId: string, filters: FocusFilters & { team: string }): Promise<FocusEventRow[]> {
   const supabase = await createSupabaseServerClient();
   let query = supabase
     .from("cp_focus_events")
-    .select("id, kind, left_at, returned_at, returned_by_reload, duration_ms, member:profiles ( full_name, email ), problem:cp_problems ( level, title )")
+    .select("id, kind, left_at, returned_at, returned_by_reload, duration_ms, is_warning, member:profiles ( full_name, email ), problem:cp_problems ( level, title )")
     .eq("competition_id", competitionId)
     .eq("registration_id", filters.team)
     .order("left_at", { ascending: false })
@@ -385,6 +398,7 @@ export async function listTeamFocusEvents(competitionId: string, filters: FocusF
     returnedAt: e.returned_at,
     returnedByReload: e.returned_by_reload,
     durationMs: e.duration_ms,
+    isWarning: e.is_warning,
     memberName: e.member ? e.member.full_name || e.member.email : null,
     problemTitle: e.problem ? `${e.problem.level}. ${e.problem.title}` : null,
   }));
