@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useState } from "react";
-import { ArrowRightIcon, IdCardIcon, LandmarkIcon, MailIcon, MessageCircleIcon, OctagonXIcon, SchoolIcon, TriangleAlertIcon, UserIcon, UsersIcon } from "lucide-react";
+import { ArrowRightIcon, IdCardIcon, MailIcon, MessageCircleIcon, OctagonXIcon, SchoolIcon, TriangleAlertIcon, UserIcon, UsersIcon } from "lucide-react";
 import { createRegistration, getNewRegistrationUploadSignature } from "@/lib/actions/registration";
 import { PAYMENT_PROOF_MAX_BYTES } from "@/lib/upload-limits";
 import { fieldErrorState, initialFormState } from "@/lib/form";
@@ -275,9 +275,6 @@ export function RegisterTeamForm({ competition, user, qrisUrl, fee }: RegisterTe
             {t("payment.payerName")} {requiredMark}
           </FieldLabel>
           <InputGroup className="h-12">
-            <InputGroupAddon>
-              <LandmarkIcon />
-            </InputGroupAddon>
             <InputGroupInput id="payerName" name="payerName" maxLength={100} aria-invalid={!!errors.payerName} required />
           </InputGroup>
           <FieldDescription>{t("payment.payerNameHint")}</FieldDescription>
