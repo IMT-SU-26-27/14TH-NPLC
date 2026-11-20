@@ -320,6 +320,7 @@ export type Database = {
           achieved_at: string
           points: number
           best_memory_kb: number | null
+          best_partial: number
           best_submission_id: string | null
           best_time_ms: number | null
           problem_id: string
@@ -332,6 +333,7 @@ export type Database = {
           achieved_at: string
           points: number
           best_memory_kb?: number | null
+          best_partial?: number
           best_submission_id?: string | null
           best_time_ms?: number | null
           problem_id: string
@@ -344,6 +346,7 @@ export type Database = {
           achieved_at?: string
           points?: number
           best_memory_kb?: number | null
+          best_partial?: number
           best_submission_id?: string | null
           best_time_ms?: number | null
           problem_id?: string
