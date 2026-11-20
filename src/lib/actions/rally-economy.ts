@@ -54,6 +54,7 @@ export async function saveEcoSettings(input: unknown): Promise<ActionResult> {
     round: p.round,
     round_price_step: p.roundPriceStep,
     promo_percent: p.promoPercent,
+    attacks_open: p.attacksOpen,
     updated_at: new Date().toISOString(),
   });
   if (error) return failed(error);
@@ -123,6 +124,7 @@ export async function saveEcoEvent(input: unknown): Promise<ActionResult> {
     region: p.region,
     asset_id: p.assetId,
     defense_needed: p.defenseNeeded,
+    defense_item_id: p.defenseItemId,
     is_active: p.isActive,
   };
   const supabase = await createSupabaseServerClient();

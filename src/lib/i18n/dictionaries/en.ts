@@ -511,6 +511,7 @@ export const en: Dictionary = {
       useAttack: "Choose an attack item",
       useDefense: "Choose a defense item",
       selfAttack: "A team can't attack itself",
+      attacksClosed: "Attacks between teams are closed. An admin opens them during an attack event",
       eventMissing: "This event doesn't exist or is off",
       inUse: "This is already used in the game, so it can't be deleted. Deactivate it instead",
       name: "Name must be 1-80 characters",

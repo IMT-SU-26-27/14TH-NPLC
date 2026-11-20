@@ -512,6 +512,7 @@ export const id = {
       useAttack: "Pilih item attack",
       useDefense: "Pilih item defense",
       selfAttack: "Tim tidak bisa menyerang dirinya sendiri",
+      attacksClosed: "Serangan antartim sedang ditutup. Admin membukanya saat ada event serangan",
       eventMissing: "Event tidak ada atau sedang nonaktif",
       inUse: "Data ini sudah dipakai dalam permainan, jadi tidak bisa dihapus. Nonaktifkan saja",
       name: "Nama harus 1-80 karakter",

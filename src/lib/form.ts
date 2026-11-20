@@ -40,6 +40,7 @@ const RAISED: [string, string][] = [
   ["Use an attack item", "rally.eco.useAttack"],
   ["Use a defense item", "rally.eco.useDefense"],
   ["A team cannot attack itself", "rally.eco.selfAttack"],
+  ["Attacks are closed", "rally.eco.attacksClosed"],
   ["This event does not exist or is off", "rally.eco.eventMissing"],
   ["You are already on a team", "errors.alreadyOnTeam"],
   ["End the preliminary round before starting the final", "admin.cp.final.endFirst"],

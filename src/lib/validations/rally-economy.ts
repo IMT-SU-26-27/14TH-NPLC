@@ -17,6 +17,7 @@ export const ecoSettingsSchema = z.object({
   round: z.coerce.number().int().min(1).max(100),
   roundPriceStep: z.coerce.number().min(0, "rally.eco.amount").max(1000, "rally.eco.amount"),
   promoPercent: percent,
+  attacksOpen: z.boolean(),
 });
 
 export const ecoItemSchema = z.object({
@@ -49,12 +50,14 @@ export const ecoEventSchema = z.object({
   id: z.uuid().optional(),
   name,
   description: z.string().trim().max(500),
-  effect: z.enum(["cash", "land_price", "asset_price"]),
-  // Cash: money per team (negative = loss). Prices: percent change (-50 halves it).
+  effect: z.enum(["cash", "cash_percent", "land_price", "asset_price"]),
+  // Cash: money per team (negative = loss). Cash percent and prices: percent change (-50 halves it).
   amount: z.coerce.number().min(-100_000_000, "rally.eco.amount").max(100_000_000, "rally.eco.amount"),
   region: optionalText(40),
   assetId: z.preprocess((v) => v || null, z.uuid().nullable()),
   defenseNeeded: z.coerce.number().int().min(0).max(1000),
+  // Only this defense item protects against the event (empty = any defense item).
+  defenseItemId: z.preprocess((v) => v || null, z.uuid().nullable()),
   isActive: z.boolean(),
 });
 

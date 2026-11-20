@@ -1067,6 +1067,7 @@ export type Database = {
           asset_id: string | null
           competition_id: string
           created_at: string
+          defense_item_id: string | null
           defense_needed: number
           description: string
           effect: Database["public"]["Enums"]["rally_eco_effect"]
@@ -1080,6 +1081,7 @@ export type Database = {
           asset_id?: string | null
           competition_id: string
           created_at?: string
+          defense_item_id?: string | null
           defense_needed?: number
           description?: string
           effect: Database["public"]["Enums"]["rally_eco_effect"]
@@ -1093,6 +1095,7 @@ export type Database = {
           asset_id?: string | null
           competition_id?: string
           created_at?: string
+          defense_item_id?: string | null
           defense_needed?: number
           description?: string
           effect?: Database["public"]["Enums"]["rally_eco_effect"]
@@ -1262,6 +1265,7 @@ export type Database = {
       rally_eco_settings: {
         Row: {
           competition_id: string
+          attacks_open: boolean
           finalized_at: string | null
           promo_percent: number
           round: number
@@ -1272,6 +1276,7 @@ export type Database = {
         }
         Insert: {
           competition_id: string
+          attacks_open?: boolean
           finalized_at?: string | null
           promo_percent?: number
           round?: number
@@ -1282,6 +1287,7 @@ export type Database = {
         }
         Update: {
           competition_id?: string
+          attacks_open?: boolean
           finalized_at?: string | null
           promo_percent?: number
           round?: number
@@ -2041,6 +2047,7 @@ export type Database = {
         Returns: {
           asset_value: number
           cash: number
+          item_value: number
           land_value: number
           registration_id: string
           team_name: string
@@ -2111,7 +2118,7 @@ export type Database = {
         | "internal_error"
         | "exec_format_error"
       payment_method: "qris" | "bank_transfer"
-      rally_eco_effect: "cash" | "land_price" | "asset_price"
+      rally_eco_effect: "cash" | "cash_percent" | "land_price" | "asset_price"
       rally_eco_entry_kind: "start" | "reward" | "purchase" | "sale" | "attack" | "event" | "adjust" | "final"
       rally_eco_item_kind: "attack" | "defense"
       rally_log_action: "recorded" | "undone" | "corrected" | "deleted"
@@ -2818,7 +2825,7 @@ export const Constants = {
         "exec_format_error",
       ],
       payment_method: ["qris", "bank_transfer"],
-      rally_eco_effect: ["cash", "land_price", "asset_price"],
+      rally_eco_effect: ["cash", "cash_percent", "land_price", "asset_price"],
       rally_eco_entry_kind: ["start", "reward", "purchase", "sale", "attack", "event", "adjust", "final"],
       rally_eco_item_kind: ["attack", "defense"],
       rally_log_action: ["recorded", "undone", "corrected", "deleted"],

@@ -3,16 +3,19 @@
 --   * money: a ledger per team; cash is the sum of its entries and never goes below 0
 --   * items (attack / defense, optional stock), land (region tag, price, owner, shield), assets (shares)
 --   * rounds raise every price by a step, and a promo takes a percentage off
---   * events change cash (defense items can absorb a loss), land prices by region, or asset prices
---   * at the end, land and assets convert to cash
+--   * events change cash (a fixed amount or a percentage; defense items can absorb a loss), land prices by region,
+--     or asset prices
+--   * teams attack each other only while an admin has opened attacks (during an attack event)
+--   * at the end, items, land and assets convert to cash
 -- Buying happens in a room run by the committee, so every change goes through these functions, called by an
--- admin or an LO. Participants only read: prices, their own team's cash, items, land and shares.
+-- admin or an LO. Participants only read: prices, their own team's cash, items, land and shares. Nothing here is in
+-- the realtime publication: phones and the Tech Space screen poll (about once a minute), to keep the server light.
 -- Not built yet: one device per team, and what happens when two teams attack the same land at once (row locks
 -- make the first attack win for now).
 
 create type public.rally_eco_item_kind as enum ('attack', 'defense');
 create type public.rally_eco_entry_kind as enum ('start', 'reward', 'purchase', 'sale', 'attack', 'event', 'adjust', 'final');
-create type public.rally_eco_effect as enum ('cash', 'land_price', 'asset_price');
+create type public.rally_eco_effect as enum ('cash', 'cash_percent', 'land_price', 'asset_price');
 
 -- ----- Settings, one row per Rally competition -----
 
@@ -22,6 +25,7 @@ create table public.rally_eco_settings (
   round smallint not null default 1 check (round >= 1),
   round_price_step numeric(6, 2) not null default 0 check (round_price_step >= 0), -- percent added per round
   promo_percent numeric(5, 2) not null default 0 check (promo_percent between 0 and 100),
+  attacks_open boolean not null default false, -- teams may attack each other only while this is on
   started_at timestamptz,
   finalized_at timestamptz,
   updated_at timestamptz not null default now()
@@ -74,10 +78,11 @@ create table public.rally_eco_events (
   name text not null check (char_length(name) between 1 and 80),
   description text not null default '' check (char_length(description) <= 500),
   effect public.rally_eco_effect not null,
-  amount numeric(10, 2) not null, -- cash: money per team (negative = loss); prices: percent change
+  amount numeric(10, 2) not null, -- cash: money per team (negative = loss); cash_percent and prices: percent change
   region text, -- land_price: only this region (null = all land)
   asset_id uuid references public.rally_eco_assets (id) on delete cascade, -- asset_price: only this asset (null = all)
   defense_needed integer not null default 0 check (defense_needed >= 0), -- cash loss: teams holding this many defense items lose them instead
+  defense_item_id uuid references public.rally_eco_items (id) on delete set null, -- only this defense item counts (null = any)
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -273,7 +278,7 @@ end;
 $$;
 
 -- Defense items a team holds, oldest first, to use up in that order.
-create or replace function private.rally_eco_defense_count(p_registration_id uuid)
+create or replace function private.rally_eco_defense_count(p_registration_id uuid, p_item_id uuid default null)
 returns integer
 language sql
 stable
@@ -283,10 +288,10 @@ as $$
   select coalesce(sum(inv.quantity), 0)::integer
   from public.rally_eco_inventory inv
   join public.rally_eco_items i on i.id = inv.item_id
-  where inv.registration_id = p_registration_id and i.kind = 'defense';
+  where inv.registration_id = p_registration_id and i.kind = 'defense' and (p_item_id is null or i.id = p_item_id);
 $$;
 
-create or replace function private.rally_eco_use_defense(p_registration_id uuid, p_count integer)
+create or replace function private.rally_eco_use_defense(p_registration_id uuid, p_count integer, p_item_id uuid default null)
 returns void
 language plpgsql
 security definer
@@ -301,6 +306,7 @@ begin
     from public.rally_eco_inventory inv
     join public.rally_eco_items i on i.id = inv.item_id
     where inv.registration_id = p_registration_id and i.kind = 'defense' and inv.quantity > 0
+      and (p_item_id is null or i.id = p_item_id)
     order by i.created_at, i.id
     for update of inv
   loop
@@ -384,7 +390,7 @@ begin
   values (v_event.id, v_event.competition_id, v_round, (select auth.uid()))
   returning id into v_run;
 
-  if v_event.effect = 'cash' then
+  if v_event.effect in ('cash', 'cash_percent') then
     for v_team in
       select r.id from public.registrations r
       where r.competition_id = v_event.competition_id and r.status = 'accepted'
@@ -392,15 +398,19 @@ begin
       for update
     loop
       if v_event.amount < 0 and v_event.defense_needed > 0
-         and private.rally_eco_defense_count(v_team) >= v_event.defense_needed then
-        perform private.rally_eco_use_defense(v_team, v_event.defense_needed);
+         and private.rally_eco_defense_count(v_team, v_event.defense_item_id) >= v_event.defense_needed then
+        perform private.rally_eco_use_defense(v_team, v_event.defense_needed, v_event.defense_item_id);
         continue;
       end if;
       v_cash := private.rally_eco_cash(v_team);
       -- A loss takes at most what the team has.
       perform private.rally_eco_post(
-        v_event.competition_id, v_team, greatest(round(v_event.amount)::integer, -v_cash), 'event',
-        v_event.name, p_event_run_id => v_run
+        v_event.competition_id, v_team,
+        greatest(
+          case when v_event.effect = 'cash' then round(v_event.amount) else round(v_cash * v_event.amount / 100) end::integer,
+          -v_cash
+        ),
+        'event', v_event.name, p_event_run_id => v_run
       );
       v_count := v_count + 1;
     end loop;
@@ -421,7 +431,7 @@ begin
 end;
 $$;
 
--- Ends the game: every team's land (at the current price) and shares turn into cash. Land keeps its owner, so the
+-- Ends the game: every team's items and land (at the current price) and shares turn into cash. Land keeps its owner, so the
 -- map still shows who held what.
 create or replace function public.rally_eco_finalize(p_competition_id uuid)
 returns void
@@ -453,6 +463,12 @@ begin
     where h.registration_id = v_team;
     perform private.rally_eco_post(p_competition_id, v_team, v_value, 'final', 'assets');
     update public.rally_eco_holdings set units = 0 where registration_id = v_team;
+
+    select coalesce(sum(inv.quantity * private.rally_eco_price(p_competition_id, i.price)), 0) into v_value
+    from public.rally_eco_inventory inv join public.rally_eco_items i on i.id = inv.item_id
+    where inv.registration_id = v_team;
+    perform private.rally_eco_post(p_competition_id, v_team, v_value, 'final', 'items');
+    update public.rally_eco_inventory set quantity = 0 where registration_id = v_team;
   end loop;
 end;
 $$;
@@ -635,6 +651,12 @@ begin
   if p_attacker_id = p_target_id then
     raise exception 'A team cannot attack itself' using errcode = 'P0001';
   end if;
+  if not exists (
+    select 1 from public.rally_eco_settings s join public.registrations r on r.competition_id = s.competition_id
+    where r.id = p_attacker_id and s.attacks_open
+  ) then
+    raise exception 'Attacks are closed' using errcode = 'P0001';
+  end if;
   -- Lock both teams in a fixed order so two attacks between the same teams cannot deadlock.
   v_competition := private.rally_eco_lock_team(least(p_attacker_id, p_target_id));
   if private.rally_eco_lock_team(greatest(p_attacker_id, p_target_id)) <> v_competition then
@@ -707,17 +729,23 @@ $$;
 
 -- Everything a team owns, valued at current prices. Admins and LOs see every team; a member only their own.
 create or replace function public.rally_eco_wealth(p_competition_id uuid)
-returns table (registration_id uuid, team_name text, cash integer, land_value integer, asset_value integer, total integer)
+returns table (registration_id uuid, team_name text, cash integer, item_value integer, land_value integer, asset_value integer, total integer)
 language sql
 stable
 security definer
 set search_path = ''
 as $$
-  select r.id, r.team_name, w.cash, w.land_value, w.asset_value, w.cash + w.land_value + w.asset_value
+  select r.id, r.team_name, w.cash, w.item_value, w.land_value, w.asset_value,
+    w.cash + w.item_value + w.land_value + w.asset_value
   from public.registrations r
   cross join lateral (
     select
       private.rally_eco_cash(r.id) as cash,
+      coalesce((
+        select sum(inv.quantity * private.rally_eco_price(r.competition_id, i.price))
+        from public.rally_eco_inventory inv join public.rally_eco_items i on i.id = inv.item_id
+        where inv.registration_id = r.id
+      ), 0)::integer as item_value,
       coalesce((
         select sum(private.rally_eco_price(r.competition_id, l.price)) from public.rally_eco_lands l
         where l.owner_registration_id = r.id
@@ -730,7 +758,7 @@ as $$
   ) w
   where r.competition_id = p_competition_id and r.status = 'accepted'
     and (private.is_rally_staff() or private.is_team_member(r.id))
-  order by 6 desc, r.team_name;
+  order by 7 desc, r.team_name;
 $$;
 
 -- Current prices after the round step and promo, for the shop and the teams' phones.
@@ -834,8 +862,8 @@ revoke all on function private.rally_eco_cash(uuid) from public, anon, authentic
 revoke all on function private.rally_eco_price(uuid, integer) from public, anon, authenticated;
 revoke all on function private.rally_eco_post(uuid, uuid, integer, public.rally_eco_entry_kind, text, uuid, uuid, uuid, uuid) from public, anon, authenticated;
 revoke all on function private.rally_eco_take_item(uuid, uuid, integer) from public, anon, authenticated;
-revoke all on function private.rally_eco_defense_count(uuid) from public, anon, authenticated;
-revoke all on function private.rally_eco_use_defense(uuid, integer) from public, anon, authenticated;
+revoke all on function private.rally_eco_defense_count(uuid, uuid) from public, anon, authenticated;
+revoke all on function private.rally_eco_use_defense(uuid, integer, uuid) from public, anon, authenticated;
 
 revoke all on function public.rally_eco_start(uuid) from public, anon;
 revoke all on function public.rally_eco_trigger_event(uuid) from public, anon;
@@ -859,9 +887,6 @@ grant execute on function public.rally_eco_shield_land(uuid, uuid, uuid) to auth
 grant execute on function public.rally_eco_attack(uuid, uuid, uuid, uuid) to authenticated;
 grant execute on function public.rally_eco_wealth(uuid) to authenticated;
 grant execute on function public.rally_eco_prices(uuid) to authenticated;
--- The Tech Space screen may run without a login.
+-- The Tech Space screen may run without a login; it polls these.
 grant execute on function public.rally_eco_leaderboard(uuid) to anon, authenticated;
 grant execute on function public.rally_eco_map(uuid) to anon, authenticated;
-
--- Live leaderboard and map on the Tech Space screen.
-alter publication supabase_realtime add table public.rally_eco_ledger, public.rally_eco_lands;
