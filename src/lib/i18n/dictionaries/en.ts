@@ -1065,7 +1065,7 @@ export const en: Dictionary = {
       cooldown: "Wait between submissions (seconds)",
       cooldownHint: "Per team. 0 means no wait.",
       wrongPenalty: "Wrong answer penalty (points)",
-      wrongPenaltyHint: "Taken off for every submission that is not Accepted. Guidebook: 10. Applies to submissions from now on.",
+      wrongPenaltyHint: "Taken off for every submission that is not Accepted. 0 = no penalty (decided 20 Nov). Applies to submissions from now on.",
       penalizeCompileError: "Penalise compile errors",
       penalizeCompileErrorHint: "The guidebook counts a compile error as a wrong answer. Errors from the judge server never cost points.",
       settingsSaved: "Settings saved",
@@ -1374,7 +1374,7 @@ export const en: Dictionary = {
         colScore: "Score",
         colRuntime: "Total runtime (s)",
         colMemory: "Total memory (MB)",
-        footnote: "Total runtime = sum of the best runtime for each Accepted problem. Every wrong answer costs 10 points, but a total never goes below 0.",
+        footnote: "Problem score = points × tests passed ÷ total tests, from the best submission. Total runtime = sum of the best runtime for each Accepted problem.",
         empty: "No teams on the leaderboard yet",
       },
       qualification: {
