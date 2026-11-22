@@ -7,7 +7,7 @@ export const EARLY_BIRD = {
   fee: 85_000,
   // Date-only, WIB. The price is valid through the whole last day.
   startsOn: "2026-11-10",
-  endsOn: "2026-11-23",
+  endsOn: "2026-11-29",
 } as const;
 
 // Google Drive folder with the CP and Rally guidebook PDFs.
