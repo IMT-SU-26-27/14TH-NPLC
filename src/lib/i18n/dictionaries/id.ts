@@ -233,7 +233,7 @@ export const id = {
         },
         {
           q: "Kapan pendaftaran dibuka dan ditutup?",
-          a: "Pendaftaran dibuka 10 November 2026 dan ditutup 10 Januari 2027. Early bird berlaku hingga 23 November 2026.",
+          a: "Pendaftaran dibuka 10 November 2026 dan ditutup 10 Januari 2027. Early bird berlaku hingga 29 November 2026.",
         },
         {
           q: "Kapan babak Competitive Programming diadakan?",
