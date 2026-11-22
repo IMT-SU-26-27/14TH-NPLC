@@ -232,7 +232,7 @@ export const en: Dictionary = {
         },
         {
           q: "When does registration open and close?",
-          a: "Registration opens on 10 November 2026 and closes on 10 January 2027. The early-bird price applies until 23 November 2026.",
+          a: "Registration opens on 10 November 2026 and closes on 10 January 2027. The early-bird price applies until 29 November 2026.",
         },
         {
           q: "When is the Competitive Programming round held?",
