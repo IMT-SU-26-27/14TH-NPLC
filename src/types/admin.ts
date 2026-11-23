@@ -145,6 +145,18 @@ export type PaymentProofButtonProps = {
   registrationId: string;
 };
 
+export type ProofFileSource = {
+  id: string;
+  team_name: string;
+  payment_proof_public_id: string | null;
+  payment_proof_format: string | null;
+};
+
+export type RegistrationExportRow = Tables<"registration_overview"> & {
+  payer_name: string | null;
+  proof_file: string | null;
+};
+
 export type QrisInput = z.infer<typeof qrisSchema>;
 
 // Admin list: every column but the WhatsApp group link, which only the admin form reads (through a function).

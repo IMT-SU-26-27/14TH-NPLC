@@ -4,10 +4,14 @@ import { refresh, updateTag } from "next/cache";
 import { COMPETITIONS_TAG } from "@/lib/data/competitions";
 import { after } from "next/server";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { hasRegistration } from "@/lib/data/registrations";
+import { zipSync } from "fflate";
 import { deleteAsset, privateAssetUrl } from "@/lib/cloudinary/server";
+import { proofFileNames } from "@/lib/proof-file-name";
+import { registrationsXlsx } from "@/lib/registrations-xlsx";
 import { notifyRegistrationReviewed } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
 import { localePath } from "@/lib/i18n/config";
@@ -193,4 +197,64 @@ export async function getPaymentProofUrl(registrationId: string): Promise<Action
   if (!data?.payment_proof_public_id || !data.payment_proof_format) return { ok: false, message: "admin.detail.noProof" };
 
   return { ok: true, data: privateAssetUrl(data.payment_proof_public_id, data.payment_proof_format) };
+}
+
+// Every team as an Excel workbook for finance (base64). The proof column names the file in the ZIP below.
+export async function exportRegistrationsXlsx(): Promise<ActionResult<string>> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+
+  const supabase = await createSupabaseServerClient();
+  const [overview, payments] = await Promise.all([
+    supabase.from("registration_overview").select("*").order("created_at"),
+    supabase.from("registrations").select("id, team_name, payer_name, payment_proof_public_id, payment_proof_format"),
+  ]);
+  if (overview.error || payments.error) return { ok: false, message: "errors.generic" };
+
+  const byId = new Map(payments.data.map((p) => [p.id, p]));
+  const fileNames = proofFileNames(payments.data);
+  const rows = overview.data.map((r) => {
+    const p = r.id ? byId.get(r.id) : undefined;
+    return {
+      ...r,
+      payer_name: p?.payer_name ?? null,
+      proof_file: r.id ? (fileNames.get(r.id) ?? null) : null,
+    };
+  });
+  // Each row links to the team's admin page, which shows the proof after an admin login (a link straight to the file
+  // would have to expire). Server Action requests always carry the site's Origin.
+  const origin = (await headers()).get("origin") ?? "";
+  const lang = await getRequestLocale();
+  return { ok: true, data: await registrationsXlsx(rows, lang, (id) => `${origin}${localePath(lang, `/admin/registrations/${id}`)}`) };
+}
+
+// Every uploaded payment proof as one ZIP (base64), each file named after its team (see proofFileNames). The server
+// fetches the private files from Cloudinary itself, so no link to them ever reaches the browser.
+// shortcut: builds the whole ZIP in memory, fine for a few hundred proofs; past that, stream it from a route handler.
+export async function downloadPaymentProofsZip(): Promise<ActionResult<string>> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("registrations")
+    .select("id, team_name, payment_proof_public_id, payment_proof_format")
+    .not("payment_proof_public_id", "is", null);
+  if (error) return { ok: false, message: "errors.generic" };
+  if (data.length === 0) return { ok: false, message: "admin.registrations.noProofs" };
+
+  const fileNames = proofFileNames(data);
+  const files: Record<string, Uint8Array> = {};
+  const results = await Promise.all(
+    data.map(async (r) => {
+      const name = fileNames.get(r.id);
+      if (!r.payment_proof_public_id || !name) return true;
+      const response = await fetch(privateAssetUrl(r.payment_proof_public_id, r.payment_proof_format ?? "jpg"));
+      if (!response.ok) return false;
+      files[name] = new Uint8Array(await response.arrayBuffer());
+      return true;
+    }),
+  );
+  if (results.includes(false)) return { ok: false, message: "admin.registrations.proofsFailed" };
+
+  // Images are already compressed; storing them is faster and barely bigger.
+  return { ok: true, data: Buffer.from(zipSync(files, { level: 0 })).toString("base64") };
 }
