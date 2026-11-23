@@ -3,48 +3,60 @@
 import { useTransition } from "react";
 import { DownloadIcon, FileArchiveIcon } from "lucide-react";
 import { toast } from "sonner";
-import { exportRegistrationsCsv, getPaymentProofsZipUrl } from "@/lib/actions/admin-registrations";
+import { downloadPaymentProofsZip, exportRegistrationsXlsx } from "@/lib/actions/admin-registrations";
 import { useI18n } from "@/hooks/use-i18n";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import type { ActionResult } from "@/types";
 
-// Finance asked (23 Nov) for the team list as a sheet and every payment proof in one download.
+// Saves a file a Server Action returned as base64.
+function saveBase64(data: string, name: string, type: string) {
+  const bytes = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+  const url = URL.createObjectURL(new Blob([bytes], { type }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+// Finance asked (23 Nov) for the team list as a spreadsheet and every payment proof in one download.
 export function RegistrationsExport() {
-  const [csvPending, startCsv] = useTransition();
+  const [xlsxPending, startXlsx] = useTransition();
   const [zipPending, startZip] = useTransition();
   const { t } = useI18n();
+  const today = new Date().toISOString().slice(0, 10);
 
-  function downloadCsv() {
-    startCsv(async () => {
-      const result = await exportRegistrationsCsv();
-      if (!result.ok) {
-        toast.error(t(result.message));
-        return;
-      }
-      const url = URL.createObjectURL(new Blob([result.data], { type: "text/csv;charset=utf-8" }));
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `pendaftaran-nplc-${new Date().toISOString().slice(0, 10)}.csv`;
-      link.click();
-      URL.revokeObjectURL(url);
-    });
-  }
-
-  function downloadZip() {
-    startZip(async () => {
-      const result = await getPaymentProofsZipUrl();
-      if (result.ok) window.location.href = result.data;
+  function download(action: () => Promise<ActionResult<string>>, name: string, type: string) {
+    return async () => {
+      const result = await action();
+      if (result.ok) saveBase64(result.data, name, type);
       else toast.error(t(result.message));
-    });
+    };
   }
 
   return (
     <>
-      <Button type="button" variant="outline" onClick={downloadCsv} disabled={csvPending} title={t("admin.registrations.exportHint")}>
-        {csvPending ? <Spinner /> : <DownloadIcon />}
-        {t("admin.registrations.exportCsv")}
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() =>
+          startXlsx(
+            download(exportRegistrationsXlsx, `pendaftaran-nplc-${today}.xlsx`, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+          )
+        }
+        disabled={xlsxPending}
+        title={t("admin.registrations.exportHint")}
+      >
+        {xlsxPending ? <Spinner /> : <DownloadIcon />}
+        {t("admin.registrations.exportXlsx")}
       </Button>
-      <Button type="button" variant="outline" onClick={downloadZip} disabled={zipPending}>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => startZip(download(downloadPaymentProofsZip, `bukti-transfer-nplc-${today}.zip`, "application/zip"))}
+        disabled={zipPending}
+      >
         {zipPending ? <Spinner /> : <FileArchiveIcon />}
         {t("admin.registrations.downloadProofs")}
       </Button>
