@@ -7,7 +7,9 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/data/auth";
 import { hasRegistration } from "@/lib/data/registrations";
-import { deleteAsset, privateAssetUrl } from "@/lib/cloudinary/server";
+import { deleteAsset, privateArchiveUrl, privateAssetUrl } from "@/lib/cloudinary/server";
+import { proofFileName } from "@/lib/cloudinary/proof-file-name";
+import { registrationsCsv } from "@/lib/registrations-csv";
 import { notifyRegistrationReviewed } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
 import { localePath } from "@/lib/i18n/config";
@@ -159,4 +161,40 @@ export async function getPaymentProofUrl(registrationId: string): Promise<Action
   if (!data?.payment_proof_public_id || !data.payment_proof_format) return { ok: false, message: "admin.detail.noProof" };
 
   return { ok: true, data: privateAssetUrl(data.payment_proof_public_id, data.payment_proof_format) };
+}
+
+// Every team as CSV for finance (opens in Google Sheets or Excel). The proof column names the file in the ZIP below.
+export async function exportRegistrationsCsv(): Promise<ActionResult<string>> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+
+  const supabase = await createSupabaseServerClient();
+  const [overview, payments] = await Promise.all([
+    supabase.from("registration_overview").select("*").order("created_at"),
+    supabase.from("registrations").select("id, payer_name, payment_proof_public_id, payment_proof_format"),
+  ]);
+  if (overview.error || payments.error) return { ok: false, message: "errors.generic" };
+
+  const byId = new Map(payments.data.map((p) => [p.id, p]));
+  const rows = overview.data.map((r) => {
+    const p = r.id ? byId.get(r.id) : undefined;
+    return {
+      ...r,
+      payer_name: p?.payer_name ?? null,
+      proof_file: p?.payment_proof_public_id ? proofFileName(p.payment_proof_public_id, p.payment_proof_format) : null,
+    };
+  });
+  return { ok: true, data: registrationsCsv(rows, await getRequestLocale()) };
+}
+
+// A 10-minute link that downloads every uploaded payment proof as one ZIP.
+export async function getPaymentProofsZipUrl(): Promise<ActionResult<string>> {
+  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.from("registrations").select("payment_proof_public_id").not("payment_proof_public_id", "is", null);
+  if (error) return { ok: false, message: "errors.generic" };
+  const ids = data.flatMap((r) => (r.payment_proof_public_id ? [r.payment_proof_public_id] : []));
+  if (ids.length === 0) return { ok: false, message: "admin.registrations.noProofs" };
+
+  return { ok: true, data: privateArchiveUrl(ids, "bukti-transfer-nplc") };
 }

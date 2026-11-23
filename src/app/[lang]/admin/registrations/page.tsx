@@ -9,6 +9,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RefreshButton } from "@/components/shared/refresh-button";
 import { RegistrationsSection } from "@/features/admin/components/registrations-section";
+import { RegistrationsExport } from "@/features/admin/components/registrations-export";
 import type { AdminRegistrationsPageProps } from "@/types/admin";
 
 export async function generateMetadata({ params }: AdminRegistrationsPageProps): Promise<Metadata> {
@@ -29,6 +30,7 @@ export default async function AdminRegistrationsPage({ params, searchParams }: A
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <RefreshButton />
+          <RegistrationsExport />
           <Link href={localePath(lang, "/admin/registrations/new")} className={buttonVariants()}>
             <PlusIcon />
             {t("admin.registrations.new")}
