@@ -22,6 +22,7 @@ const COLUMNS = [
   ["members", 10],
   ["payer", 24],
   ["paidAt", 18],
+  ["proofLink", 22],
   ["proofFile", 30],
   ["registeredAt", 18],
   ["code", 12],
@@ -29,7 +30,7 @@ const COLUMNS = [
 
 // Every team as an .xlsx workbook, returned base64 so a Server Action can hand it to the browser. Cells are written
 // as text or numbers (never formulas), so team names cannot run as formulas and phone numbers keep their leading 0.
-export async function registrationsXlsx(rows: RegistrationExportRow[], lang: Locale): Promise<string> {
+export async function registrationsXlsx(rows: RegistrationExportRow[], lang: Locale, teamUrl: (id: string) => string): Promise<string> {
   const t = getT(lang);
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet(t("admin.registrations.title"), { views: [{ state: "frozen", ySplit: 1 }] });
@@ -50,6 +51,7 @@ export async function registrationsXlsx(rows: RegistrationExportRow[], lang: Loc
       members: r.member_count ?? "",
       payer: r.payer_name ?? "",
       paidAt: wib(r.payment_submitted_at),
+      proofLink: r.id && r.proof_file ? { text: t("admin.registrations.csv.openProof"), hyperlink: teamUrl(r.id) } : "",
       proofFile: r.proof_file ?? "",
       registeredAt: wib(r.created_at),
       code: r.referral_code ?? "",

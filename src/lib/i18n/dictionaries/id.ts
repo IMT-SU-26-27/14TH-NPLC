@@ -790,6 +790,7 @@ export const id = {
       exportHint: "Semua tim dalam satu file Excel (.xlsx), bisa juga dibuka di Google Sheets.",
       downloadProofs: "Unduh bukti transfer (ZIP)",
       noProofs: "Belum ada bukti transfer yang diunggah.",
+      proofsFailed: "Sebagian bukti transfer gagal diambil. Coba lagi sebentar lagi.",
       csv: {
         no: "No",
         team: "Tim",
@@ -802,6 +803,8 @@ export const id = {
         members: "Jumlah anggota",
         payer: "Nama pengirim",
         paidAt: "Bukti dikirim (WIB)",
+        proofLink: "Link bukti",
+        openProof: "Buka di admin",
         proofFile: "File bukti (di ZIP)",
         registeredAt: "Daftar (WIB)",
         code: "Kode tim",
