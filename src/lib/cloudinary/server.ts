@@ -83,20 +83,6 @@ export function publicImageUrl(publicId: string): string {
   return client().url(publicId, { secure: true, fetch_format: "auto", quality: "auto" });
 }
 
-// Expiring link that downloads many private proofs as one ZIP, built by Cloudinary on request. File names inside are
-// the last part of each public_id (see proofFileName). Callers must check access first.
-// shortcut: every public_id rides in the URL, fine for a few hundred teams; past ~500 switch to uploader.create_zip.
-export function privateArchiveUrl(publicIds: string[], name: string, ttlSeconds = 600): string {
-  return client().utils.download_zip_url({
-    public_ids: publicIds,
-    type: "authenticated",
-    resource_type: "image",
-    flatten_folders: true,
-    target_public_id: name,
-    expires_at: Math.round(Date.now() / 1000) + ttlSeconds,
-  });
-}
-
 // Expiring link to a private (authenticated) payment or twibbon proof. Callers must check access first.
 export function privateAssetUrl(publicId: string, format: string, ttlSeconds = 600): string {
   return client().utils.private_download_url(publicId, format, {

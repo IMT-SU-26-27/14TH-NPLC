@@ -784,6 +784,7 @@ export const en: Dictionary = {
       exportHint: "Every team in one Excel file (.xlsx), also opens in Google Sheets.",
       downloadProofs: "Download payment proofs (ZIP)",
       noProofs: "No payment proofs uploaded yet.",
+      proofsFailed: "Some payment proofs could not be fetched. Try again in a moment.",
       csv: {
         no: "No",
         team: "Team",
@@ -796,6 +797,8 @@ export const en: Dictionary = {
         members: "Members",
         payer: "Sender name",
         paidAt: "Proof sent (WIB)",
+        proofLink: "Proof link",
+        openProof: "Open in admin",
         proofFile: "Proof file (in ZIP)",
         registeredAt: "Registered (WIB)",
         code: "Team code",
