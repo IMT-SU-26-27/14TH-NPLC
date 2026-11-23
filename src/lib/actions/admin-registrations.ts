@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/data/auth";
 import { hasRegistration } from "@/lib/data/registrations";
 import { deleteAsset, privateArchiveUrl, privateAssetUrl } from "@/lib/cloudinary/server";
 import { proofFileName } from "@/lib/cloudinary/proof-file-name";
-import { registrationsCsv } from "@/lib/registrations-csv";
+import { registrationsXlsx } from "@/lib/registrations-xlsx";
 import { notifyRegistrationReviewed } from "@/lib/push/notify";
 import { databaseErrorMessage, errorState, fieldErrorState, successState } from "@/lib/form";
 import { localePath } from "@/lib/i18n/config";
@@ -163,8 +163,8 @@ export async function getPaymentProofUrl(registrationId: string): Promise<Action
   return { ok: true, data: privateAssetUrl(data.payment_proof_public_id, data.payment_proof_format) };
 }
 
-// Every team as CSV for finance (opens in Google Sheets or Excel). The proof column names the file in the ZIP below.
-export async function exportRegistrationsCsv(): Promise<ActionResult<string>> {
+// Every team as an Excel workbook for finance (base64). The proof column names the file in the ZIP below.
+export async function exportRegistrationsXlsx(): Promise<ActionResult<string>> {
   if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
 
   const supabase = await createSupabaseServerClient();
@@ -183,7 +183,7 @@ export async function exportRegistrationsCsv(): Promise<ActionResult<string>> {
       proof_file: p?.payment_proof_public_id ? proofFileName(p.payment_proof_public_id, p.payment_proof_format) : null,
     };
   });
-  return { ok: true, data: registrationsCsv(rows, await getRequestLocale()) };
+  return { ok: true, data: await registrationsXlsx(rows, await getRequestLocale()) };
 }
 
 // A 10-minute link that downloads every uploaded payment proof as one ZIP.

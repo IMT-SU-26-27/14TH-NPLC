@@ -781,8 +781,8 @@ export const id = {
       emptyTitle: "Pendaftaran tidak ditemukan",
       emptyDescription: "Coba kata kunci lain atau hapus filter.",
       summary: "Hasil: {count} · halaman {page} dari {pages}",
-      exportCsv: "Export CSV",
-      exportHint: "Semua tim, bisa dibuka di Google Sheets atau Excel.",
+      exportXlsx: "Export Excel",
+      exportHint: "Semua tim dalam satu file Excel (.xlsx), bisa juga dibuka di Google Sheets.",
       downloadProofs: "Unduh bukti transfer (ZIP)",
       noProofs: "Belum ada bukti transfer yang diunggah.",
       csv: {

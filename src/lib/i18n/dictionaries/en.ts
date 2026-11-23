@@ -780,8 +780,8 @@ export const en: Dictionary = {
       emptyTitle: "No registrations found",
       emptyDescription: "Try a different search or clear the filters.",
       summary: "Results: {count} · page {page} of {pages}",
-      exportCsv: "Export CSV",
-      exportHint: "Every team, opens in Google Sheets or Excel.",
+      exportXlsx: "Export Excel",
+      exportHint: "Every team in one Excel file (.xlsx), also opens in Google Sheets.",
       downloadProofs: "Download payment proofs (ZIP)",
       noProofs: "No payment proofs uploaded yet.",
       csv: {
