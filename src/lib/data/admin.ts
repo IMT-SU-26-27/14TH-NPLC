@@ -13,7 +13,7 @@ import type {
 
 // Every function here relies on the caller having passed requireAdmin(); RLS also limits non-admins.
 
-export const PAGE_SIZE = 25;
+export const PAGE_SIZE = 10;
 
 export async function getCompetitionStats(): Promise<CompetitionStats[]> {
   const supabase = await createSupabaseServerClient();
@@ -84,6 +84,8 @@ export async function listRegistrations(filters: RegistrationFilters): Promise<R
   }
 
   const { data, count, error } = await query;
+  // A page past the last one (e.g. ?page=3 after a filter leaves one page) is "range not satisfiable": show no rows.
+  if (error?.code === "PGRST103") return { rows: [], total: 0, page: filters.page, pageSize: PAGE_SIZE };
   if (error) throw new Error(`Could not load registrations: ${error.message}`);
   return { rows: data, total: count ?? 0, page: filters.page, pageSize: PAGE_SIZE };
 }

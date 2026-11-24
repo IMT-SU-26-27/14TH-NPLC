@@ -25,12 +25,13 @@ export function RegistrationsExport() {
   const [xlsxPending, startXlsx] = useTransition();
   const [zipPending, startZip] = useTransition();
   const { t } = useI18n();
-  const today = new Date().toISOString().slice(0, 10);
 
-  function download(action: () => Promise<ActionResult<string>>, name: string, type: string) {
+  // The date is read on click, not during render: reading the clock while rendering makes Next (Cache Components)
+  // drop this page's server-rendered content on a full load, leaving it blank.
+  function download(action: () => Promise<ActionResult<string>>, base: string, ext: string, type: string) {
     return async () => {
       const result = await action();
-      if (result.ok) saveBase64(result.data, name, type);
+      if (result.ok) saveBase64(result.data, `${base}-${new Date().toISOString().slice(0, 10)}.${ext}`, type);
       else toast.error(t(result.message));
     };
   }
@@ -42,7 +43,7 @@ export function RegistrationsExport() {
         variant="outline"
         onClick={() =>
           startXlsx(
-            download(exportRegistrationsXlsx, `pendaftaran-nplc-${today}.xlsx`, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+            download(exportRegistrationsXlsx, "pendaftaran-nplc", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
           )
         }
         disabled={xlsxPending}
@@ -54,7 +55,7 @@ export function RegistrationsExport() {
       <Button
         type="button"
         variant="outline"
-        onClick={() => startZip(download(downloadPaymentProofsZip, `bukti-transfer-nplc-${today}.zip`, "application/zip"))}
+        onClick={() => startZip(download(downloadPaymentProofsZip, "bukti-transfer-nplc", "zip", "application/zip"))}
         disabled={zipPending}
       >
         {zipPending ? <Spinner /> : <FileArchiveIcon />}
