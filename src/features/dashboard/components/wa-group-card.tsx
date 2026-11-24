@@ -29,7 +29,7 @@ export function WaGroupCard({ group, lang }: WaGroupCardProps) {
         href={INSTAGRAM.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="focus-visible:ring-ring/50 inline-flex items-center gap-2 rounded-sm text-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3"
+        className="focus-visible:ring-ring/50 mx-auto flex w-fit items-center gap-2 rounded-sm text-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3"
       >
         <InstagramIcon aria-hidden className="text-primary size-4 shrink-0" />
         {t("dashboard.nextInstagram", { handle: INSTAGRAM.handle })}
