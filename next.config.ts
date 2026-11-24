@@ -22,9 +22,18 @@ const nextConfig: NextConfig = {
       { source: "/register/category-2", destination: "/register/logic-rally-games", permanent: true },
     ];
   },
-  // The push service worker must never be served stale.
+  poweredByHeader: false,
   async headers() {
     return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+      // The push service worker must never be served stale.
       {
         source: "/sw.js",
         headers: [
