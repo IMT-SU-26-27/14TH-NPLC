@@ -68,7 +68,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | Table | What it holds |
 |---|---|
 | `profiles` | One row per account, created automatically on sign-up. `role` is `participant`, `admin` or `lo`. Users can edit their name and avatar but not their role or email. |
-| `competitions` | Each competition: `type` (`competitive_programming` or `logic`), `sort_order` (display order, lowest first), `description` and `description_en` (English, optional; the `/en` pages fall back to `description`), team size (`min_members` to `max_members`, leader included; a fixed size such as Logic Rally Games 3 to 3 sets both to the same number; joining is refused at `max_members`, and accepting a team is refused below `min_members`), `max_teams` (team quota, null = no limit), `wa_group_url` (participants' WhatsApp group invite, `https://chat.whatsapp.com/…`; not readable through the API, see below), `fee` in rupiah, `twibbon_url` (optional), `qris_public_id` (Cloudinary), registration window, `is_active`. |
+| `competitions` | Each competition: `type` (`competitive_programming` or `logic`), `sort_order` (display order, lowest first), `description` and `description_en` (English, optional; the `/en` pages fall back to `description`), team size (`min_members` to `max_members`, leader included; a fixed size such as Logic Rally Games 3 to 3 sets both to the same number; joining is refused at `max_members`, and accepting a team is refused below `min_members`), `max_teams` (team quota, null = no limit), `wa_group_url` (participants' WhatsApp group invite, `https://chat.whatsapp.com/…`; not readable through the API, see below), `fee` in rupiah, `twibbon_url` (optional), `qris_public_id` (Cloudinary), registration window, `is_active`, `single_device` (one device per team on the contest pages, default true; see [One device per team](#one-device-per-team)). |
 | `registrations` | One team in one competition: `team_name`, `school`, `line_id` (the contact person's LINE ID; no longer asked for since 2026-11-08, so only some teams from before then have one; fixed for participants; `school` is required for new teams), `leader_id`, `referral_code` (unique 8-character code members join with), `status`, payment proof (Cloudinary `public_id` + format), `rejection_reason`, reviewer. Team names are unique per competition (case-insensitive) and can't be changed by participants. | `disqualified_at` / `disqualification_reason` / `disqualified_by`: set by an admin when the team broke the rules (separate from `status`, which stays `accepted`); the team then cannot submit CP solutions or receive Rally results and is hidden from the participants' leaderboards. Lifting it clears all three; no result is deleted.
 | `registration_members` | Everyone on the team, leader included (`is_leader`). Every member is an account (`user_id`). Name, email (taken from the account), phone (WhatsApp, required for every member since 2026-11-08; older members may have none), 10-digit NISN, twibbon post proof: `twibbon_post_url`, the link to the Instagram post (since 2026-11-08), or for older members an uploaded screenshot (Cloudinary `public_id` + format); required on join and register once the competition has a `twibbon_url`. A person (account, NISN or email) can be on only one team across all competitions, enforced by unique indexes. |
 | `registration_events` | The timeline on the participant dashboard. Written automatically on every status change; the rejection reason is stored as the event's `note`. |
@@ -127,6 +127,8 @@ All changes to results go through these functions, and direct writes are refused
 | `cp_finalists` | The teams an admin picked for the final. Teams read their own row only after `cp_sessions.finalists_announced_at` is set. |
 | `cp_round_results` | Standings of a finished round, archived by `cp_start_final()` with their rank. Teams read their own row. |
 | `cp_leaderboard_snapshots` | Copy of `cp_scores` taken when the leaderboard is frozen (`cp_sessions.leaderboard_frozen_at` set, by an admin or by the last-hour cut-off), deleted on unfreeze. Participants read this instead of `cp_scores` while frozen. |
+| `team_devices` | One row per team that opened a contest page: the device (browser) holding it (`device_id`, `user_id`, `label` such as "Chrome · Windows", `claimed_at`, `seen_at`), a request from another device waiting for an answer (`pending_*`), and the last request that was rejected or expired (`answered_*`, `answer`). Written only by the `team_device_*` functions. |
+| `team_device_events` | Log of every change: `claimed`, `took_over_offline`, `requested`, `approved`, `rejected`, `expired`, `admin_reset`, with who acted and the device it is about. |
 | `cp_focus_events` | One row each time a participant left the contest page while the contest was live: `kind` (`tab_hidden` another tab or minimised, `window_blur` another app or window, `fullscreen_exit` not in fullscreen), `left_at`, `returned_at` (null while away), `duration_ms` (generated), the problem open at the time, and `returned_by_reload` when the page closed while away and was loaded again. Written by the server for the participant's own live team (at most 30 per minute per person). `is_warning` marks the stretches that count as a warning (see the migration); disqualification stays an admin decision. |
 
 ### Views and functions
@@ -143,6 +145,10 @@ All changes to results go through these functions, and direct writes are refused
 | `join_team(referral_code, full_name, nisn, phone?)` | Join page. Adds the signed-in user to the team. |
 | `cp_access()` | `src/proxy.ts`. Returns the caller's accepted CP teams and each contest's status. |
 | `cp_finish_if_time_up(competition_id)` | Contest timer at zero. Ends a live contest whose end time has passed; does nothing otherwise, so any signed-in user may call it. |
+| `team_device_sync(competition_id, device_id, label, request?)` | Every contest page, on load and as a heartbeat. Claims the team for this device, keeps it, or reports who holds it; `request = true` asks the active device to hand over. |
+| `team_device_answer(competition_id, device_id, approve)` | The active device's answer to a request. |
+| `team_device_allows(competition_id, device_id)` | Run/Submit server actions: false when another device holds the caller's team. |
+| `admin_team_device_reset(registration_id)` | Admin → CP → Activity. Frees a team so its next device gets in without asking. |
 | `admin_save_problem(problem, test_cases)` | Admin problem form. Saves a problem and replaces its test cases in one step. |
 
 ## Registration flow
@@ -180,6 +186,7 @@ members join with the referral code at any point while the competition's registr
 | Submissions and results | Their own team's | All |
 | Leaderboard (`cp_scores`) | Members of accepted CP teams, **only while the contest hasn't ended and the leaderboard isn't frozen** | All, always live |
 | Frozen leaderboard (`cp_leaderboard_snapshots`) | Members of accepted CP teams, only while frozen and the contest hasn't ended | All |
+| Team devices (`team_devices`, `team_device_events`) | Nobody reads them; the `team_device_*` functions return what a device needs | All, through Admin → CP → Activity |
 | Leaving the contest page (`cp_focus_events`) | Nobody reads it; rows are added through server actions for the user's own live team | All, through Admin → CP → Activity |
 
 `competitions` is read through column privileges (since `20261109120000`): `anon` and `authenticated` may select every column except `wa_group_url`. A new column on `competitions` needs its own `grant select (…)`, and `select *` on it fails from the browser and the server client; list the columns.
@@ -211,6 +218,17 @@ The rules are those of the Programming guidebook (sections 06, 08 and 11). The d
 - Leaderboard order: `total_points` descending, then `total_runtime_ms` ascending, then `total_memory_kb` ascending (then team name, so the order is stable).
 - Changing `wrong_penalty` or `penalize_compile_error` does not rescore earlier submissions.
 
+## One device per team
+
+Kenneth (26 Nov 2026): only one device of a team may use the contest website; Rally Games uses the same rule (20 Nov meeting notes B1a). Built for the CP pages; the Rally participant pages get the same guard once they exist.
+
+- A device is one browser, identified by a random id in the httpOnly `nplc_device` cookie, so tabs of one browser count as one device whoever is signed in. Clearing site data or a private window is a new device.
+- The first device of a team to open a contest page holds the team. Another device sees a lock screen and can ask; the active device gets a dialog and approves or rejects. On approval the old device is locked out. One request at a time.
+- A request not answered within 60 s expires. A holder silent for 90 s (its heartbeat is every 10 s, and immediately when the tab becomes visible) is offline, and the next device takes over without asking.
+- Run and Submit check `team_device_allows` on the server; the lock screen alone is not the enforcement. The page content is still part of the server response, so this is a barrier and a log, not a guarantee: supervision on Zoom still applies.
+- The leave-the-page monitor runs only on the active device, so a locked device never adds warnings to its team.
+- Admin → CP → Activity shows each team's device with Online/Offline, a Reset per team, the last 20 events and the `single_device` switch (off lets every device in, as before the rule).
+
 ## Last-hour freeze
 
 Participants stop seeing live standings `private.leaderboard_freeze_minutes()` minutes (60) before the end of the CP contest (`cp_sessions.scheduled_end_at`) and of the Rally Games (`rally_sessions.scheduled_end_at`). Admins always see live scores.
@@ -232,7 +250,7 @@ An extra game next to the Rally posts. The rules are a draft from the 20 Nov 202
 - **Events** (admin only, hidden from teams; admins can add one at any time during the day): `cash` gives or takes a fixed amount and `cash_percent` a percentage of each accepted team's cash (a team holding `defense_needed` defense items, of `defense_item_id` when set, loses those instead of the money); `land_price` and `asset_price` change prices by a percentage. Each run is logged in `rally_eco_event_runs`.
 - **Start** gives every accepted team its starting cash once (run it again for teams accepted later). **Finalize** turns items and land (at the current price) and shares into cash; land keeps its owner for the map. `rally_eco_wealth` shows cash, item, land and share value and the total.
 - **Who does what:** setup, start, events and finalize are admin only. Buying, attacking, shielding and giving post money go through an admin or an LO (the shop room is run by the committee). Teams read prices, their own cash, items, land and shares; the Tech Space leaderboard (`rally_eco_leaderboard`: rank, team, cash only, so land and shares stay hidden) and map (`rally_eco_map`) are readable without a login. Nothing is in the realtime publication: screens poll about once a minute, as the lecturer asked, to keep the server light.
-- **Not built yet:** one device per team, the UI screens, and the final rules from Event.
+- **Not built yet:** the UI screens and the final rules from Event. One device per team exists ([One device per team](#one-device-per-team)); the Rally participant pages get the same guard when they are built.
 
 ## Realtime
 

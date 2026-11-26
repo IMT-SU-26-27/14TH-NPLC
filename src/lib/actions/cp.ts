@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUser } from "@/lib/data/auth";
 import { Judge0Error, runOnJudge0, verdictFor } from "@/lib/judge0/server";
+import { readDeviceId } from "@/lib/team-device";
 import { codeSubmissionSchema } from "@/lib/validations/cp";
 import type { ActionResult } from "@/types";
 import type { CodeSubmissionInput, JudgeCase, JudgeProblem, JudgeSummary, SubmissionOutcome, TestOutcome } from "@/types/cp";
@@ -78,6 +79,14 @@ async function loadAccess(problemId: string) {
   const { data: access } = await supabase.rpc("cp_access");
   const row = access?.find((r) => r.competition_id === problem.competition_id);
   if (user.role !== "admin" && (!row || row.session_status !== "live")) return { error: "cp.errors.notLive" } as const;
+  if (user.role !== "admin") {
+    // One device per team: a browser without the id (nil) only passes while no device holds the team.
+    const { data: allowed } = await supabase.rpc("team_device_allows", {
+      p_competition_id: problem.competition_id,
+      p_device_id: (await readDeviceId()) ?? "00000000-0000-0000-0000-000000000000",
+    });
+    if (!allowed) return { error: "cp.errors.otherDevice" } as const;
+  }
 
   return { user, problem, registrationId: row?.registration_id ?? null } as const;
 }

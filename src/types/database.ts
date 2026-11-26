@@ -115,6 +115,7 @@ export type Database = {
           qris_public_id: string | null
           registration_closes_at: string | null
           registration_opens_at: string | null
+          single_device: boolean
           slug: string
           sort_order: number
           twibbon_url: string | null
@@ -139,6 +140,7 @@ export type Database = {
           qris_public_id?: string | null
           registration_closes_at?: string | null
           registration_opens_at?: string | null
+          single_device?: boolean
           slug: string
           sort_order?: number
           twibbon_url?: string | null
@@ -163,6 +165,7 @@ export type Database = {
           qris_public_id?: string | null
           registration_closes_at?: string | null
           registration_opens_at?: string | null
+          single_device?: boolean
           slug?: string
           sort_order?: number
           twibbon_url?: string | null
@@ -1824,6 +1827,118 @@ export type Database = {
         }
         Relationships: []
       }
+      team_device_events: {
+        Row: {
+          action: Database["public"]["Enums"]["team_device_action"]
+          created_at: string
+          id: number
+          label: string | null
+          registration_id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["team_device_action"]
+          created_at?: string
+          id?: never
+          label?: string | null
+          registration_id: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["team_device_action"]
+          created_at?: string
+          id?: never
+          label?: string | null
+          registration_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_device_events_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_device_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_devices: {
+        Row: {
+          answer: Database["public"]["Enums"]["team_device_action"] | null
+          answered_at: string | null
+          answered_device_id: string | null
+          claimed_at: string
+          device_id: string
+          label: string
+          pending_at: string | null
+          pending_device_id: string | null
+          pending_label: string | null
+          pending_user_id: string | null
+          registration_id: string
+          seen_at: string
+          user_id: string | null
+        }
+        Insert: {
+          answer?: Database["public"]["Enums"]["team_device_action"] | null
+          answered_at?: string | null
+          answered_device_id?: string | null
+          claimed_at?: string
+          device_id: string
+          label?: string
+          pending_at?: string | null
+          pending_device_id?: string | null
+          pending_label?: string | null
+          pending_user_id?: string | null
+          registration_id: string
+          seen_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          answer?: Database["public"]["Enums"]["team_device_action"] | null
+          answered_at?: string | null
+          answered_device_id?: string | null
+          claimed_at?: string
+          device_id?: string
+          label?: string
+          pending_at?: string | null
+          pending_device_id?: string | null
+          pending_label?: string | null
+          pending_user_id?: string | null
+          registration_id?: string
+          seen_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_devices_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: true
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_devices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_devices_pending_user_id_fkey"
+            columns: ["pending_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       competition_stats: {
@@ -2099,6 +2214,30 @@ export type Database = {
           twibbon_url: string
         }[]
       }
+      team_device_allows: {
+        Args: { p_competition_id: string; p_device_id: string }
+        Returns: boolean
+      }
+      team_device_answer: {
+        Args: { p_approve: boolean; p_competition_id: string; p_device_id: string }
+        Returns: string
+      }
+      team_device_sync: {
+        Args: { p_competition_id: string; p_device_id: string; p_label: string; p_request?: boolean }
+        Returns: {
+          holder_label: string | null
+          holder_name: string | null
+          holder_since: string | null
+          request_at: string | null
+          request_label: string | null
+          request_name: string | null
+          status: string
+        }[]
+      }
+      admin_team_device_reset: {
+        Args: { p_registration_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       competition_type: "competitive_programming" | "logic"
@@ -2133,6 +2272,14 @@ export type Database = {
         | "under_review"
         | "accepted"
         | "rejected"
+      team_device_action:
+        | "claimed"
+        | "took_over_offline"
+        | "requested"
+        | "approved"
+        | "rejected"
+        | "expired"
+        | "admin_reset"
       user_role: "participant" | "admin" | "lo"
     }
     CompositeTypes: {
@@ -2840,6 +2987,15 @@ export const Constants = {
         "under_review",
         "accepted",
         "rejected",
+      ],
+      team_device_action: [
+        "claimed",
+        "took_over_offline",
+        "requested",
+        "approved",
+        "rejected",
+        "expired",
+        "admin_reset",
       ],
       user_role: ["participant", "admin", "lo"],
     },

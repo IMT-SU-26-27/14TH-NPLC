@@ -16,6 +16,7 @@ import { FocusFilters } from "@/features/cp/components/focus-filters";
 import { FocusKindBadge } from "@/features/cp/components/focus-kind-badge";
 import { FocusWarningsBadge } from "@/features/cp/components/focus-warnings-badge";
 import { StillAwayBadge } from "@/features/cp/components/still-away-badge";
+import { TeamDevicesCard } from "@/features/cp/components/team-devices-card";
 import type { AdminFocusSectionProps, FocusFilters as Filters } from "@/types/cp";
 import type { Locale } from "@/types/i18n";
 
@@ -161,6 +162,7 @@ export async function AdminFocusSection({ lang, searchParams }: AdminFocusSectio
           ))}
         </div>
       )}
+      <TeamDevicesCard competitionId={selected.id} lang={lang} />
       <FocusFilters filters={filters} competitionId={selected.id} />
       {summary.length === 0 ? (
         <Empty className="border">

@@ -31,7 +31,7 @@ export async function listCompetitionOptions(): Promise<CompetitionOption[]> {
 
 // Every column the API can read: wa_group_url is left out on purpose (see migration 20261109120000).
 const ADMIN_COMPETITION_COLUMNS =
-  "id, slug, name, type, description, description_en, min_members, max_members, max_teams, fee, qris_public_id, twibbon_url, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at, is_active, sort_order, created_at, updated_at";
+  "id, slug, name, type, description, description_en, min_members, max_members, max_teams, fee, qris_public_id, twibbon_url, payment_method, bank_account_number, bank_account_holder, registration_opens_at, registration_closes_at, is_active, sort_order, single_device, created_at, updated_at";
 
 export async function listCompetitions(): Promise<AdminCompetition[]> {
   const supabase = await createSupabaseServerClient();
