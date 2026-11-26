@@ -1007,6 +1007,300 @@ export type Database = {
           },
         ]
       }
+      rally_eco_assets: {
+        Row: {
+          competition_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+        }
+        Insert: {
+          competition_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          price: number
+        }
+        Update: {
+          competition_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      rally_eco_event_runs: {
+        Row: {
+          actor_id: string
+          affected: number
+          competition_id: string
+          created_at: string
+          event_id: string
+          id: string
+          round: number
+        }
+        Insert: {
+          actor_id: string
+          affected?: number
+          competition_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+          round: number
+        }
+        Update: {
+          actor_id?: string
+          affected?: number
+          competition_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          round?: number
+        }
+        Relationships: []
+      }
+      rally_eco_events: {
+        Row: {
+          amount: number
+          asset_id: string | null
+          competition_id: string
+          created_at: string
+          defense_item_id: string | null
+          defense_needed: number
+          description: string
+          effect: Database["public"]["Enums"]["rally_eco_effect"]
+          id: string
+          is_active: boolean
+          name: string
+          region: string | null
+        }
+        Insert: {
+          amount: number
+          asset_id?: string | null
+          competition_id: string
+          created_at?: string
+          defense_item_id?: string | null
+          defense_needed?: number
+          description?: string
+          effect: Database["public"]["Enums"]["rally_eco_effect"]
+          id?: string
+          is_active?: boolean
+          name: string
+          region?: string | null
+        }
+        Update: {
+          amount?: number
+          asset_id?: string | null
+          competition_id?: string
+          created_at?: string
+          defense_item_id?: string | null
+          defense_needed?: number
+          description?: string
+          effect?: Database["public"]["Enums"]["rally_eco_effect"]
+          id?: string
+          is_active?: boolean
+          name?: string
+          region?: string | null
+        }
+        Relationships: []
+      }
+      rally_eco_holdings: {
+        Row: {
+          asset_id: string
+          registration_id: string
+          units: number
+        }
+        Insert: {
+          asset_id: string
+          registration_id: string
+          units?: number
+        }
+        Update: {
+          asset_id?: string
+          registration_id?: string
+          units?: number
+        }
+        Relationships: []
+      }
+      rally_eco_inventory: {
+        Row: {
+          item_id: string
+          quantity: number
+          registration_id: string
+        }
+        Insert: {
+          item_id: string
+          quantity?: number
+          registration_id: string
+        }
+        Update: {
+          item_id?: string
+          quantity?: number
+          registration_id?: string
+        }
+        Relationships: []
+      }
+      rally_eco_items: {
+        Row: {
+          competition_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          kind: Database["public"]["Enums"]["rally_eco_item_kind"]
+          name: string
+          power: number
+          price: number
+          stock: number | null
+        }
+        Insert: {
+          competition_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          kind: Database["public"]["Enums"]["rally_eco_item_kind"]
+          name: string
+          power?: number
+          price: number
+          stock?: number | null
+        }
+        Update: {
+          competition_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["rally_eco_item_kind"]
+          name?: string
+          power?: number
+          price?: number
+          stock?: number | null
+        }
+        Relationships: []
+      }
+      rally_eco_lands: {
+        Row: {
+          competition_id: string
+          created_at: string
+          id: string
+          map_x: number | null
+          map_y: number | null
+          name: string
+          owner_registration_id: string | null
+          price: number
+          region: string
+          shield: number
+        }
+        Insert: {
+          competition_id: string
+          created_at?: string
+          id?: string
+          map_x?: number | null
+          map_y?: number | null
+          name: string
+          owner_registration_id?: string | null
+          price: number
+          region?: string
+          shield?: number
+        }
+        Update: {
+          competition_id?: string
+          created_at?: string
+          id?: string
+          map_x?: number | null
+          map_y?: number | null
+          name?: string
+          owner_registration_id?: string | null
+          price?: number
+          region?: string
+          shield?: number
+        }
+        Relationships: []
+      }
+      rally_eco_ledger: {
+        Row: {
+          actor_id: string
+          amount: number
+          asset_id: string | null
+          competition_id: string
+          created_at: string
+          event_run_id: string | null
+          id: number
+          item_id: string | null
+          kind: Database["public"]["Enums"]["rally_eco_entry_kind"]
+          land_id: string | null
+          note: string
+          registration_id: string
+        }
+        Insert: {
+          actor_id: string
+          amount: number
+          asset_id?: string | null
+          competition_id: string
+          created_at?: string
+          event_run_id?: string | null
+          id?: number
+          item_id?: string | null
+          kind: Database["public"]["Enums"]["rally_eco_entry_kind"]
+          land_id?: string | null
+          note?: string
+          registration_id: string
+        }
+        Update: {
+          actor_id?: string
+          amount?: number
+          asset_id?: string | null
+          competition_id?: string
+          created_at?: string
+          event_run_id?: string | null
+          id?: number
+          item_id?: string | null
+          kind?: Database["public"]["Enums"]["rally_eco_entry_kind"]
+          land_id?: string | null
+          note?: string
+          registration_id?: string
+        }
+        Relationships: []
+      }
+      rally_eco_settings: {
+        Row: {
+          competition_id: string
+          attacks_open: boolean
+          finalized_at: string | null
+          promo_percent: number
+          round: number
+          round_price_step: number
+          started_at: string | null
+          starting_cash: number
+          updated_at: string
+        }
+        Insert: {
+          competition_id: string
+          attacks_open?: boolean
+          finalized_at?: string | null
+          promo_percent?: number
+          round?: number
+          round_price_step?: number
+          started_at?: string | null
+          starting_cash?: number
+          updated_at?: string
+        }
+        Update: {
+          competition_id?: string
+          attacks_open?: boolean
+          finalized_at?: string | null
+          promo_percent?: number
+          round?: number
+          round_price_step?: number
+          started_at?: string | null
+          starting_cash?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rally_post_assignments: {
         Row: {
           created_at: string
@@ -1705,6 +1999,64 @@ export type Database = {
           undo_until: string | null
         }[]
       }
+      rally_eco_attack: {
+        Args: { p_attacker_id: string; p_item_id: string; p_land_id?: string | null; p_target_id: string }
+        Returns: string
+      }
+      rally_eco_buy_item: {
+        Args: { p_item_id: string; p_quantity?: number; p_registration_id: string }
+        Returns: number
+      }
+      rally_eco_buy_land: {
+        Args: { p_land_id: string; p_registration_id: string }
+        Returns: number
+      }
+      rally_eco_finalize: { Args: { p_competition_id: string }; Returns: undefined }
+      rally_eco_grant: {
+        Args: { p_amount: number; p_note?: string; p_registration_id: string }
+        Returns: number
+      }
+      rally_eco_leaderboard: {
+        Args: { p_competition_id: string }
+        Returns: { cash: number; rank: number; team_name: string }[]
+      }
+      rally_eco_map: {
+        Args: { p_competition_id: string }
+        Returns: {
+          land_id: string
+          map_x: number | null
+          map_y: number | null
+          name: string
+          owner_team: string | null
+          region: string
+        }[]
+      }
+      rally_eco_prices: {
+        Args: { p_competition_id: string }
+        Returns: { id: string; kind: string; name: string; price: number; stock: number | null }[]
+      }
+      rally_eco_shield_land: {
+        Args: { p_item_id: string; p_land_id: string; p_registration_id: string }
+        Returns: number
+      }
+      rally_eco_start: { Args: { p_competition_id: string }; Returns: number }
+      rally_eco_trade_asset: {
+        Args: { p_asset_id: string; p_registration_id: string; p_units: number }
+        Returns: number
+      }
+      rally_eco_trigger_event: { Args: { p_event_id: string }; Returns: number }
+      rally_eco_wealth: {
+        Args: { p_competition_id: string }
+        Returns: {
+          asset_value: number
+          cash: number
+          item_value: number
+          land_value: number
+          registration_id: string
+          team_name: string
+          total: number
+        }[]
+      }
       rally_recent_results: {
         Args: { p_post_id: string }
         Returns: {
@@ -1769,6 +2121,9 @@ export type Database = {
         | "internal_error"
         | "exec_format_error"
       payment_method: "qris" | "bank_transfer"
+      rally_eco_effect: "cash" | "cash_percent" | "land_price" | "asset_price"
+      rally_eco_entry_kind: "start" | "reward" | "purchase" | "sale" | "attack" | "event" | "adjust" | "final"
+      rally_eco_item_kind: "attack" | "defense"
       rally_log_action: "recorded" | "undone" | "corrected" | "deleted"
       rally_outcome: "win" | "lose" | "draw"
       rally_post_kind: "physical" | "digital"
@@ -2473,6 +2828,9 @@ export const Constants = {
         "exec_format_error",
       ],
       payment_method: ["qris", "bank_transfer"],
+      rally_eco_effect: ["cash", "cash_percent", "land_price", "asset_price"],
+      rally_eco_entry_kind: ["start", "reward", "purchase", "sale", "attack", "event", "adjust", "final"],
+      rally_eco_item_kind: ["attack", "defense"],
       rally_log_action: ["recorded", "undone", "corrected", "deleted"],
       rally_outcome: ["win", "lose", "draw"],
       rally_post_kind: ["physical", "digital"],

@@ -31,6 +31,7 @@ The schema is defined in [`supabase/migrations/`](../supabase/migrations/). Star
 | `20261118130000_cp_score_floor.sql` | `cp_apply_score` clamps a team's total at 0 (Kenneth, 18 Nov 2026): penalties still reduce what the team earns, but the total never shows a negative. `cp_problem_scores` keeps the real points per problem |
 | `20261120100000_cp_partial_score.sql` | Partial credit (rapat 20 Nov 2026): a problem is worth `points × passed ÷ total`, the best submission counts (`cp_problem_scores.best_partial`), and `wrong_penalty` defaults to 0 (existing sessions set to 0). New `private.cp_partial_points`; `cp_submission_points` takes `passed` and `total`. A wrong attempt is any judged run that is not Accepted. Submissions of each session's current round are rescored |
 | `20261119100000_payment_payer_name.sql` | `registrations.payer_name`: the name on the account the fee was sent from, entered with the payment proof so finance can match the bank statement. `create_registration()` takes `p_payer_name`; a leader changes it only with a new proof (`registrations_guard_payer_name`) |
+| `20261120110000_rally_economy.sql` | Rally economy game, an extra game next to the Rally posts (rapat 20 Nov 2026; rules still a draft). Tables `rally_eco_settings`, `rally_eco_items`, `rally_eco_lands`, `rally_eco_assets`, `rally_eco_events`, `rally_eco_event_runs`, `rally_eco_inventory`, `rally_eco_holdings`, `rally_eco_ledger`; functions `rally_eco_start`, `rally_eco_trigger_event`, `rally_eco_finalize` (admin), `rally_eco_grant`, `rally_eco_buy_item`, `rally_eco_buy_land`, `rally_eco_trade_asset`, `rally_eco_shield_land`, `rally_eco_attack` (admin or LO), and reads `rally_eco_leaderboard`, `rally_eco_map`, `rally_eco_wealth`, `rally_eco_prices`. See "Rally economy game" |
 
 Where migrations are applied, and how each database keeps track:
 
@@ -81,6 +82,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | `rally_results` | One team's result at one post: `outcome` (`win`, `lose`, `draw`), `points` copied from the post when recorded, who recorded it and, after an admin correction, who corrected it (`corrected_by`, `corrected_at`; the original `recorded_by` and `recorded_at` stay). Never deleted: undo and admin changes fill `voided_at`. For now one active result per team per post (`rally_results_one_active`); replays would change this index. |
 | `rally_sessions` | One per Rally competition: `status` (`not_open`, `open`, `closed`), `leaderboard_frozen_at`, `scheduled_end_at` (when the Rally ends, set by an admin; only used for the last-hour freeze), `leaderboard_frozen_auto` and `leaderboard_released_at` (see "Last-hour freeze"). LOs can look up, record and undo only while `open`; admins can correct at any time. |
 | `rally_scores` | One row per accepted team with `total_points`, `posts_finished` and `last_result_at`, kept up to date by triggers from active results only. The order is defined in `src/lib/rally/ranking.ts`. |
+| `rally_eco_*` | The Rally economy game (see "Rally economy game"). |
 | `rally_leaderboard_snapshots` | Copy of `rally_scores` taken when an admin freezes the leaderboard. Participants read this while frozen; admins always read the live scores. |
 | `rally_result_log` | Append-only audit log: action, who, when, team, post, old and new outcome and points, reason. Admins read it; nobody can change it. |
 
@@ -218,6 +220,19 @@ Participants stop seeing live standings `private.leaderboard_freeze_minutes()` m
 - An open page reloads itself at the cut-off (`use-refresh-at`).
 - An admin can unfreeze as usual. Unfreezing after the cut-off sets `leaderboard_released_at`, so it is not frozen again until a new run (a new start of the CP contest, opening the Rally again, or a new Rally end time).
 - Applies while the CP contest is `live`/`paused` and while the Rally session is `open`. Resuming a paused CP contest moves `scheduled_end_at`, and the cut-off with it.
+
+## Rally economy game
+
+An extra game next to the Rally posts. The rules are a draft from the 20 Nov 2026 meeting, so the schema is a general foundation that later rules build on.
+
+- **Money** is a ledger (`rally_eco_ledger`): a team's cash is the sum of its entries and never goes below 0. Entries are written only by the `rally_eco_*` functions.
+- **Settings** (`rally_eco_settings`, one per competition): `starting_cash`, `round`, `round_price_step` (percent added per round, compounded), `promo_percent` and `attacks_open`. Item and land prices shown and charged are `price × (1 + step)^(round − 1) × (1 − promo)`. Share prices ignore round and promo; events move them.
+- **Items** are `attack` or `defense`, with an optional `stock`. **Land** has a `region` (events target land by region), an owner and a `shield` (defense items placed on it). **Assets** are shares bought and sold per unit.
+- **Attack** (one attack item, only while `attacks_open`: the lecturer wants attacks only during an attack event): on land, a shield absorbs it, otherwise the land changes owner; on cash, one defense item the target holds absorbs it, otherwise the target loses the item's `power` in cash. Two teams are locked in a fixed order, so the first of two simultaneous attacks wins.
+- **Events** (admin only, hidden from teams; admins can add one at any time during the day): `cash` gives or takes a fixed amount and `cash_percent` a percentage of each accepted team's cash (a team holding `defense_needed` defense items, of `defense_item_id` when set, loses those instead of the money); `land_price` and `asset_price` change prices by a percentage. Each run is logged in `rally_eco_event_runs`.
+- **Start** gives every accepted team its starting cash once (run it again for teams accepted later). **Finalize** turns items and land (at the current price) and shares into cash; land keeps its owner for the map. `rally_eco_wealth` shows cash, item, land and share value and the total.
+- **Who does what:** setup, start, events and finalize are admin only. Buying, attacking, shielding and giving post money go through an admin or an LO (the shop room is run by the committee). Teams read prices, their own cash, items, land and shares; the Tech Space leaderboard (`rally_eco_leaderboard`: rank, team, cash only, so land and shares stay hidden) and map (`rally_eco_map`) are readable without a login. Nothing is in the realtime publication: screens poll about once a minute, as the lecturer asked, to keep the server light.
+- **Not built yet:** one device per team, the UI screens, and the final rules from Event.
 
 ## Realtime
 
