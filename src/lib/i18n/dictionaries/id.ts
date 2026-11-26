@@ -1089,7 +1089,7 @@ export const id = {
       cooldown: "Jeda antar pengumpulan (detik)",
       cooldownHint: "Per tim. 0 berarti tanpa jeda.",
       wrongPenalty: "Pengurangan jawaban salah (poin)",
-      wrongPenaltyHint: "Dikurangi untuk setiap kiriman yang tidak Accepted. Guidebook: 10. Berlaku untuk kiriman berikutnya.",
+      wrongPenaltyHint: "Dikurangi untuk setiap kiriman yang tidak Accepted. 0 = tanpa pengurangan (keputusan 20 Nov). Berlaku untuk kiriman berikutnya.",
       penalizeCompileError: "Compile error ikut dikurangi",
       penalizeCompileErrorHint: "Guidebook menghitung compile error sebagai jawaban salah. Error dari server penilai tidak pernah dikurangi.",
       settingsSaved: "Pengaturan disimpan",
@@ -1398,7 +1398,7 @@ export const id = {
         colScore: "Skor",
         colRuntime: "Total runtime (dtk)",
         colMemory: "Total memori (MB)",
-        footnote: "Total runtime = jumlah runtime terbaik tiap soal Accepted. Setiap jawaban salah mengurangi skor 10, tapi skor total tidak pernah di bawah 0.",
+        footnote: "Skor soal = poin × test lolos ÷ total test, dari kiriman terbaik. Total runtime = jumlah runtime terbaik tiap soal Accepted.",
         empty: "Belum ada tim di papan peringkat",
       },
       qualification: {
