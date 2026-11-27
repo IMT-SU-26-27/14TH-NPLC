@@ -21,6 +21,7 @@ import {
   disqualifySchema,
   reviewRegistrationSchema,
   updateTeamNameSchema,
+  updateTeamSchoolSchema,
   uuidSchema,
 } from "@/lib/validations/admin";
 import type { ActionResult, FormState } from "@/types";
@@ -73,6 +74,26 @@ export async function updateTeamName(_prev: FormState, formData: FormData): Prom
 
   refresh();
   return successState("admin.detail.renamed");
+}
+
+// Schools are typed freely at sign-up, so one school arrives spelled several ways; admins tidy them here.
+export async function updateTeamSchool(_prev: FormState, formData: FormData): Promise<FormState> {
+  if (!(await isAdmin())) return errorState(NOT_ADMIN);
+  const parsed = updateTeamSchoolSchema.safeParse({
+    registrationId: formData.get("registrationId"),
+    school: formData.get("school"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("registrations")
+    .update({ school: parsed.data.school })
+    .eq("id", parsed.data.registrationId);
+  if (error) return errorState(databaseErrorMessage(error));
+
+  refresh();
+  return successState("admin.detail.schoolSaved");
 }
 
 // Disqualifies an accepted team with a reason it reads on its dashboard. Results are kept; it can be lifted.

@@ -871,6 +871,7 @@ export const en: Dictionary = {
       allowPopups: "Allow pop-ups to view the proof",
       rename: "Rename",
       renamed: "Team name updated",
+      schoolSaved: "School updated",
       members: "Members",
       removeMember: "Remove {name}?",
       removeMemberDescription: "They will be taken off this team. This can't be undone.",
