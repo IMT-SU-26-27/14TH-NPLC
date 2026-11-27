@@ -9,6 +9,8 @@ import type {
   RegistrationFilters,
   RegistrationList,
   RegistrationTrend,
+  SchoolStatRow,
+  SchoolStats,
 } from "@/types/admin";
 
 // Every function here relies on the caller having passed requireAdmin(); RLS also limits non-admins.
@@ -114,6 +116,43 @@ const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
 const wibDay = (iso: string | number) => new Date(new Date(iso).getTime() + WIB_OFFSET_MS).toISOString().slice(0, 10);
 
 // New registrations per WIB day per competition, zero-filled over the last `days` days.
+// Teams that take a place (not rejected) and their people, per school, split by competition. School is free text,
+// so names are grouped ignoring case and extra spaces; "SMAN 1" and "SMA Negeri 1" stay two schools.
+export async function getSchoolStats(): Promise<SchoolStats> {
+  const supabase = await createSupabaseServerClient();
+  const [{ data: competitions, error: cError }, { data: rows, error: rError }] = await Promise.all([
+    // Same stable order as the trend chart, so each competition keeps its colour.
+    supabase.from("competitions").select("id, name").order("type").order("created_at").order("slug"),
+    supabase.from("registration_overview").select("competition_id, school, member_count").neq("status", "rejected"),
+  ]);
+  if (cError) throw new Error(`Could not load competitions: ${cError.message}`);
+  if (rError) throw new Error(`Could not load registrations: ${rError.message}`);
+
+  const series = competitions.map((c, i) => ({ id: c.id, name: c.name, key: `c${i + 1}` }));
+  const keyFor = new Map(series.map((s) => [s.id, s.key]));
+  const bySchool = new Map<string, SchoolStatRow>();
+
+  for (const row of rows) {
+    const name = row.school?.trim().replace(/\s+/g, " ") ?? "";
+    const id = name.toLowerCase();
+    let school = bySchool.get(id);
+    if (!school) {
+      school = { school: name, teams: 0, people: 0, ...Object.fromEntries(series.map((s) => [s.key, 0])) };
+      bySchool.set(id, school);
+    }
+    const key = row.competition_id ? keyFor.get(row.competition_id) : undefined;
+    if (key) school[key] = Number(school[key]) + 1;
+    school.teams += 1;
+    school.people += row.member_count ?? 0;
+  }
+
+  // Most teams first; the unnamed group (teams from before the school field) last.
+  const schools = [...bySchool.values()].sort(
+    (a, b) => Number(a.school === "") - Number(b.school === "") || b.teams - a.teams || b.people - a.people || a.school.localeCompare(b.school),
+  );
+  return { series, schools };
+}
+
 export async function getRegistrationTrend(days = 30): Promise<RegistrationTrend> {
   const supabase = await createSupabaseServerClient();
   const since = new Date(Date.now() - (days - 1) * DAY_MS);

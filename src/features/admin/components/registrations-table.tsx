@@ -49,6 +49,7 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
                 <span className="font-medium">{row.team_name}</span>
                 {row.status && <RegistrationStatusBadge status={row.status} />}
               </span>
+              {row.school && <span className="text-sm">{row.school}</span>}
               <span className="text-muted-foreground text-xs">
                 {row.competition_name} · {row.leader_name} · {row.member_count} {t("admin.registrations.members").toLowerCase()}
               </span>
@@ -63,6 +64,7 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
           <TableHeader>
             <TableRow>
               <TableHead>{t("admin.registrations.team")}</TableHead>
+              <TableHead>{t("admin.registrations.school")}</TableHead>
               <TableHead>{t("admin.registrations.competition")}</TableHead>
               <TableHead>{t("admin.registrations.leader")}</TableHead>
               <TableHead>{t("common.nisn")}</TableHead>
@@ -87,7 +89,8 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
                   </Link>
                   <div className="text-muted-foreground font-mono text-xs">{row.referral_code}</div>
                 </TableCell>
-                <TableCell>{row.competition_name}</TableCell>
+                <TableCell className="min-w-40 max-w-56 whitespace-normal">{row.school || <span className="text-muted-foreground">–</span>}</TableCell>
+                <TableCell className="min-w-28 whitespace-normal">{row.competition_name}</TableCell>
                 <TableCell>
                   <div>{row.leader_name}</div>
                   <div className="text-muted-foreground text-xs">
