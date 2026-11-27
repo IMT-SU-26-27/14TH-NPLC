@@ -137,11 +137,14 @@ export async function getSchoolStats(): Promise<SchoolStats> {
     const id = name.toLowerCase();
     let school = bySchool.get(id);
     if (!school) {
-      school = { school: name, teams: 0, people: 0, ...Object.fromEntries(series.map((s) => [s.key, 0])) };
+      school = { school: name, teams: 0, people: 0, ...Object.fromEntries(series.flatMap((s) => [[s.key, 0], [`${s.key}People`, 0]])) };
       bySchool.set(id, school);
     }
     const key = row.competition_id ? keyFor.get(row.competition_id) : undefined;
-    if (key) school[key] = Number(school[key]) + 1;
+    if (key) {
+      school[key] = Number(school[key]) + 1;
+      school[`${key}People`] = Number(school[`${key}People`]) + (row.member_count ?? 0);
+    }
     school.teams += 1;
     school.people += row.member_count ?? 0;
   }

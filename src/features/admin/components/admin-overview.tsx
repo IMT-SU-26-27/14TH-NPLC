@@ -13,8 +13,6 @@ export async function AdminOverview({ lang }: LangProps) {
   const t = getT(lang);
   await requireAdmin();
   const [stats, trend, schools] = await Promise.all([getCompetitionStats(), getRegistrationTrend(30), getSchoolStats()]);
-  const schoolTeams = schools.schools.reduce((sum, row) => sum + row.teams, 0);
-  const schoolPeople = schools.schools.reduce((sum, row) => sum + row.people, 0);
 
   return (
     <div className="space-y-4">
@@ -45,10 +43,7 @@ export async function AdminOverview({ lang }: LangProps) {
       <Card>
         <CardHeader>
           <CardTitle>{t("admin.overview.schoolsTitle")}</CardTitle>
-          <CardDescription>
-            {t("admin.overview.schoolsLead")}{" "}
-            {t("admin.overview.schoolsSummary", { schools: schools.schools.length, teams: schoolTeams, people: schoolPeople })}
-          </CardDescription>
+          <CardDescription>{t("admin.overview.schoolsLead")}</CardDescription>
         </CardHeader>
         <CardContent>
           {schools.schools.length === 0 ? (
