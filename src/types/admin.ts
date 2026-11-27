@@ -67,6 +67,11 @@ export type RegistrationFiltersFormProps = {
   competitions: CompetitionOption[];
 };
 
+export type RegistrationRowProps = {
+  href: string;
+  children: React.ReactNode;
+};
+
 export type RegistrationsTableProps = {
   list: RegistrationList;
   filters: RegistrationFilters;
