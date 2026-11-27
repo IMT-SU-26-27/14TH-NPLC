@@ -32,6 +32,11 @@ export const updateTeamNameSchema = z.object({
   teamName: z.string().trim().min(2, "validation.teamNameMin").max(60, "validation.teamNameMax"),
 });
 
+export const updateTeamSchoolSchema = z.object({
+  registrationId: z.uuid(),
+  school: schoolSchema,
+});
+
 export const adminCreateRegistrationSchema = z.object({
   competitionId: z.uuid("validation.chooseCompetition"),
   teamName: z.string().trim().min(2, "validation.teamNameMin").max(60, "validation.teamNameMax"),
