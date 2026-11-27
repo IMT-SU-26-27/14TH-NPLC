@@ -802,6 +802,7 @@ export const id = {
       apply: "Terapkan",
       reset: "Atur ulang",
       team: "Tim",
+      school: "Sekolah",
       leader: "Ketua",
       members: "Anggota",
       paymentSubmitted: "Pembayaran dikirim",
