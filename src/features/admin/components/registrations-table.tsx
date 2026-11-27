@@ -7,6 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TablePagination } from "@/components/shared/table-pagination";
+import { RegistrationRow } from "@/features/admin/components/registration-row";
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
 import type { RegistrationFilters, RegistrationsTableProps } from "@/types/admin";
 import type { Locale } from "@/types/i18n";
@@ -70,7 +71,7 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
               <TableHead>{t("common.nisn")}</TableHead>
               <TableHead className="text-right">{t("admin.registrations.members")}</TableHead>
               <TableHead>{t("admin.registrations.status")}</TableHead>
-              <TableHead>{t("admin.registrations.paymentSubmitted")}</TableHead>
+              <TableHead className="whitespace-normal">{t("admin.registrations.paymentSubmitted")}</TableHead>
               <TableHead>
                 <span className="sr-only">{t("admin.registrations.reviewAction")}</span>
               </TableHead>
@@ -78,40 +79,36 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
           </TableHeader>
           <TableBody>
             {list.rows.map((row) => (
-              <TableRow key={row.id} className="relative">
-                <TableCell>
-                  {/* The name's link stretches over the row, so a click anywhere opens the team. */}
-                  <Link
-                    href={localePath(lang, `/admin/registrations/${row.id}`)}
-                    className="font-medium underline-offset-4 after:absolute after:inset-0 hover:underline"
-                  >
+              <RegistrationRow key={row.id} href={localePath(lang, `/admin/registrations/${row.id}`)}>
+                {/* Long names and emails wrap so the table fits and Status stays in view without scrolling sideways. */}
+                <TableCell className="max-w-56 min-w-32 whitespace-normal wrap-anywhere">
+                  <Link href={localePath(lang, `/admin/registrations/${row.id}`)} className="font-medium underline-offset-4 hover:underline">
                     {row.team_name}
                   </Link>
                   <div className="text-muted-foreground font-mono text-xs">{row.referral_code}</div>
                 </TableCell>
-                <TableCell className="min-w-40 max-w-56 whitespace-normal">{row.school || <span className="text-muted-foreground">–</span>}</TableCell>
-                <TableCell className="min-w-28 whitespace-normal">{row.competition_name}</TableCell>
-                <TableCell>
+                <TableCell className="min-w-44 whitespace-normal">{row.school}</TableCell>
+                <TableCell className="whitespace-normal">{row.competition_name}</TableCell>
+                <TableCell className="min-w-40 whitespace-normal">
                   <div>{row.leader_name}</div>
-                  <div className="text-muted-foreground text-xs">
-                    {row.leader_email} · {row.leader_phone}
-                  </div>
+                  <div className="text-muted-foreground text-xs wrap-anywhere">{row.leader_email}</div>
+                  <div className="text-muted-foreground text-xs">{row.leader_phone}</div>
                 </TableCell>
                 <TableCell className="font-mono text-xs">{row.leader_nisn}</TableCell>
                 <TableCell className="text-right tabular-nums">{row.member_count}</TableCell>
                 <TableCell>{row.status && <RegistrationStatusBadge status={row.status} />}</TableCell>
-                <TableCell className="text-muted-foreground text-xs">{formatDateTime(row.payment_submitted_at, lang)}</TableCell>
+                <TableCell className="text-muted-foreground min-w-24 text-xs whitespace-normal">{formatDateTime(row.payment_submitted_at, lang)}</TableCell>
                 <TableCell className="text-right">
                   <Link
                     href={localePath(lang, `/admin/registrations/${row.id}#review`)}
                     aria-label={t("admin.registrations.reviewTeam", { team: row.team_name ?? "" })}
-                    className={buttonVariants({ variant: "outline", size: "sm", className: "relative z-10" })}
+                    className={buttonVariants({ variant: "outline", size: "sm" })}
                   >
                     {t("admin.registrations.reviewAction")}
                     <ChevronRightIcon />
                   </Link>
                 </TableCell>
-              </TableRow>
+              </RegistrationRow>
             ))}
           </TableBody>
         </Table>

@@ -67,6 +67,11 @@ export type RegistrationFiltersFormProps = {
   competitions: CompetitionOption[];
 };
 
+export type RegistrationRowProps = {
+  href: string;
+  children: React.ReactNode;
+};
+
 export type RegistrationsTableProps = {
   list: RegistrationList;
   filters: RegistrationFilters;
@@ -113,6 +118,11 @@ export type ReviewFormProps = {
 export type TeamNameFormProps = {
   registrationId: string;
   teamName: string;
+};
+
+export type TeamSchoolFormProps = {
+  registrationId: string;
+  school: string | null;
 };
 
 export type AdminMembersTableProps = {

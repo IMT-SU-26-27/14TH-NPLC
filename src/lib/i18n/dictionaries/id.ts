@@ -797,7 +797,6 @@ export const id = {
       schoolPeople: "Peserta",
     },
     registrations: {
-      school: "Sekolah",
       title: "Pendaftaran",
       reviewAction: "Ubah status",
       reviewTeam: "Ubah status pendaftaran {team}",
@@ -812,6 +811,7 @@ export const id = {
       apply: "Terapkan",
       reset: "Atur ulang",
       team: "Tim",
+      school: "Sekolah",
       leader: "Ketua",
       members: "Anggota",
       paymentSubmitted: "Pembayaran dikirim",
@@ -882,6 +882,7 @@ export const id = {
       allowPopups: "Izinkan pop-up untuk melihat bukti",
       rename: "Ganti nama",
       renamed: "Nama tim diperbarui",
+      schoolSaved: "Asal sekolah diperbarui",
       members: "Anggota",
       removeMember: "Keluarkan {name}?",
       removeMemberDescription: "Anggota ini dikeluarkan dari tim. Tindakan ini tidak bisa dibatalkan.",

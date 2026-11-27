@@ -27,6 +27,7 @@ import { DisqualificationForm } from "@/components/shared/disqualification-form"
 import { PaymentProofButton } from "@/features/admin/components/payment-proof-button";
 import { ReviewForm } from "@/features/admin/components/review-form";
 import { TeamNameForm } from "@/features/admin/components/team-name-form";
+import { TeamSchoolForm } from "@/features/admin/components/team-school-form";
 import type { AdminIdSectionProps } from "@/types/admin";
 
 export async function RegistrationDetail({ params }: AdminIdSectionProps) {
@@ -82,21 +83,16 @@ export async function RegistrationDetail({ params }: AdminIdSectionProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <dl className="grid gap-3 text-sm sm:grid-cols-2">
-                <div>
-                  <dt className="text-muted-foreground">{t("register.school")}</dt>
-                  <dd className="font-medium">{team.school ?? "—"}</dd>
-                </div>
-                {/* LINE ID is no longer asked for; only older teams have one. */}
-                {team.line_id && (
-                  <div>
-                    <dt className="text-muted-foreground">{t("register.lineId")}</dt>
-                    <dd className="font-mono font-medium">{team.line_id}</dd>
-                  </div>
-                )}
-              </dl>
+              {/* LINE ID is no longer asked for; only older teams have one. */}
+              {team.line_id && (
+                <dl className="text-sm">
+                  <dt className="text-muted-foreground">{t("register.lineId")}</dt>
+                  <dd className="font-mono font-medium">{team.line_id}</dd>
+                </dl>
+              )}
               <AdminMembersTable team={team} />
               <TeamNameForm registrationId={team.id} teamName={team.team_name} />
+              <TeamSchoolForm registrationId={team.id} school={team.school} />
             </CardContent>
           </Card>
           <AdminTwibbonProofs team={team} lang={lang} />

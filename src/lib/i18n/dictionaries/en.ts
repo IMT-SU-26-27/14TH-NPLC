@@ -796,7 +796,6 @@ export const en: Dictionary = {
       schoolPeople: "Participants",
     },
     registrations: {
-      school: "School",
       title: "Registrations",
       reviewAction: "Review status",
       reviewTeam: "Review status for {team}",
@@ -811,6 +810,7 @@ export const en: Dictionary = {
       apply: "Apply",
       reset: "Reset",
       team: "Team",
+      school: "School",
       leader: "Leader",
       members: "Members",
       paymentSubmitted: "Payment submitted",
@@ -881,6 +881,7 @@ export const en: Dictionary = {
       allowPopups: "Allow pop-ups to view the proof",
       rename: "Rename",
       renamed: "Team name updated",
+      schoolSaved: "School updated",
       members: "Members",
       removeMember: "Remove {name}?",
       removeMemberDescription: "They will be taken off this team. This can't be undone.",
