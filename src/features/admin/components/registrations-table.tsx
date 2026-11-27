@@ -7,6 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TablePagination } from "@/components/shared/table-pagination";
+import { RegistrationRow } from "@/features/admin/components/registration-row";
 import { RegistrationStatusBadge } from "@/features/registration/components/registration-status-badge";
 import type { RegistrationFilters, RegistrationsTableProps } from "@/types/admin";
 import type { Locale } from "@/types/i18n";
@@ -76,13 +77,9 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
           </TableHeader>
           <TableBody>
             {list.rows.map((row) => (
-              <TableRow key={row.id} className="relative">
+              <RegistrationRow key={row.id} href={localePath(lang, `/admin/registrations/${row.id}`)}>
                 <TableCell>
-                  {/* The name's link stretches over the row, so a click anywhere opens the team. */}
-                  <Link
-                    href={localePath(lang, `/admin/registrations/${row.id}`)}
-                    className="font-medium underline-offset-4 after:absolute after:inset-0 hover:underline"
-                  >
+                  <Link href={localePath(lang, `/admin/registrations/${row.id}`)} className="font-medium underline-offset-4 hover:underline">
                     {row.team_name}
                   </Link>
                   <div className="text-muted-foreground font-mono text-xs">{row.referral_code}</div>
@@ -102,13 +99,13 @@ export function RegistrationsTable({ list, filters, lang }: RegistrationsTablePr
                   <Link
                     href={localePath(lang, `/admin/registrations/${row.id}#review`)}
                     aria-label={t("admin.registrations.reviewTeam", { team: row.team_name ?? "" })}
-                    className={buttonVariants({ variant: "outline", size: "sm", className: "relative z-10" })}
+                    className={buttonVariants({ variant: "outline", size: "sm" })}
                   >
                     {t("admin.registrations.reviewAction")}
                     <ChevronRightIcon />
                   </Link>
                 </TableCell>
-              </TableRow>
+              </RegistrationRow>
             ))}
           </TableBody>
         </Table>
