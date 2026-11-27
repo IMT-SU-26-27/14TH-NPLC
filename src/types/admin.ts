@@ -87,6 +87,19 @@ export type RegistrationTrendChartProps = {
   trend: RegistrationTrend;
 };
 
+// One school: total teams and people, plus teams per competition under each series key (c1, c2, ...).
+// school is "" for teams registered before the school field existed.
+export type SchoolStatRow = { school: string; teams: number; people: number } & Record<string, string | number>;
+
+export type SchoolStats = {
+  series: TrendSeries[];
+  schools: SchoolStatRow[];
+};
+
+export type SchoolChartProps = {
+  stats: SchoolStats;
+};
+
 export type DisqualificationFormProps = {
   registrationId: string;
   disqualifiedAt: string | null;
