@@ -774,6 +774,7 @@ export const en: Dictionary = {
       apply: "Apply",
       reset: "Reset",
       team: "Team",
+      school: "School",
       leader: "Leader",
       members: "Members",
       paymentSubmitted: "Payment submitted",
