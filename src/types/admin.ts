@@ -101,6 +101,11 @@ export type TeamNameFormProps = {
   teamName: string;
 };
 
+export type TeamSchoolFormProps = {
+  registrationId: string;
+  school: string | null;
+};
+
 export type AdminMembersTableProps = {
   team: AdminTeam;
 };

@@ -832,6 +832,7 @@ export const id = {
       allowPopups: "Izinkan pop-up untuk melihat bukti",
       rename: "Ganti nama",
       renamed: "Nama tim diperbarui",
+      schoolSaved: "Asal sekolah diperbarui",
       members: "Anggota",
       removeMember: "Keluarkan {name}?",
       removeMemberDescription: "Anggota ini dikeluarkan dari tim. Tindakan ini tidak bisa dibatalkan.",
