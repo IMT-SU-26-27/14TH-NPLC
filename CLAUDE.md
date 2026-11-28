@@ -60,6 +60,15 @@ src/
 - Schema changes go in a new file in `supabase/migrations/`; never edit an applied migration. Keep `docs/database.md` in sync.
 - CP submissions are judged on the server with the self-hosted Judge0 (`JUDGE0_URL`, server-only) and inserted with the service role. Never send hidden test cases or the Judge0 URL to the browser.
 
+## Performance and caching
+Contest pages are open on 50+ devices at once. These mistakes do not show on localhost with one user.
+- `"use cache"` only for data that is the same for every visitor (footer, competition list, timeline). Never cache anything read with the user's session or for one team or user: the cached result is served to every visitor, so one team would see another team's data. Tag it with `cacheTag` and call `updateTag` or `revalidateTag` in the Server Action that changes it.
+- No polling. Do not write `setInterval` or `setTimeout` loops that fetch data or call `router.refresh()`. For live data, reuse a Realtime hook in `src/hooks/` and apply the payload to state (see `use-leaderboard-realtime.ts`). Call `router.refresh()` only on a rare event such as a status change or the leaderboard freeze.
+- Reuse an existing Realtime hook before adding a channel: one channel per table per page. Realtime caps concurrent users and events per second.
+- Client components do not fetch data. Read it in a Server Component through `src/lib/data` and pass it in as props.
+- Heavy client libraries (Monaco, Recharts, the QR scanner) are imported only by the page that uses them, never from a layout or a shared component. Load them with `next/dynamic` when they are not needed on first paint.
+- Ask the Tech lead before adding a dependency.
+
 ## Files and images (Cloudinary)
 - All images and uploaded files go to Cloudinary, never Supabase Storage. Store only the Cloudinary `public_id` in the database.
 - Cloudinary helpers live in `src/lib/cloudinary/`. `CLOUDINARY_API_SECRET` is server-only; uploads are signed by a server action and sent from the browser directly to Cloudinary.
