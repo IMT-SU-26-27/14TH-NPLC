@@ -31,6 +31,13 @@ export async function getCpSessionStatus(competitionId: string): Promise<CpSessi
   return data?.status ?? null;
 }
 
+// The CP competition of the participant's accepted team, whatever the contest state; null without one.
+export async function getOwnCpCompetitionId(): Promise<string | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.rpc("cp_access");
+  return data?.[0]?.competition_id ?? null;
+}
+
 // The CP competition the signed-in user plays in (participants), or the first CP competition (admins).
 // RLS keeps participants to their own accepted team and its competition.
 export async function getContestContext(isAdmin: boolean): Promise<ContestContext | null> {
